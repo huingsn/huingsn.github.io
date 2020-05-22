@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="跨域介绍1、同源策略简介同源策略[same origin policy]是浏览器的一个安全功能，不同源的客户端脚本在没有明确授权的情况下，不能读写对方资源。 同源策略是浏览器安全的基石。   什么是源：源[origin]就是协议、域名和端口号。例如：http:&#x2F;&#x2F;www.baidu.com:80这个URL。 什么是同源：若地址里面的协议、域名和端口号均相同则属于同源。 哪些操作不受同源策略限制">
+<meta property="og:type" content="article">
+<meta property="og:title" content="跨域问题整理">
+<meta property="og:url" content="https://huyunshun.com/2019/04/23/%E8%B7%A8%E5%9F%9F%E9%97%AE%E9%A2%98%E6%95%B4%E7%90%86/index.html">
+<meta property="og:site_name" content="简">
+<meta property="og:description" content="跨域介绍1、同源策略简介同源策略[same origin policy]是浏览器的一个安全功能，不同源的客户端脚本在没有明确授权的情况下，不能读写对方资源。 同源策略是浏览器安全的基石。   什么是源：源[origin]就是协议、域名和端口号。例如：http:&#x2F;&#x2F;www.baidu.com:80这个URL。 什么是同源：若地址里面的协议、域名和端口号均相同则属于同源。 哪些操作不受同源策略限制">
+<meta property="article:published_time" content="2019-04-23T04:43:41.000Z">
+<meta property="article:modified_time" content="2020-05-20T10:04:24.691Z">
+<meta property="article:author" content="初晨">
+<meta property="article:tag" content="编程">
+<meta property="article:tag" content="开发">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://huyunshun.com/2019/04/23/跨域问题整理/"/>
+
+
+
+
+
+  <title>跨域问题整理 | 简</title>
+  
+
+
+
+
+
+
+
+
+  <script type="text/javascript" src="/js/src/love.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
+
+  <!-- 看板娘 -->
+    
+        <script async src="/live2d-widget/autoload.js"></script>
+    
+ <!-- 飘动的彩带） -->
+  <script src="/js/src/piao.js" type="text/javascript"></script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">简</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">人生短暂，学海无边，而大道至简。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://huyunshun.com/2019/04/23/%E8%B7%A8%E5%9F%9F%E9%97%AE%E9%A2%98%E6%95%B4%E7%90%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="初晨">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://img.huyunshun.com/img/20200522182348.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="简">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">跨域问题整理</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-23T12:43:41+08:00">
+                2019-04-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/spring/" itemprop="url" rel="index">
+                    <span itemprop="name">spring</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="跨域介绍"><a href="#跨域介绍" class="headerlink" title="跨域介绍"></a>跨域介绍</h2><h3 id="1、同源策略简介"><a href="#1、同源策略简介" class="headerlink" title="1、同源策略简介"></a>1、同源策略简介</h3><p>同源策略[same origin policy]是浏览器的一个安全功能，不同源的客户端脚本在没有明确授权的情况下，不能读写对方资源。 同源策略是浏览器安全的基石。  </p>
+<p>什么是源：源[origin]就是协议、域名和端口号。例如：<a href="http://www.baidu.com:80这个URL。">http://www.baidu.com:80这个URL。</a></p>
+<p>什么是同源：若地址里面的协议、域名和端口号均相同则属于同源。</p>
+<p>哪些操作不受同源策略限制    </p>
+<ul>
+<li>页面中的链接，重定向以及表单提交是不会受到同源策略限制的；</li>
+<li>跨域资源的引入是可以的。</li>
+</ul>
+<h3 id="2、跨域"><a href="#2、跨域" class="headerlink" title="2、跨域"></a>2、跨域</h3><p>受前面所讲的浏览器同源策略的影响，不是同源的脚本不能操作其他源下面的对象。想要操作另一个源下的对象就需要跨域。 在同源策略的限制下，非同源的网站之间不能发送 AJAX 请求。</p>
+<p>如何跨域？<br>降域：可以通过设置 document.damain=’a.com’，浏览器就会认为它们都是同一个源。想要实现以上任意两个页面之间的通信，两个页面必须都设置documen.damain=’a.com’。</p>
+<p>JSONP跨域<br>CORS 跨域</p>
+<h2 id="CORS-简介"><a href="#CORS-简介" class="headerlink" title="CORS 简介"></a>CORS 简介</h2><p>为了解决浏览器同源问题，W3C 提出了跨源资源共享，即 CORS(Cross-Origin Resource Sharing)。</p>
+<p>CORS 做到了两点：不破坏即有规则和服务器实现了 CORS 接口，就可以跨源通信。</p>
+<p>基于这两点，CORS 将请求分为两类：简单请求和非简单请求。   </p>
+<h3 id="1、简单请求"><a href="#1、简单请求" class="headerlink" title="1、简单请求"></a>1、简单请求</h3><p>在CORS出现前，发送HTTP请求时在头信息中不能包含任何自定义字段，且 HTTP 头信息不超过以下几个字段：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Accept</span><br><span class="line">Accept-Language</span><br><span class="line">Content-Language</span><br><span class="line">Last-Event-ID</span><br><span class="line">Content-Type 只限于 [application&#x2F;x-www-form-urlencoded 、multipart&#x2F;form-data、text&#x2F;plain ] 类型</span><br></pre></td></tr></table></figure>
+<p>一个简单的请求例子：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">GET &#x2F;test HTTP&#x2F;1.1</span><br><span class="line">Accept: *&#x2F;*</span><br><span class="line">Accept-Encoding: gzip, deflate, sdch, br</span><br><span class="line">Origin: http:&#x2F;&#x2F;www.examples.com</span><br><span class="line">Host: www.examples.com</span><br><span class="line">对于简单请求，CORS的策略是请求时在请求头中增加一个Origin字段，服务器收到请求后，根据该字段判断是否允许该请求访问。</span><br></pre></td></tr></table></figure>
+<p>如果允许，则在 HTTP 头信息中添加 Access-Control-Allow-Origin 字段，并返回正确的结果 ；<br>如果不允许，则不在 HTTP 头信息中添加 Access-Control-Allow-Origin 字段 。<br>除了上面提到的 Access-Control-Allow-Origin ，还有几个字段用于描述 CORS 返回结果 ：</p>
+<p>Access-Control-Allow-Credentials： 可选，用户是否可以发送、处理 cookie；<br>Access-Control-Expose-Headers：可选，可以让用户拿到的字段。有几个字段无论设置与否都可以拿到的，包括：Cache-Control、Content-Language、Content-Type、Expires、Last-Modified、Pragma 。   </p>
+<h3 id="2、非简单请求"><a href="#2、非简单请求" class="headerlink" title="2、非简单请求"></a>2、非简单请求</h3><p>对于非简单请求的跨源请求，浏览器会在真实请求发出前，增加一次OPTION请求，称为预检请求(preflight request)。预检请求将真实请求的信息，包括请求方法、自定义头字段、源信息添加到 HTTP 头信息字段中，询问服务器是否允许这样的操作。</p>
+<p>例如一个DELETE请求：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">OPTIONS &#x2F;test HTTP&#x2F;1.1</span><br><span class="line">Origin: http:&#x2F;&#x2F;www.examples.com</span><br><span class="line">Access-Control-Request-Method: DELETE</span><br><span class="line">Access-Control-Request-Headers: X-Custom-Header</span><br><span class="line">Host: www.examples.com</span><br></pre></td></tr></table></figure>
+<p>与 CORS 相关的字段有：</p>
+<p>请求使用的 HTTP 方法 Access-Control-Request-Method ；<br>请求中包含的自定义头字段 Access-Control-Request-Headers 。<br>服务器收到请求时，需要分别对 Origin、Access-Control-Request-Method、Access-Control-Request-Headers 进行验证，验证通过后，会在返回 HTTP头信息中添加 ：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Access-Control-Allow-Origin: http:&#x2F;&#x2F;www.examples.com</span><br><span class="line">Access-Control-Allow-Methods: GET, POST, PUT, DELETE</span><br><span class="line">Access-Control-Allow-Headers: X-Custom-Header</span><br><span class="line">Access-Control-Allow-Credentials: true</span><br><span class="line">Access-Control-Max-Age: 1728000</span><br><span class="line">他们的含义分别是：</span><br><span class="line"></span><br><span class="line">Access-Control-Allow-Methods: 真实请求允许的方法</span><br><span class="line">Access-Control-Allow-Headers: 服务器允许使用的字段</span><br><span class="line">Access-Control-Allow-Credentials: 是否允许用户发送、处理 cookie</span><br><span class="line">Access-Control-Max-Age: 预检请求的有效期，单位为秒。有效期内，不会重复发送预检请求</span><br><span class="line">当预检请求通过后，浏览器会发送真实请求到服务器。这就实现了跨源请求。</span><br></pre></td></tr></table></figure>
+
+<h2 id="跨域配置实现"><a href="#跨域配置实现" class="headerlink" title="跨域配置实现"></a>跨域配置实现</h2><h3 id="1、使用-CrossOrigin-注解实现，可以加在方法或者类上。"><a href="#1、使用-CrossOrigin-注解实现，可以加在方法或者类上。" class="headerlink" title="1、使用@CrossOrigin 注解实现，可以加在方法或者类上。"></a>1、使用@CrossOrigin 注解实现，可以加在方法或者类上。</h3><ul>
+<li>origins  ： 允许可访问的域列表</li>
+<li>maxAge：准备响应前的缓存持续的最大时间（以秒为单位）。<br>@CrossOrigin(origins = “<a href="http://domain2.com&quot;" target="_blank" rel="noopener">http://domain2.com&quot;</a>, maxAge = 3600)</li>
+</ul>
+<h3 id="2、全局配置"><a href="#2、全局配置" class="headerlink" title="2、全局配置"></a>2、全局配置</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="meta">@EnableWebMvc</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">WebMvcConfig</span> <span class="keyword">implements</span> <span class="title">WebMvcConfigurer</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addCorsMappings</span><span class="params">(CorsRegistry registry)</span> </span>&#123;</span><br><span class="line">        registry.addMapping(<span class="string">"/front/edu/study/notes/getNote.php*"</span>);</span><br><span class="line">        <span class="comment">//registry.addMapping("*");</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">    @Override</span></span><br><span class="line"><span class="comment">    public void addCorsMappings(CorsRegistry registry) &#123;</span></span><br><span class="line"><span class="comment">        registry.addMapping("/**")</span></span><br><span class="line"><span class="comment">                .allowedHeaders("Content-Type","X-Requested-With","accept,Origin","Access-Control-Request-Method","Access-Control-Request-Headers","token")</span></span><br><span class="line"><span class="comment">                .allowedMethods("*")</span></span><br><span class="line"><span class="comment">                .allowedOrigins("*")</span></span><br><span class="line"><span class="comment">                .allowCredentials(true);</span></span><br><span class="line"><span class="comment">    &#125;</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//过期，不建议使用，1.5版本为继承WebMvcConfigurerAdapter 类实现抽象方法</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">WebMvcConfig</span> <span class="keyword">extends</span> <span class="title">WebMvcConfigurerAdapter</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addCorsMappings</span><span class="params">(CorsRegistry registry)</span> </span>&#123;</span><br><span class="line">        registry.addMapping(<span class="string">"/**"</span>)</span><br><span class="line">                .allowedOrigins(<span class="string">"*"</span>)</span><br><span class="line">                .allowedMethods(<span class="string">"POST"</span>, <span class="string">"GET"</span>, <span class="string">"PUT"</span>, <span class="string">"OPTIONS"</span>, <span class="string">"DELETE"</span>)</span><br><span class="line">                .maxAge(<span class="number">3600</span>)</span><br><span class="line">                .allowCredentials(<span class="keyword">true</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3、拦截器配置"><a href="#3、拦截器配置" class="headerlink" title="3、拦截器配置"></a>3、拦截器配置</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CorsConfig</span> </span>&#123;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> CorsFilter <span class="title">corsFilter</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        UrlBasedCorsConfigurationSource source = <span class="keyword">new</span> UrlBasedCorsConfigurationSource();</span><br><span class="line">        CorsConfiguration config = <span class="keyword">new</span> CorsConfiguration();</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        config.addAllowedHeader(<span class="string">"*"</span>);</span><br><span class="line">        config.addAllowedMethod(<span class="string">"*"</span>);</span><br><span class="line">        config.setAllowCredentials(<span class="keyword">true</span>);</span><br><span class="line">        <span class="comment">//config.addAllowedOrigin("http://localhost:9000");//允许请求方</span></span><br><span class="line">        config.addAllowedOrigin(<span class="string">"*"</span>);</span><br><span class="line"></span><br><span class="line">        source.registerCorsConfiguration(<span class="string">"/front/edu/study/notes/getNote.php*"</span>, config);</span><br><span class="line">        <span class="comment">//source.registerCorsConfiguration("/**", config); // CORS 配置对所有接口都有效</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">/*FilterRegistrationBean bean = newFilterRegistrationBean(new CorsFilter(source));</span></span><br><span class="line"><span class="comment">        bean.setOrder(0);*/</span></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> CorsFilter(source);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//普通拦截器在HttpServletResponse 加上也可以</span></span><br><span class="line">          <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">preHandle</span><span class="params">(HttpServletRequest request, HttpServletResponse response, Object handler)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">                response.addHeader(<span class="string">"Access-Control-Allow-Origin"</span>, <span class="string">"*"</span>);</span><br><span class="line">                response.addHeader(<span class="string">"Access-Control-Allow-Methods"</span>, <span class="string">"GET, POST, PUT, DELETE, OPTIONS"</span>);</span><br><span class="line">                response.addHeader(<span class="string">"Access-Control-Allow-Headers"</span>,</span><br><span class="line">                        <span class="string">"Content-Type,X-Requested-With,accept,Origin,Access-Control-Request-Method,Access-Control-Request-Headers,token"</span>);</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">            &#125;</span><br></pre></td></tr></table></figure>
+<p>无论是通过哪种方式配置 CORS，都是在构造 CorsConfiguration。 一个 CORS 配置用一个 CorsConfiguration类来表示，它的定义如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CorsConfiguration</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> List&lt;String&gt; allowedOrigins;</span><br><span class="line">    <span class="keyword">private</span> List&lt;String&gt; allowedMethods;</span><br><span class="line">    <span class="keyword">private</span> List&lt;String&gt; allowedHeaders;</span><br><span class="line">    <span class="keyword">private</span> List&lt;String&gt; exposedHeaders;</span><br><span class="line">    <span class="keyword">private</span> Boolean allowCredentials;</span><br><span class="line">    <span class="keyword">private</span> Long maxAge;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Spring 中对 CORS 规则的校验，都是通过委托给 DefaultCorsProcessor实现的。</p>
+<p>DefaultCorsProcessor 处理过程如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">①判断依据是 Header中是否包含 Origin。如果包含则说明为 CORS请求，转到 2；否则，说明不是 CORS 请求，不作任何处理。</span><br><span class="line">②判断 response 的 Header 是否已经包含 Access-Control-Allow-Origin，如果包含，证明已经被处理过了, 转到 3，否则不再处理。</span><br><span class="line">③判断是否同源，如果是则转交给负责该请求的类处理</span><br><span class="line">④是否配置了 CORS 规则，如果没有配置，且是预检请求，则拒绝该请求，如果没有配置，且不是预检请求，则交给负责该请求的类处理。如果配置了，则对该请求进行校验。</span><br><span class="line">⑤校验就是根据 CorsConfiguration 这个类的配置进行判断：</span><br><span class="line"></span><br><span class="line">判断 origin 是否合法</span><br><span class="line">判断 method 是否合法</span><br><span class="line">判断 header是否合法</span><br><span class="line">如果全部合法，则在 response header中添加响应的字段，并交给负责该请求的类处理，如果不合法，则拒绝该请求。</span><br></pre></td></tr></table></figure>
+<h3 id="4、Servlet方式"><a href="#4、Servlet方式" class="headerlink" title="4、Servlet方式"></a>4、Servlet方式</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;设置允许跨域的配置</span><br><span class="line">&#x2F;&#x2F; 这里填写你允许进行跨域的主机</span><br><span class="line">rep.setHeader(&quot;Access-Control-Allow-Origin&quot;, &quot;*&quot;);</span><br><span class="line">&#x2F;&#x2F;rep.setHeader(&quot;Access-Control-Allow-Origin&quot;, &quot;*&quot;);</span><br><span class="line">rep.setHeader(&quot;Access-Control-Expose-Headers&quot;, jwtProperties.getHeader());</span><br><span class="line">&#x2F;&#x2F; 允许的访问方法</span><br><span class="line">rep.setHeader(&quot;Access-Control-Allow-Methods&quot;, &quot;POST, GET, PUT, OPTIONS, DELETE, PATCH&quot;);</span><br><span class="line">&#x2F;&#x2F; Access-Control-Max-Age 用于 CORS 相关配置的缓存</span><br><span class="line">rep.setHeader(&quot;Access-Control-Max-Age&quot;, &quot;3600&quot;);</span><br><span class="line">rep.setHeader(&quot;Access-Control-Allow-Headers&quot;, &quot;token, Origin, X-Requested-With, Content-Type, Accept&quot;);</span><br><span class="line">&#x2F;&#x2F;若要返回cookie、携带seesion等信息则将此项设置我true</span><br><span class="line">rep.setHeader(&quot;Access-Control-Allow-Credentials&quot;, &quot;true&quot;);</span><br><span class="line">&#x2F;&#x2F; 把获取的Session返回个前端Cookie</span><br><span class="line">&#x2F;&#x2F;rep.addCookie(new Cookie(&quot;JSSESIONID&quot;, session.getId()));</span><br><span class="line">chain.doFilter(req, rep);</span><br></pre></td></tr></table></figure>
+<p>到此，完成。<br>如果是其他语言，解决方式都是类似，这篇文章包含了多种语言的处理方式。<br><a href="https://segmentfault.com/a/1190000012469713" target="_blank" rel="noopener">https://segmentfault.com/a/1190000012469713</a></p>
+
+      
+    </div>
+     <!-- 相关文章推荐 -->
+    
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/23/Hibernate%20Validator%E6%A0%A1%E9%AA%8C/" rel="next" title="Hibernate Validator">
+                <i class="fa fa-chevron-left"></i> Hibernate Validator
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/04/23/jpa%E4%B8%AD%E6%89%B9%E9%87%8F%E6%9B%B4%E6%96%B0%E5%92%8C%E6%8F%92%E5%85%A5%E5%AE%9E%E7%8E%B0%E5%8F%8A%E5%A4%8D%E6%9D%82%E6%9F%A5%E8%AF%A2/" rel="prev" title="jpa中批量更新和插入实现及复杂查询.md">
+                jpa中批量更新和插入实现及复杂查询.md <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+<span class="jiathis_txt">分享到：</span>
+<a class="jiathis_button_fav">收藏夹</a>
+<a class="jiathis_button_copy">复制网址</a>
+<a class="jiathis_button_email">邮件</a>
+<a class="jiathis_button_weixin">微信</a>
+<a class="jiathis_button_qzone">QQ空间</a>
+<a class="jiathis_button_tqq">腾讯微博</a>
+<a class="jiathis_button_douban">豆瓣</a>
+<a class="jiathis_button_share">一键分享</a>
+
+<a href="http://www.jiathis.com/share?uid=2140465" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+<a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+var jiathis_config={
+  data_track_clickback:true,
+  summary:"",
+  shortUrl:false,
+  hideMore:false
+}
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://img.huyunshun.com/img/20200522182348.png"
+                alt="初晨" />
+            
+              <p class="site-author-name" itemprop="name">初晨</p>
+              <p class="site-description motion-element" itemprop="description">永远不要说你知道本质，更别说真相了。</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">249</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">46</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+<!--近期文章版块-->
+            
+                <div class="links-of-blogroll motion-element links-of-blogroll-block">
+                  <div class="links-of-blogroll-title">
+                    <!-- modify icon to fire by szw -->
+                    <i class="fa fa-history fa-" aria-hidden="true"></i>
+                    近期文章
+                  </div>
+                  <ul class="links-of-blogroll-list">
+                    
+                    
+                      <li>
+                        <a href="/2020/05/22/WebSocket%E3%80%81Socket%E3%80%81TCP%E3%80%81HTTP%E5%8C%BA%E5%88%AB/" title="WebSocket、Socket、TCP、HTTP区别" target="_blank">WebSocket、Socket、TCP、HTTP区别</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/19/Springboot%E9%A1%B9%E7%9B%AE%E7%9A%84%E6%8E%A5%E5%8F%A3%E9%98%B2%E5%88%B7/" title="Springboot项目的接口防刷" target="_blank">Springboot项目的接口防刷</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/03/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Volatile%E5%85%B3%E9%94%AE%E5%AD%97%E5%8F%8A%E5%85%B6%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/" title="深入理解Volatile关键字及其实现原理" target="_blank">深入理解Volatile关键字及其实现原理</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/04/20/%E4%BD%BF%E7%94%A8vscode%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0%E7%8E%AF%E5%A2%83/" title="使用vscode搭建个人笔记环境" target="_blank">使用vscode搭建个人笔记环境</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/01/20/HBase%E4%BB%8B%E7%BB%8D%E5%AE%89%E8%A3%85%E4%B8%8E%E6%93%8D%E4%BD%9C/" title="HBase介绍安装与操作" target="_blank">HBase介绍安装与操作</a>
+                      </li>
+                    
+                  </ul>
+                </div>
+            
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#跨域介绍"><span class="nav-number">1.</span> <span class="nav-text">跨域介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1、同源策略简介"><span class="nav-number">1.1.</span> <span class="nav-text">1、同源策略简介</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2、跨域"><span class="nav-number">1.2.</span> <span class="nav-text">2、跨域</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CORS-简介"><span class="nav-number">2.</span> <span class="nav-text">CORS 简介</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1、简单请求"><span class="nav-number">2.1.</span> <span class="nav-text">1、简单请求</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2、非简单请求"><span class="nav-number">2.2.</span> <span class="nav-text">2、非简单请求</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#跨域配置实现"><span class="nav-number">3.</span> <span class="nav-text">跨域配置实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1、使用-CrossOrigin-注解实现，可以加在方法或者类上。"><span class="nav-number">3.1.</span> <span class="nav-text">1、使用@CrossOrigin 注解实现，可以加在方法或者类上。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2、全局配置"><span class="nav-number">3.2.</span> <span class="nav-text">2、全局配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3、拦截器配置"><span class="nav-number">3.3.</span> <span class="nav-text">3、拦截器配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4、Servlet方式"><span class="nav-number">3.4.</span> <span class="nav-text">4、Servlet方式</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Copyright</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

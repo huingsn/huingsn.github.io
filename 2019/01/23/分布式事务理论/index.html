@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="事务,分布式," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="一个数据库事务通常包含了一个序列的对数据库的读&#x2F;写操作。它的存在包含有以下两个目的：  为数据库操作序列提供了一个从失败中恢复到正常状态的方法，同时提供了数据库即使在异常状态下仍能保持一致性的方法。 当多个应用程序在并发访问数据库时，可以在这些应用程序之间提供一个隔离方法，以防止彼此的操作互相干扰。  并非任意的对数据库的操作序列都是数据库事务。数据库事务拥有以下四个特性，习惯上被称之为 ACID">
+<meta property="og:type" content="article">
+<meta property="og:title" content="分布式事务理论">
+<meta property="og:url" content="https://huyunshun.com/2019/01/23/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1%E7%90%86%E8%AE%BA/index.html">
+<meta property="og:site_name" content="简">
+<meta property="og:description" content="一个数据库事务通常包含了一个序列的对数据库的读&#x2F;写操作。它的存在包含有以下两个目的：  为数据库操作序列提供了一个从失败中恢复到正常状态的方法，同时提供了数据库即使在异常状态下仍能保持一致性的方法。 当多个应用程序在并发访问数据库时，可以在这些应用程序之间提供一个隔离方法，以防止彼此的操作互相干扰。  并非任意的对数据库的操作序列都是数据库事务。数据库事务拥有以下四个特性，习惯上被称之为 ACID">
+<meta property="og:image" content="https://img.huyunshun.com/img/20200423150038.png">
+<meta property="article:published_time" content="2019-01-23T06:59:58.000Z">
+<meta property="article:modified_time" content="2020-05-20T10:04:24.694Z">
+<meta property="article:author" content="初晨">
+<meta property="article:tag" content="事务">
+<meta property="article:tag" content="分布式">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img.huyunshun.com/img/20200423150038.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://huyunshun.com/2019/01/23/分布式事务理论/"/>
+
+
+
+
+
+  <title>分布式事务理论 | 简</title>
+  
+
+
+
+
+
+
+
+
+  <script type="text/javascript" src="/js/src/love.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
+
+  <!-- 看板娘 -->
+    
+        <script async src="/live2d-widget/autoload.js"></script>
+    
+ <!-- 飘动的彩带） -->
+  <script src="/js/src/piao.js" type="text/javascript"></script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">简</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">人生短暂，学海无边，而大道至简。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://huyunshun.com/2019/01/23/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1%E7%90%86%E8%AE%BA/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="初晨">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://img.huyunshun.com/img/20200522182348.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="简">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">分布式事务理论</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-23T14:59:58+08:00">
+                2019-01-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/" itemprop="url" rel="index">
+                    <span itemprop="name">分布式</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>一个数据库事务通常包含了一个序列的对数据库的读/写操作。它的存在包含有以下两个目的：</p>
+<ul>
+<li>为数据库操作序列提供了一个从失败中恢复到正常状态的方法，同时提供了数据库即使在异常状态下仍能保持一致性的方法。</li>
+<li>当多个应用程序在并发访问数据库时，可以在这些应用程序之间提供一个隔离方法，以防止彼此的操作互相干扰。</li>
+</ul>
+<p>并非任意的对数据库的操作序列都是数据库事务。数据库事务拥有以下四个特性，习惯上被称之为 ACID特性。</p>
+<ul>
+<li>原子性（Atomicity）：事务作为一个整体被执行，包含在其中的对数据库的操作要么全部被执行，要么都不执行。</li>
+<li>一致性（Consistency）：事务应确保数据库的状态从一个一致状态转变为另一个一致状态。一致状态的含义是数据库中的数据应满足完整性约束。</li>
+<li>隔离性（Isolation）：多个事务并发执行时，一个事务的执行不应影响其他事务的执行。</li>
+<li>持久性（Durability）：已被提交的事务对数据库的修改应该永久保存在数据库中。</li>
+</ul>
+<p>对于分布式系统而言，要保证分布式系统中的数据一致性就需要一种方案，可以保证数据在子系统中始终保持一致，避免业务出现问题。这种实现方案就叫做分布式事务，要么一起成功，要么一起失败，必须是一个整体性的事务。</p>
+<p>分布式中数据设计需要遵循的理论基础：CAP 理论和 BASE 理论。</p>
+<h3 id="CAP-理论"><a href="#CAP-理论" class="headerlink" title="CAP 理论"></a>CAP 理论</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">CAP，Consistency Availability Partition tolerance 的简写：</span><br><span class="line">Consistency：一致性，对某个客户端来说，读操作能够返回最新的写操作结果。</span><br><span class="line">Availability：可用性，非故障节点在合理的时间内返回合理的响应。</span><br><span class="line">Partition tolerance：分区容错性，当出现网络分区后，系统能够继续提供服务，你知道什么是网络分区吗？</span><br></pre></td></tr></table></figure>
+<p>因为分布式系统中系统肯定部署在多台机器上，无法保证网络做到 100% 的可靠，所以 P 一定存在。</p>
+<p>在出现网络分区后，必须要在这两者之间进行取舍，因此就有了两种架构：CP 架构 和 AP 架构</p>
+<ul>
+<li>CP架构：违背了可用性的要求，只满足一致性和分区容错，即 CP，CAP 理论是忽略网络延迟，从系统 A 同步数据到系统 B 的网络延迟是忽略的。CP 架构保证了客户端在获取数据时一定是最近的写操作，或者获取到异常信息，绝不会出现数据不一致的情况。</li>
+<li>AP 架构：违背了一致性的要求，只满足可用性和分区容错，即 AP，AP 架构保证了客户端在获取数据时无论返回的是最新值还是旧值，系统一定是可用的。CAP 理论关注粒度是数据，而不是整体系统设计的策略</li>
+</ul>
+<h3 id="BASE-理论"><a href="#BASE-理论" class="headerlink" title="BASE 理论"></a>BASE 理论</h3><p>BASE 理论指的是基本可用 Basically Available，软状态 Soft State，最终一致性 Eventual Consistency，核心思想是即便无法做到强一致性，但应该采用适合的方式保证最终一致性。</p>
+<p>BASE，Basically Available  Soft State  Eventual Consistency 的简写：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">BA：Basically Available 基本可用，分布式系统在出现故障的时候，允许损失部分可用性，即保证核心可用。</span><br><span class="line">S：Soft State 软状态，允许系统存在中间状态，而该中间状态不会影响系统整体可用性。</span><br><span class="line">E：Consistency 最终一致性，系统中的所有数据副本经过一定时间后，最终能够达到一致的状态。</span><br></pre></td></tr></table></figure>
+<p>BASE 理论本质上是对 CAP 理论的延伸，是对 CAP 中 AP 方案的一个补充。</p>
+<h3 id="分布式事务协议"><a href="#分布式事务协议" class="headerlink" title="分布式事务协议"></a>分布式事务协议</h3><p>目前较为流行的分布式事务解决方案可以分为几种：</p>
+<h4 id="两阶段提交-X-Open-XA-协议"><a href="#两阶段提交-X-Open-XA-协议" class="headerlink" title="两阶段提交 X/Open XA 协议"></a>两阶段提交 X/Open XA 协议</h4><p>XA 是一个分布式事务协议，由 Tuxedo 提出。XA 规范主要定义了（全局）事务管理器（Transaction Manager）和（局部）资源管理器（Resource Manager）之间的接口。XA 接口是双向的系统接口，在事务管理器（Transaction Manager）以及一个或多个资源管理器（Resource Manager）之间形成通信桥梁。</p>
+<p><img src="https://img.huyunshun.com/img/20200423150038.png" alt="20200423150038"></p>
+<p>XA 协议采用两阶段提交方式来管理分布式事务。XA 接口提供资源管理器与事务管理器之间进行通信的标准接口。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">XA协议比较简单，而且一旦商业数据库实现了XA协议，使用分布式事务的成本也比较低。但是，XA也有致命的缺点，那就是性能不理想，特别是在交易下单链路，往往并发量很高，XA无法满足高并发场景。XA目前在商业数据库支持的比较理想，在MySQL数据库中支持的不太理想，mysql的XA实现，没有记录prepare阶段日志，主备切换回导致主库与备库数据不一致。许多nosql也没有支持XA，这让XA的应用场景变得非常狭隘。</span><br></pre></td></tr></table></figure>
+
+<h4 id="2PC：二阶段提交协议"><a href="#2PC：二阶段提交协议" class="headerlink" title="2PC：二阶段提交协议"></a>2PC：二阶段提交协议</h4><p>二阶段提交（Two-phase Commit），是指，为了使基于分布式系统架构下的所有节点在进行事务提交时保持一致性而设计的一种算法（Algorithm）。通常，二阶段提交也被称为是一种协议（Protocol）。</p>
+<p>在分布式系统中，每个节点虽然可以知晓自己的操作是成功或者失败，却无法知道其他节点的操作是成功或失败。</p>
+<p>当一个事务跨越多个节点时，为了保持事务的 ACID 特性，需要引入一个作为协调者的组件来统一掌控所有节点（称作参与者）的操作结果并最终指示这些节点是否要把操作结果进行真正的提交（比如将更新后的数据写入磁盘等等）。</p>
+<p>因此，二阶段提交的算法思路可以概括为：参与者将操作成败通知协调者，再由协调者根据所有参与者的反馈情报决定各参与者是否要提交操作还是中止操作。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">投票阶段 Prepares：</span><br><span class="line">协调者向所有参与者询问是否可以执行提交操作，并开始等待各参与者的响应。</span><br><span class="line">参与者执行事务操作，如果执行成功就返回 Yes 响应，如果执行失败就返回 No 响应。</span><br><span class="line">如果协调者接受参与者响应超时，也会认为执行事务操作失败。</span><br><span class="line"></span><br><span class="line">提交阶段 Commit：</span><br><span class="line">如果第一阶段汇总所有参与者都返回 Yes 响应，协调者向所有参与者发出提交请求，所有参与者提交事务。</span><br><span class="line">如果第一阶段中有一个或者多个参与者返回 No 响应，协调者向所有参与者发出回滚请求，所有参与者进行回滚操作。</span><br></pre></td></tr></table></figure>
+<p>二阶段提交优点：尽量保证了数据的强一致，但不是 100% 一致。</p>
+<p>二阶段提交缺点：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">单点故障，由于协调者的重要性，一旦协调者发生故障，参与者会一直阻塞，尤其是在第二阶段，协调者发生故障，那么所有的参与者都处于锁定事务资源的状态中，而无法继续完成事务操作。</span><br><span class="line">同步阻塞，由于所有节点在执行操作时都是同步阻塞的，当参与者占有公共资源时，其他第三方节点访问公共资源不得不处于阻塞状态。</span><br><span class="line">数据不一致，在第二阶段中，当协调者向参与者发送提交事务请求之后，发生了局部网络异常或者在发送提交事务请求过程中协调者发生了故障，这会导致只有一部分参与者接收到了提交事务请求。</span><br><span class="line">而在这部分参与者接到提交事务请求之后就会执行提交事务操作。但是其他部分未接收到提交事务请求的参与者则无法提交事务。从而导致分布式系统中的数据不一致。</span><br></pre></td></tr></table></figure>
+<p>二阶段提交的问题：如果协调者在第二阶段发送提交请求之后挂掉，而唯一接受到这条消息的参与者执行之后也挂掉了，即使协调者通过选举协议产生了新的协调者并通知其他参与者进行提交或回滚操作的话，都可能会与这个已经执行的参与者执行的操作不一样。</p>
+<p>当这个挂掉的参与者恢复之后，就会产生数据不一致的问题。</p>
+<h4 id="3PC：三阶段提交协议"><a href="#3PC：三阶段提交协议" class="headerlink" title="3PC：三阶段提交协议"></a>3PC：三阶段提交协议</h4><p>三阶段提交（Three-phase commit），是为解决两阶段提交协议的缺点而设计的。与两阶段提交不同的是，三阶段提交是“非阻塞”协议。</p>
+<p>三阶段提交在两阶段提交的第一阶段与第二阶段之间插入了一个准备阶段，使得原先在两阶段提交中，参与者在投票之后，由于协调者发生崩溃或错误，而导致参与者处于无法知晓是否提交或者中止的“不确定状态”所产生的可能相当长的延时的问题得以解决。</p>
+<p>三阶段提交的三个阶段：CanCommit/PreCommit/DoCommit</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">询问阶段：CanCommit</span><br><span class="line">协调者向参与者发送 Commit 请求，参与者如果可以提交就返回 Yes 响应，否则返回 No 响应。</span><br><span class="line"></span><br><span class="line">准备阶段：PreCommit</span><br><span class="line">协调者根据参与者在询问阶段的响应判断是否执行事务还是中断事务：</span><br><span class="line">如果所有参与者都返回 Yes，则执行事务。</span><br><span class="line">如果参与者有一个或多个参与者返回 No 或者超时，则中断事务。</span><br><span class="line"></span><br><span class="line">参与者执行完操作之后返回 ACK 响应，同时开始等待最终指令。</span><br><span class="line"></span><br><span class="line">③提交阶段：DoCommit</span><br><span class="line">协调者根据参与者在准备阶段的响应判断是否执行事务还是中断事务：</span><br><span class="line">如果所有参与者都返回正确的 ACK 响应，则提交事务。</span><br><span class="line">如果参与者有一个或多个参与者收到错误的 ACK 响应或者超时，则中断事务。</span><br><span class="line">如果参与者无法及时接收到来自协调者的提交或者中断事务请求时，会在等待超时之后，会继续进行事务提交。</span><br><span class="line"></span><br><span class="line">协调者收到所有参与者的 ACK 响应，完成事务。</span><br></pre></td></tr></table></figure>
+
+<p>在三阶段提交中，如果在第三阶段协调者发送提交请求之后挂掉，并且唯一的接受的参与者执行提交操作之后也挂掉了，这时协调者通过选举协议产生了新的协调者。</p>
+<p>在二阶段提交时存在的问题就是新的协调者不确定已经执行过事务的参与者是执行的提交事务还是中断事务。</p>
+<p>但是在三阶段提交时，肯定得到了第二阶段的再次确认，那么第二阶段必然是已经正确的执行了事务操作，只等待提交事务了。</p>
+<p>所以新的协调者可以从第二阶段中分析出应该执行的操作，进行提交或者中断事务操作，这样即使挂掉的参与者恢复过来，数据也是一致的。</p>
+<p>所以，三阶段提交解决了二阶段提交中存在的由于协调者和参与者同时挂掉可能导致的数据一致性问题和单点故障问题，并减少阻塞。因为一旦参与者无法及时收到来自协调者的信息之后，他会默认执行提交事务，而不会一直持有事务资源并处于阻塞状态。</p>
+<p>三阶段提交的问题：在提交阶段如果发送的是中断事务请求，但是由于网络问题，导致部分参与者没有接到请求。那么参与者会在等待超时之后执行提交事务操作，这样这些由于网络问题导致提交事务的参与者的数据就与接受到中断事务请求的参与者存在数据不一致的问题。</p>
+<h3 id="强一致性分布式事务"><a href="#强一致性分布式事务" class="headerlink" title="强一致性分布式事务"></a>强一致性分布式事务</h3><p>基于 2PC/XA 协议实现的 JTA</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Transaction Manager：常用方法，可以开启，回滚，获取事务。begin()，rollback()...</span><br><span class="line">XAResouce：资源管理，通过 Session 来进行事务管理，commit（xid）...</span><br><span class="line">XID : 每一个事务都分配一个特定的 XID。</span><br></pre></td></tr></table></figure>
+<p>JTA 主要的原理是二阶段提交，当整个业务完成了之后只是第一阶段提交，在第二阶段提交之前会检查其他所有事务是否已经提交。</p>
+<p>如果前面出现了错误或是没有提交，那么第二阶段就不会提交，而是直接回滚，这样所有的事务都会做回滚操作。基于 JTA 这种方案实现分布式事务的强一致性。</p>
+<p>JTA 的特点：基于两阶段提交，有可能会出现数据不一致的情况；事务时间过长，阻塞；性能低，吞吐量低</p>
+<h3 id="最终一致性分布式事务方案"><a href="#最终一致性分布式事务方案" class="headerlink" title="最终一致性分布式事务方案"></a>最终一致性分布式事务方案</h3><p>JTA 方案适用于单体架构多数据源时实现分布式事务，但对于微服务间的分布式事务就无能为力了，我们需要使用其他的方案实现分布式事务。</p>
+<p>本地消息表</p>
+<p>本地消息表的核心思想是将分布式事务拆分成本地事务进行处理。</p>
+<p>以本文中例子，在订单系统新增一条消息表，将新增订单和新增消息放到一个事务里完成，然后通过轮询的方式去查询消息表，将消息推送到 MQ，库存系统去消费 MQ。</p>
+<h3 id="消息事务-最终一致性"><a href="#消息事务-最终一致性" class="headerlink" title="消息事务+最终一致性"></a>消息事务+最终一致性</h3><p>基于消息中间件的两阶段提交，本质上是对消息中间件的一种特殊利用，它是将本地事务和发消息放在了一个分布式事务里，保证要么本地操作成功成功并且对外发消息成功，要么两者都失败，开源的RocketMQ就支持这一特性。具体原理如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">1、A系统向消息中间件发送一条预备消息</span><br><span class="line">2、消息中间件保存预备消息并返回成功</span><br><span class="line">3、A执行本地事务</span><br><span class="line">4、A发送提交消息给消息中间件</span><br><span class="line"></span><br><span class="line">通过以上4步完成了一个消息事务。对于以上的4个步骤，每个步骤都可能产生错误：</span><br><span class="line"></span><br><span class="line">步骤一出错，则整个事务失败，不会执行A的本地操作</span><br><span class="line">步骤二出错，则整个事务失败，不会执行A的本地操作</span><br><span class="line">步骤三出错，这时候需要回滚预备消息，怎么回滚？答案是A系统实现一个消息中间件的回调接口，消息中间件会去不断执行回调接口，检查A事务执行是否执行成功，如果失败则回滚预备消息</span><br><span class="line">步骤四出错，这时候A的本地事务是成功的，那么消息中间件要回滚A吗？答案是不需要，其实通过回调接口，消息中间件能够检查到A执行成功了，这时候其实不需要A发提交消息了，消息中间件可以自己对消息进行提交，从而完成整个消息事务</span><br><span class="line">基于消息中间件的两阶段提交往往用在高并发场景下，将一个分布式事务拆成一个消息事务（A系统的本地操作+发消息）+B系统的本地操作，其中B系统的操作由消息驱动，只要消息事务成功，那么A操作一定成功，消息也一定发出来了，这时候B会收到消息去执行本地操作，如果本地操作失败，消息会重投，直到B操作成功，这样就变相地实现了A与B的分布式事务。</span><br><span class="line"></span><br><span class="line">此方案能够完成A和B的操作，但是A和B并不是严格一致的，而是最终一致的，我们在这里牺牲了一致性，换来了性能的大幅度提升。当然，这种玩法也是有风险的，如果B一直执行不成功，那么一致性会被破坏，具体要不要玩，还是得看业务能够承担多少风险。</span><br></pre></td></tr></table></figure>
+
+<h3 id="TCC"><a href="#TCC" class="headerlink" title="TCC"></a>TCC</h3><p>TCC（Try、Confirm、Cancel）是两阶段提交的一个变种。TCC提供了一个框架，需要应用程序按照该框架编程，将业务逻辑的每个分支都分为Try、Confirm、Cancel三个操作集。TCC让应用程序自己定义数据库操作的粒度，使得降低锁冲突、提高吞吐量成为可能。</p>
+<p>以一个典型的淘宝订单为例，按照TCC框架，应用需要在Try阶段将商品的库存减去，将买家支付宝账户中的相应金额扣掉，在临时表中记录下商品的数量，订单的金额等信息；另外再编写Confirm的逻辑，即在临时表中删除相关记录，生成订单，告知CRM、物流等系统，等等；以及Cancel逻辑，即恢复库存和买家账户金额，删除临时表相关记录。</p>
+<p>TCC就是通过代码人为实现了两阶段提交，不同的业务场景所写的代码都不一样，复杂度也不一样，因此，这种模式并不能很好地被复用。</p>
+
+      
+    </div>
+     <!-- 相关文章推荐 -->
+    
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/%E4%BA%8B%E5%8A%A1/" rel="tag"># 事务</a>
+          
+            <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F/" rel="tag"># 分布式</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/01/23/FastDFS%20%E5%88%86%E5%B8%83%E5%BC%8F%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/" rel="next" title="FastDFS 分布式文件系统">
+                <i class="fa fa-chevron-left"></i> FastDFS 分布式文件系统
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/01/25/Spring%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E2%80%94%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96%E5%A4%84%E7%90%86/" rel="prev" title="Spring源码分析—循环依赖处理">
+                Spring源码分析—循环依赖处理 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+<span class="jiathis_txt">分享到：</span>
+<a class="jiathis_button_fav">收藏夹</a>
+<a class="jiathis_button_copy">复制网址</a>
+<a class="jiathis_button_email">邮件</a>
+<a class="jiathis_button_weixin">微信</a>
+<a class="jiathis_button_qzone">QQ空间</a>
+<a class="jiathis_button_tqq">腾讯微博</a>
+<a class="jiathis_button_douban">豆瓣</a>
+<a class="jiathis_button_share">一键分享</a>
+
+<a href="http://www.jiathis.com/share?uid=2140465" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+<a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+var jiathis_config={
+  data_track_clickback:true,
+  summary:"",
+  shortUrl:false,
+  hideMore:false
+}
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://img.huyunshun.com/img/20200522182348.png"
+                alt="初晨" />
+            
+              <p class="site-author-name" itemprop="name">初晨</p>
+              <p class="site-description motion-element" itemprop="description">永远不要说你知道本质，更别说真相了。</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">249</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">46</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+<!--近期文章版块-->
+            
+                <div class="links-of-blogroll motion-element links-of-blogroll-block">
+                  <div class="links-of-blogroll-title">
+                    <!-- modify icon to fire by szw -->
+                    <i class="fa fa-history fa-" aria-hidden="true"></i>
+                    近期文章
+                  </div>
+                  <ul class="links-of-blogroll-list">
+                    
+                    
+                      <li>
+                        <a href="/2020/05/22/WebSocket%E3%80%81Socket%E3%80%81TCP%E3%80%81HTTP%E5%8C%BA%E5%88%AB/" title="WebSocket、Socket、TCP、HTTP区别" target="_blank">WebSocket、Socket、TCP、HTTP区别</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/19/Springboot%E9%A1%B9%E7%9B%AE%E7%9A%84%E6%8E%A5%E5%8F%A3%E9%98%B2%E5%88%B7/" title="Springboot项目的接口防刷" target="_blank">Springboot项目的接口防刷</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/03/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Volatile%E5%85%B3%E9%94%AE%E5%AD%97%E5%8F%8A%E5%85%B6%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/" title="深入理解Volatile关键字及其实现原理" target="_blank">深入理解Volatile关键字及其实现原理</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/04/20/%E4%BD%BF%E7%94%A8vscode%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0%E7%8E%AF%E5%A2%83/" title="使用vscode搭建个人笔记环境" target="_blank">使用vscode搭建个人笔记环境</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/01/20/HBase%E4%BB%8B%E7%BB%8D%E5%AE%89%E8%A3%85%E4%B8%8E%E6%93%8D%E4%BD%9C/" title="HBase介绍安装与操作" target="_blank">HBase介绍安装与操作</a>
+                      </li>
+                    
+                  </ul>
+                </div>
+            
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#CAP-理论"><span class="nav-number">1.</span> <span class="nav-text">CAP 理论</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BASE-理论"><span class="nav-number">2.</span> <span class="nav-text">BASE 理论</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#分布式事务协议"><span class="nav-number">3.</span> <span class="nav-text">分布式事务协议</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#两阶段提交-X-Open-XA-协议"><span class="nav-number">3.1.</span> <span class="nav-text">两阶段提交 X&#x2F;Open XA 协议</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2PC：二阶段提交协议"><span class="nav-number">3.2.</span> <span class="nav-text">2PC：二阶段提交协议</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3PC：三阶段提交协议"><span class="nav-number">3.3.</span> <span class="nav-text">3PC：三阶段提交协议</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#强一致性分布式事务"><span class="nav-number">4.</span> <span class="nav-text">强一致性分布式事务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#最终一致性分布式事务方案"><span class="nav-number">5.</span> <span class="nav-text">最终一致性分布式事务方案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#消息事务-最终一致性"><span class="nav-number">6.</span> <span class="nav-text">消息事务+最终一致性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TCC"><span class="nav-number">7.</span> <span class="nav-text">TCC</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Copyright</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

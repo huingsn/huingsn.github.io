@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="docker," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="介绍Kubernetes 是 Google 团队发起并维护的基于 Docker 的开源容器集群管理系统，它不仅支持常见的云平台，而且支持内部数据中心。 建于 Docker 之上的 Kubernetes 可以构建一个容器的调度服务，其目的是让用户透过 Kubernetes 集群来进行云端容器集群的管理，而无需用户进行复杂的设置工作。系统会自动选取合适的工作节点来执行具体的容器集群调度处理工作。其核心">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Docker Kubernetes项目">
+<meta property="og:url" content="https://huyunshun.com/2019/05/21/Docker_Kubernetes%E9%A1%B9%E7%9B%AE/index.html">
+<meta property="og:site_name" content="简">
+<meta property="og:description" content="介绍Kubernetes 是 Google 团队发起并维护的基于 Docker 的开源容器集群管理系统，它不仅支持常见的云平台，而且支持内部数据中心。 建于 Docker 之上的 Kubernetes 可以构建一个容器的调度服务，其目的是让用户透过 Kubernetes 集群来进行云端容器集群的管理，而无需用户进行复杂的设置工作。系统会自动选取合适的工作节点来执行具体的容器集群调度处理工作。其核心">
+<meta property="og:image" content="https://img.huyunshun.com/img1/Docker/sdfgdgd43543fdf323s257imgclip_1.png">
+<meta property="og:image" content="https://img.huyunshun.com/img1/Docker/sdfgdgd43543fdf323s257imgclip.png">
+<meta property="article:published_time" content="2019-05-20T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-05-20T10:04:24.667Z">
+<meta property="article:author" content="初晨">
+<meta property="article:tag" content="docker">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img.huyunshun.com/img1/Docker/sdfgdgd43543fdf323s257imgclip_1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://huyunshun.com/2019/05/21/Docker_Kubernetes项目/"/>
+
+
+
+
+
+  <title>Docker Kubernetes项目 | 简</title>
+  
+
+
+
+
+
+
+
+
+  <script type="text/javascript" src="/js/src/love.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
+
+  <!-- 看板娘 -->
+    
+        <script async src="/live2d-widget/autoload.js"></script>
+    
+ <!-- 飘动的彩带） -->
+  <script src="/js/src/piao.js" type="text/javascript"></script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">简</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">人生短暂，学海无边，而大道至简。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://huyunshun.com/2019/05/21/Docker_Kubernetes%E9%A1%B9%E7%9B%AE/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="初晨">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://img.huyunshun.com/img/20200522182348.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="简">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Docker Kubernetes项目</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-05-21T00:00:00+08:00">
+                2019-05-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/docker/" itemprop="url" rel="index">
+                    <span itemprop="name">docker</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h1><p>Kubernetes 是 Google 团队发起并维护的基于 Docker 的开源容器集群管理系统，它不仅支持常见的云平台，而且支持内部数据中心。</p>
+<p>建于 Docker 之上的 Kubernetes 可以构建一个容器的调度服务，其目的是让用户透过 Kubernetes 集群来进行云端容器集群的管理，而无需用户进行复杂的设置工作。系统会自动选取合适的工作节点来执行具体的容器集群调度处理工作。其核心概念是 Container Pod。一个 Pod 由一组工作于同一物理工作节点的容器构成。这些组容器拥有相同的网络命名空间、IP以及存储配额，也可以根据实际情况对每一个 Pod 进行端口映射。此外，Kubernetes 工作节点会由主系统进行管理，节点包含了能够运行 Docker 容器所用到的服务。</p>
+<p>它的目标是管理跨多个主机的容器，提供基本的部署，维护以及运用伸缩，主要实现语言为 Go 语言。Kubernetes 是：</p>
+<ul>
+<li>易学：轻量级，简单，容易理解</li>
+<li>便携：支持公有云，私有云，混合云，以及多种云平台</li>
+<li>可拓展：模块化，可插拔，支持钩子，可任意组合</li>
+<li>自修复：自动重调度，自动重启，自动复制</li>
+</ul>
+<p>Kubernetes 构建于 Google 数十年经验，一大半来源于 Google 生产环境规模的经验。结合了社区最佳的想法和实践。</p>
+<p>在分布式系统中，部署，调度，伸缩一直是最为重要的也最为基础的功能。Kubernetes 就是希望解决这一序列问题的。</p>
+<h1 id="基本说明"><a href="#基本说明" class="headerlink" title="基本说明"></a>基本说明</h1><p><img src="https://img.huyunshun.com/img1/Docker/sdfgdgd43543fdf323s257imgclip_1.png" alt=""></p>
+<p>具体见 Kubernetes 学习笔记</p>
+<h1 id="快速部署"><a href="#快速部署" class="headerlink" title="快速部署"></a>快速部署</h1><p><img src="https://img.huyunshun.com/img1/Docker/sdfgdgd43543fdf323s257imgclip.png" alt=""></p>
+<p>Kubernetes 依赖 Etcd 服务来维护所有主节点的状态。Etcd 参见etcd项目介绍。</p>
+<h3 id="启动-Etcd-服务"><a href="#启动-Etcd-服务" class="headerlink" title="启动 Etcd 服务"></a>启动 Etcd 服务</h3><p>docker run –net=host -d gcr.io/google_containers/etcd:2.0.9 /usr/local/bin/etcd –addr=127.0.0.1:4001 –bind-addr=0.0.0.0:4001 –data-dir=/var/etcd/data</p>
+<h3 id="启动主节点（启动-kubelet）"><a href="#启动主节点（启动-kubelet）" class="headerlink" title="启动主节点（启动 kubelet）"></a>启动主节点（启动 kubelet）</h3><p>docker run –net=host -d -v /var/run/docker.sock:/var/run/docker.sock  gcr.io/google_containers/hyperkube:v0.17.0 /hyperkube kubelet –api_servers=<a href="http://localhost:8080" target="_blank" rel="noopener">http://localhost:8080</a> –v=2 –address=0.0.0.0 –enable_server –hostname_override=127.0.0.1 –config=/etc/kubernetes/manifests</p>
+<h3 id="启动服务代理"><a href="#启动服务代理" class="headerlink" title="启动服务代理"></a>启动服务代理</h3><p>docker run -d –net=host –privileged gcr.io/google_containers/hyperkube:v0.17.0 /hyperkube proxy –master=<a href="http://127.0.0.1:8080" target="_blank" rel="noopener">http://127.0.0.1:8080</a> –v=2</p>
+<p>测试：在本地访问 8080 端口</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">$ curl 127.0.0.1:8080</span><br><span class="line">&#123;</span><br><span class="line">  &quot;paths&quot;: [</span><br><span class="line">    &quot;&#x2F;api&quot;,</span><br><span class="line">    &quot;&#x2F;api&#x2F;v1beta1&quot;,</span><br><span class="line">    &quot;&#x2F;api&#x2F;v1beta2&quot;,</span><br><span class="line">    &quot;&#x2F;api&#x2F;v1beta3&quot;,</span><br><span class="line">    &quot;&#x2F;healthz&quot;,</span><br><span class="line">    &quot;&#x2F;healthz&#x2F;ping&quot;,</span><br><span class="line">    &quot;&#x2F;logs&#x2F;&quot;,</span><br><span class="line">    &quot;&#x2F;metrics&quot;,</span><br><span class="line">    &quot;&#x2F;static&#x2F;&quot;,</span><br><span class="line">    &quot;&#x2F;swagger-ui&#x2F;&quot;,</span><br><span class="line">    &quot;&#x2F;swaggerapi&#x2F;&quot;,</span><br><span class="line">    &quot;&#x2F;validate&quot;,</span><br><span class="line">    &quot;&#x2F;version&quot;</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="查看服务"><a href="#查看服务" class="headerlink" title="查看服务"></a>查看服务</h3><p>所有服务启动后，查看本地实际运行的 Docker 容器，有如下几个。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">CONTAINER ID        IMAGE                                        COMMAND                CREATED             STATUS              PORTS               NAMES</span><br><span class="line">ee054db2516c        gcr.io&#x2F;google_containers&#x2F;hyperkube:v0.17.0   &quot;&#x2F;hyperkube schedule   2 days ago          Up 1 days                               k8s_scheduler.509f29c9_k8s-master-127.0.0.1_default_9941e5170b4365bd4aa91f122ba0c061_e97037f5</span><br><span class="line">3b0f28de07a2        gcr.io&#x2F;google_containers&#x2F;hyperkube:v0.17.0   &quot;&#x2F;hyperkube apiserve   2 days ago          Up 1 days                               k8s_apiserver.245e44fa_k8s-master-127.0.0.1_default_9941e5170b4365bd4aa91f122ba0c061_6ab5c23d</span><br><span class="line">2eaa44ecdd8e        gcr.io&#x2F;google_containers&#x2F;hyperkube:v0.17.0   &quot;&#x2F;hyperkube controll   2 days ago          Up 1 days                               k8s_controller-manager.33f83d43_k8s-master-127.0.0.1_default_9941e5170b4365bd4aa91f122ba0c061_1a60106f</span><br><span class="line">30aa7163cbef        gcr.io&#x2F;google_containers&#x2F;hyperkube:v0.17.0   &quot;&#x2F;hyperkube proxy --   2 days ago          Up 1 days                               jolly_davinci</span><br><span class="line">a2f282976d91        gcr.io&#x2F;google_containers&#x2F;pause:0.8.0         &quot;&#x2F;pause&quot;               2 days ago          Up 2 days                               k8s_POD.e4cc795_k8s-master-127.0.0.1_default_9941e5170b4365bd4aa91f122ba0c061_e8085b1f</span><br><span class="line">c060c52acc36        gcr.io&#x2F;google_containers&#x2F;hyperkube:v0.17.0   &quot;&#x2F;hyperkube kubelet    2 days ago          Up 1 days                               serene_nobel</span><br><span class="line">cc3cd263c581        gcr.io&#x2F;google_containers&#x2F;etcd:2.0.9          &quot;&#x2F;usr&#x2F;local&#x2F;bin&#x2F;etcd   2 days ago          Up 1 days                               happy_turing</span><br></pre></td></tr></table></figure>
+<p>这些服务大概分为三类：主节点服务、工作节点服务和其它服务。</p>
+<h3 id="主节点服务"><a href="#主节点服务" class="headerlink" title="主节点服务"></a>主节点服务</h3><p>apiserver 是整个系统的对外接口，提供 RESTful 方式供客户端和其它组件调用；</p>
+<p>scheduler 负责对资源进行调度，分配某个 pod 到某个节点上；</p>
+<p>controller-manager 负责管理控制器，包括 endpoint-controller（刷新服务和 pod 的关联信息）和 replication-controller（维护某个 pod 的复制为配置的数值）。</p>
+<h3 id="工作节点服务"><a href="#工作节点服务" class="headerlink" title="工作节点服务"></a>工作节点服务</h3><p>kubelet 是工作节点执行操作的 agent，负责具体的容器生命周期管理，根据从数据库中获取的信息来管理容器，并上报 pod 运行状态等；</p>
+<p>proxy 为 pod 上的服务提供访问的代理。</p>
+<h3 id="其它服务"><a href="#其它服务" class="headerlink" title="其它服务"></a>其它服务</h3><p>Etcd 是所有状态的存储数据库；</p>
+
+      
+    </div>
+     <!-- 相关文章推荐 -->
+    
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/docker/" rel="tag"># docker</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/05/20/Docker_Etcd%E9%A1%B9%E7%9B%AE/" rel="next" title="Docker Etcd项目">
+                <i class="fa fa-chevron-left"></i> Docker Etcd项目
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/05/22/Elastic-Job%E5%88%86%E5%B8%83%E5%BC%8F%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/" rel="prev" title="Elastic-Job分布式定时任务">
+                Elastic-Job分布式定时任务 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+<span class="jiathis_txt">分享到：</span>
+<a class="jiathis_button_fav">收藏夹</a>
+<a class="jiathis_button_copy">复制网址</a>
+<a class="jiathis_button_email">邮件</a>
+<a class="jiathis_button_weixin">微信</a>
+<a class="jiathis_button_qzone">QQ空间</a>
+<a class="jiathis_button_tqq">腾讯微博</a>
+<a class="jiathis_button_douban">豆瓣</a>
+<a class="jiathis_button_share">一键分享</a>
+
+<a href="http://www.jiathis.com/share?uid=2140465" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+<a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+var jiathis_config={
+  data_track_clickback:true,
+  summary:"",
+  shortUrl:false,
+  hideMore:false
+}
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://img.huyunshun.com/img/20200522182348.png"
+                alt="初晨" />
+            
+              <p class="site-author-name" itemprop="name">初晨</p>
+              <p class="site-description motion-element" itemprop="description">永远不要说你知道本质，更别说真相了。</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">249</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">46</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+<!--近期文章版块-->
+            
+                <div class="links-of-blogroll motion-element links-of-blogroll-block">
+                  <div class="links-of-blogroll-title">
+                    <!-- modify icon to fire by szw -->
+                    <i class="fa fa-history fa-" aria-hidden="true"></i>
+                    近期文章
+                  </div>
+                  <ul class="links-of-blogroll-list">
+                    
+                    
+                      <li>
+                        <a href="/2020/05/22/WebSocket%E3%80%81Socket%E3%80%81TCP%E3%80%81HTTP%E5%8C%BA%E5%88%AB/" title="WebSocket、Socket、TCP、HTTP区别" target="_blank">WebSocket、Socket、TCP、HTTP区别</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/19/Springboot%E9%A1%B9%E7%9B%AE%E7%9A%84%E6%8E%A5%E5%8F%A3%E9%98%B2%E5%88%B7/" title="Springboot项目的接口防刷" target="_blank">Springboot项目的接口防刷</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/03/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Volatile%E5%85%B3%E9%94%AE%E5%AD%97%E5%8F%8A%E5%85%B6%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/" title="深入理解Volatile关键字及其实现原理" target="_blank">深入理解Volatile关键字及其实现原理</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/04/20/%E4%BD%BF%E7%94%A8vscode%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0%E7%8E%AF%E5%A2%83/" title="使用vscode搭建个人笔记环境" target="_blank">使用vscode搭建个人笔记环境</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/01/20/HBase%E4%BB%8B%E7%BB%8D%E5%AE%89%E8%A3%85%E4%B8%8E%E6%93%8D%E4%BD%9C/" title="HBase介绍安装与操作" target="_blank">HBase介绍安装与操作</a>
+                      </li>
+                    
+                  </ul>
+                </div>
+            
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#介绍"><span class="nav-number">1.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#基本说明"><span class="nav-number">2.</span> <span class="nav-text">基本说明</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#快速部署"><span class="nav-number">3.</span> <span class="nav-text">快速部署</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#启动-Etcd-服务"><span class="nav-number">3.0.1.</span> <span class="nav-text">启动 Etcd 服务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#启动主节点（启动-kubelet）"><span class="nav-number">3.0.2.</span> <span class="nav-text">启动主节点（启动 kubelet）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#启动服务代理"><span class="nav-number">3.0.3.</span> <span class="nav-text">启动服务代理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查看服务"><span class="nav-number">3.0.4.</span> <span class="nav-text">查看服务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#主节点服务"><span class="nav-number">3.0.5.</span> <span class="nav-text">主节点服务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#工作节点服务"><span class="nav-number">3.0.6.</span> <span class="nav-text">工作节点服务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#其它服务"><span class="nav-number">3.0.7.</span> <span class="nav-text">其它服务</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Copyright</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

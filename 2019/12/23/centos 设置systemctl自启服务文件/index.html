@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="linux,centos," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="方式一建立服务文件vim &#x2F;usr&#x2F;lib&#x2F;systemd&#x2F;system&#x2F;mongodb.service 1234567891011121314[Unit]    Description&#x3D;mongodb  After&#x3D;network.target remote-fs.target nss-lookup.target    [Service] Type&#x3D;forking">
+<meta property="og:type" content="article">
+<meta property="og:title" content="centos 设置systemctl自启服务文件">
+<meta property="og:url" content="https://huyunshun.com/2019/12/23/centos%20%E8%AE%BE%E7%BD%AEsystemctl%E8%87%AA%E5%90%AF%E6%9C%8D%E5%8A%A1%E6%96%87%E4%BB%B6/index.html">
+<meta property="og:site_name" content="简">
+<meta property="og:description" content="方式一建立服务文件vim &#x2F;usr&#x2F;lib&#x2F;systemd&#x2F;system&#x2F;mongodb.service 1234567891011121314[Unit]    Description&#x3D;mongodb  After&#x3D;network.target remote-fs.target nss-lookup.target    [Service] Type&#x3D;forking">
+<meta property="article:published_time" content="2019-12-23T08:14:52.000Z">
+<meta property="article:modified_time" content="2020-05-20T10:04:24.672Z">
+<meta property="article:author" content="初晨">
+<meta property="article:tag" content="linux">
+<meta property="article:tag" content="centos">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://huyunshun.com/2019/12/23/centos 设置systemctl自启服务文件/"/>
+
+
+
+
+
+  <title>centos 设置systemctl自启服务文件 | 简</title>
+  
+
+
+
+
+
+
+
+
+  <script type="text/javascript" src="/js/src/love.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
+
+  <!-- 看板娘 -->
+    
+        <script async src="/live2d-widget/autoload.js"></script>
+    
+ <!-- 飘动的彩带） -->
+  <script src="/js/src/piao.js" type="text/javascript"></script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">简</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">人生短暂，学海无边，而大道至简。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://huyunshun.com/2019/12/23/centos%20%E8%AE%BE%E7%BD%AEsystemctl%E8%87%AA%E5%90%AF%E6%9C%8D%E5%8A%A1%E6%96%87%E4%BB%B6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="初晨">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://img.huyunshun.com/img/20200522182348.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="简">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">centos 设置systemctl自启服务文件</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-12-23T16:14:52+08:00">
+                2019-12-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/linux/" itemprop="url" rel="index">
+                    <span itemprop="name">linux</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="方式一"><a href="#方式一" class="headerlink" title="方式一"></a>方式一</h1><h2 id="建立服务文件"><a href="#建立服务文件" class="headerlink" title="建立服务文件"></a>建立服务文件</h2><p>vim /usr/lib/systemd/system/mongodb.service</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">[Unit] </span><br><span class="line">   </span><br><span class="line">Description&#x3D;mongodb  </span><br><span class="line">After&#x3D;network.target remote-fs.target nss-lookup.target </span><br><span class="line">   </span><br><span class="line">[Service] </span><br><span class="line">Type&#x3D;forking </span><br><span class="line">ExecStart&#x3D;&#x2F;usr&#x2F;local&#x2F;mongodb&#x2F;bin&#x2F;mongod -config &#x2F;usr&#x2F;local&#x2F;mongodb&#x2F;bin&#x2F;mongodb.conf</span><br><span class="line">ExecReload&#x3D;&#x2F;bin&#x2F;kill -s HUP $MAINPID </span><br><span class="line">ExecStop&#x3D;&#x2F;usr&#x2F;local&#x2F;mongodb&#x2F;bin&#x2F;mongod --shutdown -config &#x2F;usr&#x2F;local&#x2F;mongodb&#x2F;bin&#x2F;mongodb.conf </span><br><span class="line">PrivateTmp&#x3D;true </span><br><span class="line">     </span><br><span class="line">[Install] </span><br><span class="line">WantedBy&#x3D;multi-user.target</span><br></pre></td></tr></table></figure>
+
+<p>文件内容解释</p>
+<p>Description:描述服务</p>
+<p>After:描述服务类别</p>
+<p>[Service]服务运行参数的设置</p>
+<p>Type=forking是后台运行的形式</p>
+<p>ExecStart为服务的具体运行命令</p>
+<p>ExecReload为重启命令</p>
+<p>ExecStop为停止命令</p>
+<p>PrivateTmp=True表示给服务分配独立的临时空间</p>
+<p>注意：启动、重启、停止命令全部要求使用绝对路径</p>
+<p>[Install]服务安装的相关设置，可设置为多用户</p>
+<h2 id="设置开机自启动"><a href="#设置开机自启动" class="headerlink" title="设置开机自启动"></a>设置开机自启动</h2><p>任意目录下执行</p>
+<p>systemctl enable xxx.service </p>
+<h2 id="其他命令"><a href="#其他命令" class="headerlink" title="其他命令"></a>其他命令</h2><p>启动服务</p>
+<p>systemctl start xxxx.service</p>
+<p>设置开机自启动</p>
+<p>systemctl enable xxxx.service</p>
+<p>停止开机自启动</p>
+<p>systemctl disable xxxx.service</p>
+<p>查看服务当前状态</p>
+<p>systemctl status xxx.service</p>
+<p>重新启动服务</p>
+<p>systemctl restart xxx.service</p>
+<p>查看所有已启动的服务</p>
+<p>systemctl list-units –type=service</p>
+<h2 id="CentOS7-0中systemctl启动关闭服务的用法"><a href="#CentOS7-0中systemctl启动关闭服务的用法" class="headerlink" title="CentOS7.0中systemctl启动关闭服务的用法"></a>CentOS7.0中systemctl启动关闭服务的用法</h2><p>systemctl是主要的工具，它融合之前service和chkconfig的功能于一体。可以使用它永久性或只在当前会话中启用/禁用服务。<br>systemctl可以列出正在运行的服务状态<br>systemd-cgls以树形列出正在运行的进程，它可以递归显示控制组内容。    </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">启动&#x2F;关闭、启用&#x2F;禁用服务：</span><br><span class="line">启动一个服务：systemctl start postfix.service</span><br><span class="line">关闭一个服务：systemctl stop postfix.service</span><br><span class="line">重启一个服务：systemctl restart postfix.service</span><br><span class="line">显示一个服务的状态：systemctl status postfix.service</span><br><span class="line"></span><br><span class="line">在开机时启用一个服务：systemctl enable postfix.service</span><br><span class="line">在开机时禁用一个服务：systemctl disable postfix.service</span><br><span class="line">查看服务是否开机启动：systemctl is-enabled postfix.service;echo $?</span><br><span class="line"></span><br><span class="line">查看已启动的服务列表：systemctl list-unit-files|grep enabled</span><br></pre></td></tr></table></figure>
+<p>说明：启用服务就是在当前“runlevel”的配置文件目录/etc/systemd/system/multi-user.target.wants/里，建立/usr/lib/systemd/system里面对应服务配置文件的软链接；禁用服务就是删除此软链接</p>
+<h1 id="方式二"><a href="#方式二" class="headerlink" title="方式二"></a>方式二</h1><p>先在/etc/rc.d/init.d下新建文件 mongod</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">#!&#x2F;bin&#x2F;sh</span><br><span class="line">#</span><br><span class="line">#chkconfig: 2345 80 90</span><br><span class="line">#description: mongodb</span><br><span class="line"></span><br><span class="line">if test -f &#x2F;sys&#x2F;kernel&#x2F;mm&#x2F;transparent_hugepage&#x2F;enabled; then</span><br><span class="line">   echo never &gt; &#x2F;sys&#x2F;kernel&#x2F;mm&#x2F;transparent_hugepage&#x2F;enabled</span><br><span class="line">fi</span><br><span class="line">if test -f &#x2F;sys&#x2F;kernel&#x2F;mm&#x2F;transparent_hugepage&#x2F;defrag; then</span><br><span class="line">   echo never &gt; &#x2F;sys&#x2F;kernel&#x2F;mm&#x2F;transparent_hugepage&#x2F;defrag</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line">start() &#123;</span><br><span class="line">&#x2F;usr&#x2F;local&#x2F;mongodb&#x2F;bin&#x2F;mongod -config &#x2F;usr&#x2F;local&#x2F;mongodb&#x2F;bin&#x2F;mongodb.conf</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">stop() &#123;</span><br><span class="line">&#x2F;usr&#x2F;local&#x2F;mongodb&#x2F;bin&#x2F;mongod -config &#x2F;usr&#x2F;local&#x2F;mongodb&#x2F;bin&#x2F;mongodb.conf --shutdown</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">case &quot;$1&quot; in</span><br><span class="line">  start)</span><br><span class="line">    start</span><br><span class="line">    ;;</span><br><span class="line">  stop)</span><br><span class="line">    stop</span><br><span class="line">    ;;</span><br><span class="line">  restart)</span><br><span class="line">    stop</span><br><span class="line">    start</span><br><span class="line">    ;;</span><br><span class="line">  *)</span><br><span class="line"> echo $&quot;Usage: $0 &#123;start|stop|restart&#125;&quot;</span><br><span class="line"> exit 1</span><br><span class="line">esac</span><br></pre></td></tr></table></figure>
+<p>授权 等操作：</p>
+<p>chmod +x /etc/rc.d/init.d/mongod</p>
+<p>chkconfig –add mongod</p>
+<p>chkconfig –level 345 mongod on</p>
+<p>chkconfig –list mongod</p>
+<p>service mongod start</p>
+<p>之后就可以开始使用service mongod start|stop|restart 管理mongodb服务了。</p>
+
+      
+    </div>
+     <!-- 相关文章推荐 -->
+    
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/linux/" rel="tag"># linux</a>
+          
+            <a href="/tags/centos/" rel="tag"># centos</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/12/23/Hexo%E6%90%AD%E5%BB%BA/" rel="next" title="Hexo搭建">
+                <i class="fa fa-chevron-left"></i> Hexo搭建
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/12/23/Hadoop%E5%AE%89%E8%A3%85%E5%92%8C%E9%85%8D%E7%BD%AE/" rel="prev" title="Hadoop安装和配置及使用介绍">
+                Hadoop安装和配置及使用介绍 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+<span class="jiathis_txt">分享到：</span>
+<a class="jiathis_button_fav">收藏夹</a>
+<a class="jiathis_button_copy">复制网址</a>
+<a class="jiathis_button_email">邮件</a>
+<a class="jiathis_button_weixin">微信</a>
+<a class="jiathis_button_qzone">QQ空间</a>
+<a class="jiathis_button_tqq">腾讯微博</a>
+<a class="jiathis_button_douban">豆瓣</a>
+<a class="jiathis_button_share">一键分享</a>
+
+<a href="http://www.jiathis.com/share?uid=2140465" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+<a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+var jiathis_config={
+  data_track_clickback:true,
+  summary:"",
+  shortUrl:false,
+  hideMore:false
+}
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://img.huyunshun.com/img/20200522182348.png"
+                alt="初晨" />
+            
+              <p class="site-author-name" itemprop="name">初晨</p>
+              <p class="site-description motion-element" itemprop="description">永远不要说你知道本质，更别说真相了。</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">249</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">46</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+<!--近期文章版块-->
+            
+                <div class="links-of-blogroll motion-element links-of-blogroll-block">
+                  <div class="links-of-blogroll-title">
+                    <!-- modify icon to fire by szw -->
+                    <i class="fa fa-history fa-" aria-hidden="true"></i>
+                    近期文章
+                  </div>
+                  <ul class="links-of-blogroll-list">
+                    
+                    
+                      <li>
+                        <a href="/2020/05/22/WebSocket%E3%80%81Socket%E3%80%81TCP%E3%80%81HTTP%E5%8C%BA%E5%88%AB/" title="WebSocket、Socket、TCP、HTTP区别" target="_blank">WebSocket、Socket、TCP、HTTP区别</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/19/Springboot%E9%A1%B9%E7%9B%AE%E7%9A%84%E6%8E%A5%E5%8F%A3%E9%98%B2%E5%88%B7/" title="Springboot项目的接口防刷" target="_blank">Springboot项目的接口防刷</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/03/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Volatile%E5%85%B3%E9%94%AE%E5%AD%97%E5%8F%8A%E5%85%B6%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/" title="深入理解Volatile关键字及其实现原理" target="_blank">深入理解Volatile关键字及其实现原理</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/04/20/%E4%BD%BF%E7%94%A8vscode%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0%E7%8E%AF%E5%A2%83/" title="使用vscode搭建个人笔记环境" target="_blank">使用vscode搭建个人笔记环境</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/01/20/HBase%E4%BB%8B%E7%BB%8D%E5%AE%89%E8%A3%85%E4%B8%8E%E6%93%8D%E4%BD%9C/" title="HBase介绍安装与操作" target="_blank">HBase介绍安装与操作</a>
+                      </li>
+                    
+                  </ul>
+                </div>
+            
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#方式一"><span class="nav-number">1.</span> <span class="nav-text">方式一</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#建立服务文件"><span class="nav-number">1.1.</span> <span class="nav-text">建立服务文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#设置开机自启动"><span class="nav-number">1.2.</span> <span class="nav-text">设置开机自启动</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其他命令"><span class="nav-number">1.3.</span> <span class="nav-text">其他命令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CentOS7-0中systemctl启动关闭服务的用法"><span class="nav-number">1.4.</span> <span class="nav-text">CentOS7.0中systemctl启动关闭服务的用法</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#方式二"><span class="nav-number">2.</span> <span class="nav-text">方式二</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Copyright</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

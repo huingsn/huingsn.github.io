@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="日期," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="时区GMT（Greenwich Mean Time）：格林尼治时间，格林尼治标准时间的正午是指当太阳横穿格林尼治子午线时（也就是在格林尼治上空最高点时）的时间。 UTC（Universal Time Coordinated）：统一协调时间，其以原子时秒长为基础，在时刻上尽量接近于格林尼治标准时间，标准 UTC 时间格式 yyyy-MM-dd’T’HH:mm:ss.SSSXXX。 格林尼治时间已经不">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java日期时间API完全解析">
+<meta property="og:url" content="https://huyunshun.com/2018/06/22/Java%E6%97%A5%E6%9C%9F%E6%97%B6%E9%97%B4API%E5%AE%8C%E5%85%A8%E8%A7%A3%E6%9E%90/index.html">
+<meta property="og:site_name" content="简">
+<meta property="og:description" content="时区GMT（Greenwich Mean Time）：格林尼治时间，格林尼治标准时间的正午是指当太阳横穿格林尼治子午线时（也就是在格林尼治上空最高点时）的时间。 UTC（Universal Time Coordinated）：统一协调时间，其以原子时秒长为基础，在时刻上尽量接近于格林尼治标准时间，标准 UTC 时间格式 yyyy-MM-dd’T’HH:mm:ss.SSSXXX。 格林尼治时间已经不">
+<meta property="article:published_time" content="2018-06-21T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-05-20T10:04:24.698Z">
+<meta property="article:author" content="初晨">
+<meta property="article:tag" content="日期">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://huyunshun.com/2018/06/22/Java日期时间API完全解析/"/>
+
+
+
+
+
+  <title>Java日期时间API完全解析 | 简</title>
+  
+
+
+
+
+
+
+
+
+  <script type="text/javascript" src="/js/src/love.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
+
+  <!-- 看板娘 -->
+    
+        <script async src="/live2d-widget/autoload.js"></script>
+    
+ <!-- 飘动的彩带） -->
+  <script src="/js/src/piao.js" type="text/javascript"></script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">简</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">人生短暂，学海无边，而大道至简。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://huyunshun.com/2018/06/22/Java%E6%97%A5%E6%9C%9F%E6%97%B6%E9%97%B4API%E5%AE%8C%E5%85%A8%E8%A7%A3%E6%9E%90/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="初晨">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://img.huyunshun.com/img/20200522182348.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="简">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Java日期时间API完全解析</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-22T00:00:00+08:00">
+                2018-06-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h4 id="时区"><a href="#时区" class="headerlink" title="时区"></a>时区</h4><p>GMT（Greenwich Mean Time）：格林尼治时间，格林尼治标准时间的正午是指当太阳横穿格林尼治子午线时（也就是在格林尼治上空最高点时）的时间。</p>
+<p>UTC（Universal Time Coordinated）：统一协调时间，其以原子时秒长为基础，在时刻上尽量接近于格林尼治标准时间，标准 UTC 时间格式 yyyy-MM-dd’T’HH:mm:ss.SSSXXX。</p>
+<p>格林尼治时间已经不再被作为标准时间使用，UTC 是最主要的世界时间标准。</p>
+<h4 id="Java提供了获取当前时间的方法"><a href="#Java提供了获取当前时间的方法" class="headerlink" title="Java提供了获取当前时间的方法"></a>Java提供了获取当前时间的方法</h4><ul>
+<li><p>System.currentTimeMillis() 返回当前时间，以毫秒为单位。<br>表示是当前时刻至 1970-01-01 00:00:00.000 的毫秒差值。返回的long值可以用来初始化java.util.Date, java.sql.Date, java.sql.Timestamp和java.util.GregorianCalendar对象。</p>
+</li>
+<li><p>System.nanoTime() 返回一个时间值(系统计时器的当前值)，精确到纳秒。<br>它是由 JVM 提供的一个时间，主要用来精确衡量两个时间段之间的时间</p>
+</li>
+</ul>
+<p>时间粒度：System.currentTimeMillis()方法的时间粒度是大于1毫秒的。如果你反复执行这个方法，短时间内得到的结果是相同的，或又突然在某一次结果增加了几十毫秒，这是正常的。</p>
+<h4 id="旧的时间API"><a href="#旧的时间API" class="headerlink" title="旧的时间API"></a>旧的时间API</h4><ul>
+<li>Java的日期/时间类的定义并不一致，在java.util和java.sql的包中都有日期类，此外用于格式化和解析的类在java.text包中定义。   </li>
+<li>java.util.Date同时包含日期和时间，而java.sql.Date仅包含日期，将其纳入java.sql包并不合理。另外这两个类都有相同的名字，这本身就是一个非常糟糕的设计。   </li>
+<li>对于时间、时间戳、格式化以及解析，并没有一些明确定义的类。对于格式化和解析的需求，我们有java.text.DateFormat抽象类，但通常情况下，SimpleDateFormat类被用于此类需求。   </li>
+<li>所有的日期类都是可变的，因此他们都不是线程安全的，这是Java日期类最大的问题之一。   </li>
+<li>日期类并不提供国际化，没有时区支持，因此Java引入了java.util.Calendar和java.util.TimeZone类，但他们同样存在上述所有的问题。   </li>
+</ul>
+<h5 id="java-util-Date"><a href="#java-util-Date" class="headerlink" title="java.util.Date"></a>java.util.Date</h5><p>java.util.Date类用于封装日期及时间信息，一般仅用它显示某个日期，不对他作任何操作处理，作处理推荐用Calendar类，计算方便。</p>
+<p>构造方法</p>
+<p>Date() ：分配 Date对象并初始化此对象，以表示分配它的时间（精确到毫秒）。</p>
+<p>Date(long date)：分配 Date对象并初始化此对象，以表示自从标准基准时间（称为“历元（epoch）”，即 1970 年 1 月 1 日 00:00:00 GMT）以来的指定毫秒数。</p>
+<h5 id="Calendar与GregorianCalendar"><a href="#Calendar与GregorianCalendar" class="headerlink" title="Calendar与GregorianCalendar"></a>Calendar与GregorianCalendar</h5><p>java.util.Calendar类用于封装日历信息，其主作用在于其方法可以对时间分量进行运算。Calendar类是一个抽象类，它为特定瞬间与一组诸如 YEAR、MONTH、DAY_OF_MONTH、HOUR 等 日历字段之间的转换提供了一些方法，并为操作日历字段（例如获得下星期的日期）提供了一些方法。</p>
+<p>Calendar类是抽象类，构造方法是protected的，API中提供了getInstance方法用来创建对象。</p>
+<p>Java只提供java.util.GregorianCalendar这一种java.util.Calendar的实现类。</p>
+<h5 id="SimpleDateFormat"><a href="#SimpleDateFormat" class="headerlink" title="SimpleDateFormat"></a>SimpleDateFormat</h5><p>SimpleDateFormat(String pattern)，pattern -为描述日期和时间格式的模式，注：此构造方法可能不支持所有语言环境。要覆盖所有语言环境，请使用 DateFormat 类中的工厂方法。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">public final String format(Date date)将一个 Date 格式化为日期&#x2F;时间字符串</span><br><span class="line">public Date parse(String source)throws ParseException从给定字符串的开始解析文本，以生成一个日期。</span><br></pre></td></tr></table></figure>
+<h5 id="DateFormat"><a href="#DateFormat" class="headerlink" title="DateFormat"></a>DateFormat</h5><p>java.text.DateFormat类（抽象类）是SimpleDateFormat类的父类</p>
+<h5 id="java-sql-Date"><a href="#java-sql-Date" class="headerlink" title="java.sql.Date"></a>java.sql.Date</h5><p>java.sql.Date继承java.util.Date,为了把前者转为后者，不支持Date参数的构造器，传入long类型的时间。</p>
+<p>java.sql.Date是SQL中的单纯的日期类型，没有时分秒。如果同时需要日期和时间，应该使用Timestamp。它也是 java.util.Date 的子类，Timestamp 则包含时间戳的完整信息。</p>
+<p>java.sql.Timestamp是java.util.Date的派生类（继承），所以在java.util.Date上能做的事，也可以在java.sql.Timestamp上做。</p>
+<p>现在的Date类中大部分方法已经弃用，现在一般使用旧的API，Date只负责存储一个时间，并对Calendar和DateFormat提供操作接口。Calendar获取Date中特定的信息，对日期时间进行操作，SimpleDateFormat对日期时间进行格式化输入输出。</p>
+<p>总的来说，Date、Calendar 和 DateFormat 已经能够处理一般的时间日期问题了。但是它们依然很繁琐，不好用并且这些日期类都是可变且线程不安全的。</p>
+<h4 id="Java-8-时间日期API"><a href="#Java-8-时间日期API" class="headerlink" title="Java 8 时间日期API"></a>Java 8 时间日期API</h4><p>特性</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">不变性：新的日期&#x2F;时间API中，所有的类都是不可变的，这对多线程很有好处。</span><br><span class="line">关注点分离：借鉴了Joda库的一些优点，新的API将人可读的日期时间和机器时间（unix timestamp）明确分离，它为日期（Date）、时间（Time）、日期时间（DateTime）、时间戳（unix timestamp）以及时区定义了不同的类。</span><br><span class="line">清晰：在所有的类中，方法都被明确定义用以完成相同的行为。例如要拿到当前实例我们可以使用now()方法，在所有的类中都定义了format()和parse()方法，而不是像以前那样专门有一个独立的类。为了更好的处理问题，所有的类都使用了工厂模式和策略模式，一旦你使用了其中某个类的方法，与其他类协同工作并不困难。</span><br><span class="line">实用操作：所有新的日期&#x2F;时间API类都实现了一系列方法用以完成通用的任务，如：加、减、格式化、解析、从日期&#x2F;时间中提取单独部分，等等。</span><br><span class="line">可扩展性：新的日期&#x2F;时间API是工作在ISO-8601日历系统上的，但我们也可以将其应用在非IOS的日历上。</span><br></pre></td></tr></table></figure>
+<p>Java8日期时间的默认格式如下：yyyy-MM-dd-HH-mm-ss.zzz</p>
+<p>主要的    核心类：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">LocalDate：日期类，不带时间</span><br><span class="line">LocalTime：时间类，不带日期</span><br><span class="line">LocalDateTime：日期和时间类</span><br><span class="line">ZonedDateTime：时区日期时间类</span><br><span class="line">OffsetDateTime：按UTC时间偏移来得到日期时间</span><br><span class="line">Clock：获取某个时区下当前的瞬时时间，日期或者时间</span><br><span class="line">Instant：Unix时间，代表时间戳，比如 2018-01-14T02:20:13.592Z</span><br><span class="line">Duration：两个时间之间，表示一个绝对的精确跨度，使用毫秒为单位</span><br><span class="line">Period：两个日期之间</span><br><span class="line">ZoneId：时区</span><br><span class="line">DateTimeFormatter：格式化输出</span><br><span class="line">TemporalAdjusters：获得指定日期时间等，如当月的第一天、今年的最后一天等等</span><br></pre></td></tr></table></figure>
+
+<h5 id="LocalDate、LocalTime、LocalDateTime"><a href="#LocalDate、LocalTime、LocalDateTime" class="headerlink" title="LocalDate、LocalTime、LocalDateTime"></a>LocalDate、LocalTime、LocalDateTime</h5><p>LocalDate是不变的日期时间对象代表一个日期，往往被视为年月日。其他日期字段，如一年中的一天，一周和一周的一天，也可以访问。 </p>
+<p>LocalTime是不变的日期时间对象代表一个时间，往往被视为小时分钟秒。时间为代表的纳秒级精度。 </p>
+<p>LocalDateTime是不变的日期时间对象代表一个日期时间，往往被视为年、月、日、时、分、秒。其他日期和时间字段，如一年中的一天，一周和一周的一天，也可以访问。时间为代表的纳秒级精度。</p>
+<h5 id="DateTimeFormatter"><a href="#DateTimeFormatter" class="headerlink" title="DateTimeFormatter"></a>DateTimeFormatter</h5><p>格式器用于解析日期字符串和格式化日期输出，创建格式器最简单的方法是通过 DateTimeFormatter 的静态工厂方法以及常量。创建格式器一般有如下三种方式：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">常用 ISO 格式常量，如 ISO_LOCAL_DATE</span><br><span class="line">字母模式，如 ofPattern(&quot;yyyy&#x2F;MM&#x2F;dd&quot;)</span><br><span class="line">本地化样式，如 ofLocalizedDate(FormatStyle.MEDIUM)</span><br></pre></td></tr></table></figure>
+<p>使用DateTimeFormatter完成格式化</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">LocalDateTime localDateTime = LocalDateTime.now();</span><br><span class="line"><span class="comment">//创建一个格式化程序使用指定的模式。</span></span><br><span class="line">DateTimeFormatter formatter = DateTimeFormatter.ofPattern(<span class="string">"yyyy-MM-dd HH:mm:ss"</span>);</span><br><span class="line">String formatDateTime = localDateTime.format(formatter);</span><br><span class="line">System.out.println(formatDateTime);</span><br><span class="line"></span><br><span class="line"><span class="comment">//DateTimeFormatter提供了一些默认的格式化器，DateTimeFormatter.ISO_LOCAL_DATE_TIME 格式 yyyy-MM-ddTHH:mm:ss.SSS</span></span><br><span class="line">String dateTime2 = localDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);</span><br><span class="line">System.out.println(dateTime2);</span><br></pre></td></tr></table></figure>
+<p>使用DateTimeFormatter完成格式化</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">LocalDate localDate = LocalDate.parse(<span class="string">"2018/11/11"</span>,DateTimeFormatter.ofPattern(<span class="string">"yyyy/MM/dd"</span>));</span><br><span class="line">System.out.println(localDate); <span class="comment">//2018-11-11</span></span><br></pre></td></tr></table></figure>
+<p>和旧的 java.util.DateFormat 相比较，所有的 DateTimeFormatter 实例都是线程安全的。</p>
+<h5 id="Instant"><a href="#Instant" class="headerlink" title="Instant"></a>Instant</h5><p>Instant 表示时间线上的一点（与 Date 类似），它只是简单地表示自 1970 年 1 月 1 日 0 时 0 分 0 秒（UTC）开始的秒数。</p>
+<p>Instant 由两部分组成，一是从原点开始到指定时间点的秒数 s， 二是距离该秒数 s 的纳秒数。它以 Unix 时间戳的形式存储日期时间。</p>
+<p>Instant类的工厂方法创建一个Instant实例</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Instant now = Instant.now();</span><br><span class="line"><span class="comment">//第一个参数是秒，第二个是纳秒参数，纳秒的存储范围是0至999,999,999 2s之后的在加上100万纳秒（1s）</span></span><br><span class="line">Instant instant = Instant.ofEpochSecond(<span class="number">2</span>,<span class="number">1000000000</span>);</span><br><span class="line">System.out.println(instant); <span class="comment">//1970-01-01T00:00:03Z</span></span><br><span class="line"><span class="comment">//java.util.Date与Instant可相互转换</span></span><br><span class="line">Instant timestamp = <span class="keyword">new</span> Date().toInstant();</span><br><span class="line">Date.from(Instant.now());</span><br></pre></td></tr></table></figure>
+<h5 id="Clock"><a href="#Clock" class="headerlink" title="Clock"></a>Clock</h5><p>Clock用于查找当前时刻，可以用来获取某个时区下当前的日期和时间，也可以用来代替旧的System.currentTimeMillis()方法和TimeZone.getDefault()方法。</p>
+<h5 id="Duration"><a href="#Duration" class="headerlink" title="Duration"></a>Duration</h5><p>一个Duration实例是不可变的，当创建出对象后就不能改变它的值了。你只能通过Duration的计算方法，来创建出一个新的Durtaion对象.</p>
+<h5 id="Period"><a href="#Period" class="headerlink" title="Period"></a>Period</h5><p>Period 是以年月日来衡量一个时间段，用于计算两个日期间隔，所以 between() 方法只能接收 LocalDate 类型的参数。</p>
+<h5 id="ZonedDateTime和ZonedId"><a href="#ZonedDateTime和ZonedId" class="headerlink" title="ZonedDateTime和ZonedId"></a>ZonedDateTime和ZonedId</h5><p>ZonedDateTime类是Java 8中日期时间功能里，用于表示带时区的日期与时间信息的类。ZonedDateTime 类的值是不可变的，所以其计算方法会返回一个新的ZonedDateTime 实例。</p>
+<p>Java 使用 ZoneId 来标识不同的时区，从基准 UTC 开始的一个固定偏移。</p>
+<h5 id="TemporalAdjusters"><a href="#TemporalAdjusters" class="headerlink" title="TemporalAdjusters"></a>TemporalAdjusters</h5><p>有的时候，你需要进行一些更加复杂的操作，比如，将日期调整到下个周日、下个工作日，或者是本月的最后一天。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">LocalDate localDate = LocalDate.now();  </span><br><span class="line"><span class="comment">// 1. 本月第一天</span></span><br><span class="line">LocalDate firstDayOfMonth = localDate.with(TemporalAdjusters.firstDayOfMonth());</span><br><span class="line"><span class="comment">// 2. 本月最后一天</span></span><br><span class="line">LocalDate lastDayOfMonth = localDate.with(TemporalAdjusters.lastDayOfMonth());</span><br><span class="line"><span class="comment">// 3. 本年第一天</span></span><br><span class="line">LocalDate firstDayOfYear = localDate.with(TemporalAdjusters.firstDayOfYear());</span><br><span class="line"><span class="comment">// 4. 下个月第一天</span></span><br><span class="line">LocalDate firstDayOfNextMonth = localDate.with(TemporalAdjusters.firstDayOfNextMonth());</span><br><span class="line"><span class="comment">// 5. 本年度最后一天</span></span><br><span class="line">LocalDate lastDayOfYear = localDate.with(TemporalAdjusters.lastDayOfYear());</span><br></pre></td></tr></table></figure>
+<p>用重载版本的with方法，向其传递一个提供了更多定制化选择的TemporalAdjuster对象,更加灵活地处理日期。TemporalAdjusters类通过静态方法提供了大量的常用的TemporalAdjuster的实现供我们使用。</p>
+<h5 id="这些日期类之间转换"><a href="#这些日期类之间转换" class="headerlink" title="这些日期类之间转换"></a>这些日期类之间转换</h5><p>java.util.Date 与 LocalDate、LocalTime、LocalDateTime 转换</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//将Date转换为LocalDate，LocalTime，LocalDateTime可以借助于ZonedDateTime和Instant，实现如下：</span></span><br><span class="line"></span><br><span class="line">Date date = <span class="keyword">new</span> Date();</span><br><span class="line"></span><br><span class="line"><span class="comment">// Date -&gt; LocalDateTime</span></span><br><span class="line">LocalDateTime localDateTime = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();</span><br><span class="line">System.out.println(<span class="string">"localDateTime by Instant: "</span> + localDateTime);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Date -&gt; LocalDate</span></span><br><span class="line">LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();</span><br><span class="line"></span><br><span class="line"><span class="comment">// Date -&gt; LocalTime</span></span><br><span class="line">LocalTime localTime = date.toInstant().atZone(ZoneId.systemDefault()).toLocalTime();</span><br><span class="line"></span><br><span class="line"><span class="comment">//2. Date -&gt; LocalDateTime</span></span><br><span class="line">localDateTime = LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());</span><br><span class="line">System.out.println(<span class="string">"localDateTime by ofInstant: "</span> + localDateTime);</span><br></pre></td></tr></table></figure>
+<p>由于JDK8实现了向下兼容，所以Date里在JDK8版本引入了2个方法，from和toInstant，所以我们可以借助这两个方法来实现LocalDateTime到Date的转换。<br>将LocalDateTime转为Date如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">LocalDateTime localDateTime = LocalDateTime.now();</span><br><span class="line"></span><br><span class="line"><span class="comment">// LocalDateTime -&gt; Date</span></span><br><span class="line">Date date = Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());</span><br><span class="line"></span><br><span class="line"><span class="comment">// LocalDate -&gt; Date，时间默认都是00</span></span><br><span class="line">LocalDate localDate = LocalDate.now();</span><br><span class="line">date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());</span><br></pre></td></tr></table></figure>
+<p>日期与字符串的转换</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//通过LocalDate，LocalTime，LocalDateTime的parse方法和DateTimeFormatter来实现：</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//字符串-&gt;日期</span></span><br><span class="line">LocalDate localDate = LocalDate.parse(<span class="string">"2018-09-09"</span>, DateTimeFormatter.ofPattern(<span class="string">"yyyy-MM-dd"</span>));</span><br><span class="line">LocalDateTime localDateTime = LocalDateTime.parse(<span class="string">"2018-09-10 12:12:12"</span>, DateTimeFormatter.ofPattern(<span class="string">"yyyy-MM-dd HH:mm:ss"</span>));</span><br><span class="line"></span><br><span class="line"><span class="comment">//日期-&gt;字符串</span></span><br><span class="line">String localDate = LocalDate.now().format(DateTimeFormatter.ofPattern(<span class="string">"yyyy-MM-dd"</span>));</span><br><span class="line">String localDateTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern(<span class="string">"yyyy-MM-dd HH:mm:ss"</span>));</span><br><span class="line"><span class="comment">// 也可以通过DateTimeFormatter的format方法</span></span><br><span class="line">DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(<span class="string">"yyyy-MM-dd HH:mm:ss"</span>);</span><br><span class="line">localDateTime = dateTimeFormatter.format(LocalDateTime.now());</span><br></pre></td></tr></table></figure>
+<p>时间戳与LocalDateTime转换</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//时间戳-&gt;LocalDateTime</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> LocalDateTime <span class="title">convertToDate</span><span class="params">(<span class="keyword">long</span> timestamp)</span> </span>&#123;</span><br><span class="line">   <span class="comment">// ofEpochSecond 以秒为单位， ofEpochMilli 以毫秒为单位</span></span><br><span class="line">   <span class="comment">// Instant.ofEpochSecond(timestamp);</span></span><br><span class="line">   Instant instant = Instant.ofEpochMilli(timestamp);</span><br><span class="line">   <span class="keyword">return</span> LocalDateTime.ofInstant(instant, ZoneId.systemDefault());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//LocalDateTime-&gt;时间戳</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">long</span> <span class="title">convertToTimestamp</span><span class="params">()</span> </span>&#123;</span><br><span class="line">   LocalDateTime localDateTime = LocalDateTime.now();</span><br><span class="line">   <span class="keyword">return</span> localDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>新的 API 区分各种日期时间概念并且各个概念使用相似的方法定义模式，这种相似性非常有利于 API 的学习。总结一下一般的方法或者方法前缀：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">of：静态工厂方法，用于创建实例</span><br><span class="line">now：静态工厂方法，用当前时间创建实例</span><br><span class="line">parse：静态工厂方法，从字符串解析得到对象实例</span><br><span class="line">get：获取时间日期对象的部分状态。</span><br><span class="line">is：检查某些东西的是否是 true，例如比较时间前后</span><br><span class="line">with：返回一个部分状态改变了的时间日期对象拷贝</span><br><span class="line">plus：返回一个时间增加了的、时间日期对象拷贝</span><br><span class="line">minus：返回一个时间减少了的、时间日期对象拷贝</span><br><span class="line">to：转换到另一个类型</span><br><span class="line">at：把这个对象与另一个对象组合起来，例如 date.atTime(time)</span><br><span class="line">format：提供格式化时间日期对象的能力</span><br></pre></td></tr></table></figure>
+<p>参考文章：<a href="https://www.cnblogs.com/kiwenzhang/p/10960741.html" target="_blank" rel="noopener">https://www.cnblogs.com/kiwenzhang/p/10960741.html</a></p>
+<h4 id="Joda-Time"><a href="#Joda-Time" class="headerlink" title="Joda-Time"></a>Joda-Time</h4><p>Joda-Time提供了一组Java类包用于处理包括ISO8601标准在内的date和time。可以利用它把JDK Date和Calendar类完全替换掉，而且仍然能够提供很好的集成。</p>
+<p>Joda 与 JDK 是百分之百可互操作的，因此您无需替换所有 Java 代码，只需要替换执行日期/时间计算的那部分代码。</p>
+<h2 id="如果时间需要按照今天，昨天这样返回，例子如下："><a href="#如果时间需要按照今天，昨天这样返回，例子如下：" class="headerlink" title="如果时间需要按照今天，昨天这样返回，例子如下："></a>如果时间需要按照今天，昨天这样返回，例子如下：</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DateFormatUtil</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> String <span class="title">format</span><span class="params">(Date date)</span> </span>&#123;</span><br><span class="line">        DateTime now = <span class="keyword">new</span> DateTime();</span><br><span class="line">        DateTime today_start = <span class="keyword">new</span> DateTime(now.getYear(), now.getMonthOfYear(), now.getDayOfMonth(), <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">        DateTime today_end = today_start.plusDays(<span class="number">1</span>);</span><br><span class="line">        DateTime yesterday_start = today_start.minusDays(<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>(date.after(today_start.toDate()) &amp;&amp; date.before(today_end.toDate())) &#123;</span><br><span class="line">            <span class="keyword">return</span> String.format(<span class="string">"今天 %s"</span>, <span class="keyword">new</span> DateTime(date).toString(<span class="string">"HH:mm:ss"</span>));</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span>(date.after(yesterday_start.toDate()) &amp;&amp; date.before(today_start.toDate())) &#123;</span><br><span class="line">            <span class="keyword">return</span> String.format(<span class="string">"昨天 %s"</span>, <span class="keyword">new</span> DateTime(date).toString(<span class="string">"HH:mm:ss"</span>));</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> DateTime(date).toString(<span class="string">"yyyy-MM-dd HH:mm:ss"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> String <span class="title">formats</span><span class="params">(String dateString)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(StringUtils.isEmpty(dateString))&#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="string">""</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            SimpleDateFormat dateFormat=<span class="keyword">new</span> SimpleDateFormat(<span class="string">"yyyy-MM-dd HH:mm:ss"</span>);</span><br><span class="line">            Date date = dateFormat.parse(dateString);</span><br><span class="line">            <span class="keyword">return</span>  format(date);</span><br><span class="line">        &#125;<span class="keyword">catch</span> (ParseException e)&#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> dateString;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">/*public static void main(String[] args) throws ParseException &#123;</span></span><br><span class="line"><span class="comment">        System.out.println(formats("2019-06-01 10:12:05"));</span></span><br><span class="line"><span class="comment">        System.out.println(formats("2019-07-12 10:12:05"));</span></span><br><span class="line"><span class="comment">        System.out.println(formats("2019-07-11 10:12:05"));</span></span><br><span class="line"><span class="comment">        System.out.println(formats("2019-07-10 10:12:05"));</span></span><br><span class="line"><span class="comment">    &#125;*/</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>需要引入包：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>commons-codec<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>commons-codec<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+      
+    </div>
+     <!-- 相关文章推荐 -->
+    
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/%E6%97%A5%E6%9C%9F/" rel="tag"># 日期</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/06/14/MongoDB%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C/" rel="next" title="MongoDB基本操作">
+                <i class="fa fa-chevron-left"></i> MongoDB基本操作
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/07/20/spring%E6%95%B4%E5%90%88Oauth2/" rel="prev" title="spring整合Oauth2">
+                spring整合Oauth2 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+<span class="jiathis_txt">分享到：</span>
+<a class="jiathis_button_fav">收藏夹</a>
+<a class="jiathis_button_copy">复制网址</a>
+<a class="jiathis_button_email">邮件</a>
+<a class="jiathis_button_weixin">微信</a>
+<a class="jiathis_button_qzone">QQ空间</a>
+<a class="jiathis_button_tqq">腾讯微博</a>
+<a class="jiathis_button_douban">豆瓣</a>
+<a class="jiathis_button_share">一键分享</a>
+
+<a href="http://www.jiathis.com/share?uid=2140465" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+<a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+var jiathis_config={
+  data_track_clickback:true,
+  summary:"",
+  shortUrl:false,
+  hideMore:false
+}
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://img.huyunshun.com/img/20200522182348.png"
+                alt="初晨" />
+            
+              <p class="site-author-name" itemprop="name">初晨</p>
+              <p class="site-description motion-element" itemprop="description">永远不要说你知道本质，更别说真相了。</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">249</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">46</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+<!--近期文章版块-->
+            
+                <div class="links-of-blogroll motion-element links-of-blogroll-block">
+                  <div class="links-of-blogroll-title">
+                    <!-- modify icon to fire by szw -->
+                    <i class="fa fa-history fa-" aria-hidden="true"></i>
+                    近期文章
+                  </div>
+                  <ul class="links-of-blogroll-list">
+                    
+                    
+                      <li>
+                        <a href="/2020/05/22/WebSocket%E3%80%81Socket%E3%80%81TCP%E3%80%81HTTP%E5%8C%BA%E5%88%AB/" title="WebSocket、Socket、TCP、HTTP区别" target="_blank">WebSocket、Socket、TCP、HTTP区别</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/19/Springboot%E9%A1%B9%E7%9B%AE%E7%9A%84%E6%8E%A5%E5%8F%A3%E9%98%B2%E5%88%B7/" title="Springboot项目的接口防刷" target="_blank">Springboot项目的接口防刷</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/03/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Volatile%E5%85%B3%E9%94%AE%E5%AD%97%E5%8F%8A%E5%85%B6%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/" title="深入理解Volatile关键字及其实现原理" target="_blank">深入理解Volatile关键字及其实现原理</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/04/20/%E4%BD%BF%E7%94%A8vscode%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0%E7%8E%AF%E5%A2%83/" title="使用vscode搭建个人笔记环境" target="_blank">使用vscode搭建个人笔记环境</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/01/20/HBase%E4%BB%8B%E7%BB%8D%E5%AE%89%E8%A3%85%E4%B8%8E%E6%93%8D%E4%BD%9C/" title="HBase介绍安装与操作" target="_blank">HBase介绍安装与操作</a>
+                      </li>
+                    
+                  </ul>
+                </div>
+            
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#时区"><span class="nav-number">1.</span> <span class="nav-text">时区</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Java提供了获取当前时间的方法"><span class="nav-number">2.</span> <span class="nav-text">Java提供了获取当前时间的方法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#旧的时间API"><span class="nav-number">3.</span> <span class="nav-text">旧的时间API</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#java-util-Date"><span class="nav-number">3.1.</span> <span class="nav-text">java.util.Date</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Calendar与GregorianCalendar"><span class="nav-number">3.2.</span> <span class="nav-text">Calendar与GregorianCalendar</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#SimpleDateFormat"><span class="nav-number">3.3.</span> <span class="nav-text">SimpleDateFormat</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#DateFormat"><span class="nav-number">3.4.</span> <span class="nav-text">DateFormat</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#java-sql-Date"><span class="nav-number">3.5.</span> <span class="nav-text">java.sql.Date</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Java-8-时间日期API"><span class="nav-number">4.</span> <span class="nav-text">Java 8 时间日期API</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#LocalDate、LocalTime、LocalDateTime"><span class="nav-number">4.1.</span> <span class="nav-text">LocalDate、LocalTime、LocalDateTime</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#DateTimeFormatter"><span class="nav-number">4.2.</span> <span class="nav-text">DateTimeFormatter</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Instant"><span class="nav-number">4.3.</span> <span class="nav-text">Instant</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Clock"><span class="nav-number">4.4.</span> <span class="nav-text">Clock</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Duration"><span class="nav-number">4.5.</span> <span class="nav-text">Duration</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Period"><span class="nav-number">4.6.</span> <span class="nav-text">Period</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#ZonedDateTime和ZonedId"><span class="nav-number">4.7.</span> <span class="nav-text">ZonedDateTime和ZonedId</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#TemporalAdjusters"><span class="nav-number">4.8.</span> <span class="nav-text">TemporalAdjusters</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#这些日期类之间转换"><span class="nav-number">4.9.</span> <span class="nav-text">这些日期类之间转换</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Joda-Time"><span class="nav-number">5.</span> <span class="nav-text">Joda-Time</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如果时间需要按照今天，昨天这样返回，例子如下："><span class="nav-number"></span> <span class="nav-text">如果时间需要按照今天，昨天这样返回，例子如下：</span></a></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Copyright</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

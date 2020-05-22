@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="docker," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Node.js简介简单的说 Node.js 就是运行在服务端的 JavaScript。Node.js 是一个基于 Chrome V8 引擎的 JavaScript 运行环境。Node.js 使用了一个事件驱动、非阻塞式 I&#x2F;O 的模型，使其轻量又高效。Node.js 的包管理器 npm，是全球最大的开源库生态系统。 123安装环境本机系统：Windows 7NODEJS版本：node-v10.14">
+<meta property="og:type" content="article">
+<meta property="og:title" content="NodeJS安装配置及Express基本介绍">
+<meta property="og:url" content="https://huyunshun.com/2019/04/01/NodeJS%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE%E5%8F%8AExpress%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D/index.html">
+<meta property="og:site_name" content="简">
+<meta property="og:description" content="Node.js简介简单的说 Node.js 就是运行在服务端的 JavaScript。Node.js 是一个基于 Chrome V8 引擎的 JavaScript 运行环境。Node.js 使用了一个事件驱动、非阻塞式 I&#x2F;O 的模型，使其轻量又高效。Node.js 的包管理器 npm，是全球最大的开源库生态系统。 123安装环境本机系统：Windows 7NODEJS版本：node-v10.14">
+<meta property="og:image" content="https://img.huyunshun.com/img1/194611-20181129173245817-852443677.png">
+<meta property="og:image" content="https://img.huyunshun.com/img1/194611-20181129173348943-146303304.png">
+<meta property="og:image" content="https://img.huyunshun.com/img1/194611-20181129174436210-845981413.png">
+<meta property="og:image" content="https://img.huyunshun.com/img1/194611-20181129173740384-2069475975.png">
+<meta property="og:image" content="https://img.huyunshun.com/img1/194611-20181129174117244-1134849807.png">
+<meta property="og:image" content="https://img.huyunshun.com/img1/194611-20181129181056416-1906347011.png">
+<meta property="og:image" content="https://img.huyunshun.com/img1/194611-20181129181637580-1965005708.png">
+<meta property="og:image" content="https://img.huyunshun.com/img1/194611-20181129182412766-321153255.png">
+<meta property="og:image" content="https://img.huyunshun.com/img1/194611-20181129182720024-1458059380.png">
+<meta property="og:image" content="https://img.huyunshun.com/img1/194611-20181129184052166-628609956.png">
+<meta property="og:image" content="https://img.huyunshun.com/img1/imgclip_1.png">
+<meta property="og:image" content="https://img.huyunshun.com/img1/imgclip2dfsdf.png">
+<meta property="og:image" content="https://img.huyunshun.com/img1/imgclip_2.png">
+<meta property="og:image" content="https://img.huyunshun.com/img1/imgclip_3.png">
+<meta property="article:published_time" content="2019-03-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-05-20T10:04:24.689Z">
+<meta property="article:author" content="初晨">
+<meta property="article:tag" content="docker">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img.huyunshun.com/img1/194611-20181129173245817-852443677.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://huyunshun.com/2019/04/01/NodeJS安装配置及Express基本介绍/"/>
+
+
+
+
+
+  <title>NodeJS安装配置及Express基本介绍 | 简</title>
+  
+
+
+
+
+
+
+
+
+  <script type="text/javascript" src="/js/src/love.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
+
+  <!-- 看板娘 -->
+    
+        <script async src="/live2d-widget/autoload.js"></script>
+    
+ <!-- 飘动的彩带） -->
+  <script src="/js/src/piao.js" type="text/javascript"></script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">简</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">人生短暂，学海无边，而大道至简。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://huyunshun.com/2019/04/01/NodeJS%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE%E5%8F%8AExpress%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="初晨">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://img.huyunshun.com/img/20200522182348.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="简">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">NodeJS安装配置及Express基本介绍</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-01T00:00:00+08:00">
+                2019-04-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/docker/" itemprop="url" rel="index">
+                    <span itemprop="name">docker</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Node-js简介"><a href="#Node-js简介" class="headerlink" title="Node.js简介"></a>Node.js简介</h1><p>简单的说 Node.js 就是运行在服务端的 JavaScript。Node.js 是一个基于 Chrome V8 引擎的 JavaScript 运行环境。Node.js 使用了一个事件驱动、非阻塞式 I/O 的模型，使其轻量又高效。Node.js 的包管理器 npm，是全球最大的开源库生态系统。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">安装环境</span><br><span class="line">本机系统：Windows 7</span><br><span class="line">NODEJS版本：node-v10.14.0-x64</span><br></pre></td></tr></table></figure>
+<p>步骤</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">1、下载对应你系统的Node.js版本:https:&#x2F;&#x2F;nodejs.org&#x2F;en&#x2F;download&#x2F;</span><br><span class="line">2、选安装目录进行安装</span><br><span class="line">3、环境配置</span><br><span class="line">4、测试</span><br></pre></td></tr></table></figure>
+<h1 id="下载"><a href="#下载" class="headerlink" title="下载"></a>下载</h1><p><img src="https://img.huyunshun.com/img1/194611-20181129173245817-852443677.png" alt=""></p>
+<h1 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h1><p>Windows上安装时务必选择全部组件，包括勾选Add to Path，更改自己需要的安装目录。</p>
+<p><img src="https://img.huyunshun.com/img1/194611-20181129173348943-146303304.png" alt=""></p>
+<p>安装完成后安装目录有nodejs的文件：</p>
+<p><img src="https://img.huyunshun.com/img1/194611-20181129174436210-845981413.png" alt=""></p>
+<p>测试安装是否成功了：【win+R】键，输入cmd，然后回车，打开cmd窗口。</p>
+<p><img src="https://img.huyunshun.com/img1/194611-20181129173740384-2069475975.png" alt=""></p>
+<p>分别输入：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">node -v</span><br><span class="line">npm -v</span><br></pre></td></tr></table></figure>
+<p><img src="https://img.huyunshun.com/img1/194611-20181129174117244-1134849807.png" alt=""></p>
+<p>显示出版本信息，说明安装成功！</p>
+<h1 id="NPM"><a href="#NPM" class="headerlink" title="NPM"></a>NPM</h1><p>npm是什么？</p>
+<p>npm是Node.js的包管理工具（package manager）。npm的作用就是对Node.js依赖的包进行管理，也可以理解为用来安装/卸载Node.js需要装的东西，在Node.js上开发时，会用到很多别人写的JavaScript代码包。如果我们要使用别人的包，每次都要去搜索——下载——解压——使用，这样非常麻烦。于是出现了这个集中管理的工具，大家都把自己开发的模块打包后放到npm官网上，如果别人需要，直接通过npm安装就可以使用了。<br>npm还可以根据包的依赖关系，把所有依赖的包都下载并管理起来。新版的Node.js已自带npm，安装Node.js时会一起安装。</p>
+<h1 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h1><p>主要配置的是npm安装的全局模块所在的路径，以及缓存cache的路径。是因为以后在执行类似：npm install express [-g]（后面的可选参数-g，g代表global全局安装的意思）的安装语句时，会将安装的模块安装到【C:\Users\用户名\AppData\Roaming\npm】默认路径中。</p>
+<p>将全模块所在路径和缓存路径放在我node.js安装的文件夹中，再安装目录下创建两个文件夹【node_global】及【node_cache】：</p>
+<p><img src="https://img.huyunshun.com/img1/194611-20181129181056416-1906347011.png" alt=""></p>
+<p>创建完两个空文件夹之后，打开cmd命令窗口，输入：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">npm config set prefix &quot;XXXXXX\nodejs\node_global</span><br><span class="line">npm config set cache &quot;XXXXX\nodejs\node_cache</span><br></pre></td></tr></table></figure>
+<p>XXXXX是你nodejs文件路径</p>
+<p><img src="https://img.huyunshun.com/img1/194611-20181129181637580-1965005708.png" alt=""></p>
+<p>设置环境变量</p>
+<p>　　window7等老版本windows的编辑环境变量的方式，很麻烦，一不小心，漏了个分号，都会弄得自己怀疑人生。</p>
+<p>　　下载了&nbsp;Rapid Environment Editor 这个小工具，就可以很方便的在window7及以下版本编辑环境变量了。</p>
+<p>　　下载地址：<a href="https://www.rapidee.com/en/download" target="_blank" rel="noopener">https://www.rapidee.com/en/download</a>           按计算机是32还是64位下载对应版本</p>
+<p>打开软件</p>
+<p>【系统变量】下右键新建一个变量【NODE_PATH】，值为C:\AdministratorProgramFiles\nodejs\node_modules</p>
+<p><img src="https://img.huyunshun.com/img1/194611-20181129182412766-321153255.png" alt=""></p>
+<p>【用户变量】下的【Path】中的这一项C:\Users\用户名\AppData\Roaming\npm 修改为C:\AdministratorProgramFiles\nodejs\node_global</p>
+<p><img src="https://img.huyunshun.com/img1/194611-20181129182720024-1458059380.png" alt=""></p>
+<p>配置完后，安装个module测试下，我们就安装最常用的express模块，打开cmd窗口，<br />输入如下命令进行模块的全局安装：</p>
+<p>npm install express -g# -g是全局安装的意思</p>
+<p>安装完成后可以看到C:\AdministratorProgramFiles\nodejs\node_global\node_modules下有express模块</p>
+<h1 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h1><p>此时，nodejs安装环境配置完毕，由于nodejs是运行在服务端的，所以编写的JavaScript代码将不能在浏览器环境中执行了，而是在Node环境中执行。</p>
+<p>因此，JavaScript代码将直接在你的计算机上以命令行的方式运行，所以，我们要先选择一个文本编辑器来编写JavaScript代码，并且把它保存到本地硬盘的某个目录，才能够执行。</p>
+<p>&nbsp;用电脑上安装的编辑器编写代码测试。我用Notepad++，注意用UTF-8格式保存。</p>
+<p>输入以下代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">console.log(&#39;Hello, world！&#39;);</span><br></pre></td></tr></table></figure>
+<p>第一行写上&apos;use strict&apos;，是因为我们总是以严格模式运行JavaScript代码，避免各种潜在陷阱。</p>
+<p>然后，选择一个目录保存为helloworld.js，必须要以.js结尾，就可以打开命令行窗口，把当前目录切换到helloworld.js所在目录，运行这个程序：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">G:\NodeJs node helloworld.js</span><br><span class="line">Hello, world！</span><br></pre></td></tr></table></figure>
+<p><img src="https://img.huyunshun.com/img1/194611-20181129184052166-628609956.png" alt=""></p>
+<p>至此，NodeJS下载安装配置环境，测试都完成。</p>
+<h1 id="Express"><a href="#Express" class="headerlink" title="Express"></a>Express</h1><p>Express是基于Nodejs的官方Web开发库，每年升级一个大版本，在Express4时，替换掉中件间库connect，而改用多个更细粒度的库来取代。<br>首先，我们需要安装express库。在Express3.6.x之前的版本，Express需要全局安装的，项目构建器模块是合并在Express项目中的，后来这个构建器被拆分出来，独立成为了一个项目express-generator，现在我们只需要全局安装express-generator项目就行了。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install -g express-generator@4  #全局安装-g</span><br></pre></td></tr></table></figure>
+<p>安装后可以看到全局模块：<br><img src="https://img.huyunshun.com/img1/imgclip_1.png" alt=""></p>
+<h1 id="IDE工程结构"><a href="#IDE工程结构" class="headerlink" title="IDE工程结构"></a>IDE工程结构</h1><p>使用WebStorm创建一个基于Express项目：<br><img src="https://img.huyunshun.com/img1/imgclip2dfsdf.png" alt=""><br>目录结构：   </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">bin, 存放启动项目的脚本文件</span><br><span class="line">node_modules, 存放所有的项目依赖库。</span><br><span class="line">public，静态文件(css,js,img)</span><br><span class="line">routes，路由文件(MVC中的C,controller)</span><br><span class="line">views，页面文件(Ejs模板)</span><br><span class="line">package.json，项目依赖配置及开发者信息</span><br><span class="line">app.js，应用核心配置文件</span><br></pre></td></tr></table></figure>
+<p><img src="https://img.huyunshun.com/img1/imgclip_2.png" alt="">    </p>
+<h2 id="package-json项目配置"><a href="#package-json项目配置" class="headerlink" title="package.json项目配置"></a>package.json项目配置</h2><p>package.json用于项目依赖配置及开发者信息，scripts属性是用于定义操作命令的，可以非常方便的增加启动命令，比如默认的start，用npm start代表执行node ./bin/www命令。   </p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"name"</span>: <span class="string">"express-study"</span>,</span><br><span class="line">  <span class="attr">"version"</span>: <span class="string">"0.0.0"</span>,</span><br><span class="line">  <span class="attr">"private"</span>: <span class="literal">true</span>,</span><br><span class="line">  <span class="attr">"scripts"</span>: &#123;</span><br><span class="line">    <span class="attr">"start"</span>: <span class="string">"node ./bin/www"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">"dependencies"</span>: &#123;</span><br><span class="line">    <span class="attr">"cookie-parser"</span>: <span class="string">"~1.4.4"</span>,</span><br><span class="line">    <span class="attr">"debug"</span>: <span class="string">"~2.6.9"</span>,</span><br><span class="line">    <span class="attr">"express"</span>: <span class="string">"~4.16.1"</span>,</span><br><span class="line">    <span class="attr">"http-errors"</span>: <span class="string">"~1.6.3"</span>,</span><br><span class="line">    <span class="attr">"morgan"</span>: <span class="string">"~1.9.1"</span>,</span><br><span class="line">    <span class="attr">"pug"</span>: <span class="string">"2.0.0-beta11"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="app-js核心文件"><a href="#app-js核心文件" class="headerlink" title="app.js核心文件"></a>app.js核心文件</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 加载依赖库，原来这个类库都封装在connect中，现在需地注单独加载</span></span><br><span class="line"><span class="keyword">var</span> createError = <span class="built_in">require</span>(<span class="string">'http-errors'</span>);</span><br><span class="line"><span class="keyword">var</span> express = <span class="built_in">require</span>(<span class="string">'express'</span>);</span><br><span class="line"><span class="keyword">var</span> path = <span class="built_in">require</span>(<span class="string">'path'</span>);</span><br><span class="line"><span class="keyword">var</span> cookieParser = <span class="built_in">require</span>(<span class="string">'cookie-parser'</span>);</span><br><span class="line"><span class="keyword">var</span> logger = <span class="built_in">require</span>(<span class="string">'morgan'</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 加载路由控制</span></span><br><span class="line"><span class="keyword">var</span> indexRouter = <span class="built_in">require</span>(<span class="string">'./routes/index'</span>);</span><br><span class="line"><span class="keyword">var</span> usersRouter = <span class="built_in">require</span>(<span class="string">'./routes/users'</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 创建项目实例</span></span><br><span class="line"><span class="keyword">var</span> app = express();</span><br><span class="line"></span><br><span class="line"><span class="comment">// 定义pug模板引擎和模板文件位置，也可以使用ejs或其他模型引擎</span></span><br><span class="line">app.set(<span class="string">'views'</span>, path.join(__dirname, <span class="string">'views'</span>));</span><br><span class="line">app.set(<span class="string">'view engine'</span>, <span class="string">'pug'</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 定义日志和输出级别</span></span><br><span class="line">app.use(logger(<span class="string">'dev'</span>));</span><br><span class="line"><span class="comment">// 定义数据解析器</span></span><br><span class="line">app.use(express.json());</span><br><span class="line">app.use(express.urlencoded(&#123; <span class="attr">extended</span>: <span class="literal">false</span> &#125;));</span><br><span class="line"><span class="comment">// 定义cookie解析器</span></span><br><span class="line">app.use(cookieParser());</span><br><span class="line"><span class="comment">// 定义静态文件目录</span></span><br><span class="line">app.use(express.static(path.join(__dirname, <span class="string">'public'</span>)));</span><br><span class="line"></span><br><span class="line"><span class="comment">// 匹配路径和路由</span></span><br><span class="line">app.use(<span class="string">'/'</span>, indexRouter);</span><br><span class="line">app.use(<span class="string">'/users'</span>, usersRouter);</span><br><span class="line"></span><br><span class="line"><span class="comment">// catch 404 and forward to error handler</span></span><br><span class="line">app.use(<span class="function"><span class="keyword">function</span>(<span class="params">req, res, next</span>) </span>&#123;</span><br><span class="line">  next(createError(<span class="number">404</span>));</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// error handler</span></span><br><span class="line">app.use(<span class="function"><span class="keyword">function</span>(<span class="params">err, req, res, next</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// set locals, only providing error in development</span></span><br><span class="line">  res.locals.message = err.message;</span><br><span class="line">  res.locals.error = req.app.get(<span class="string">'env'</span>) === <span class="string">'development'</span> ? err : &#123;&#125;;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// render the error page</span></span><br><span class="line">  res.status(err.status || <span class="number">500</span>);</span><br><span class="line">  res.render(<span class="string">'error'</span>);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 输出模型app</span></span><br><span class="line"><span class="built_in">module</span>.exports = app;</span><br></pre></td></tr></table></figure>
+<p>www文件也是一个node的脚本，用于分离配置和启动程序。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/usr/bin/env node</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Module dependencies.</span></span><br><span class="line"><span class="comment"> * 加载依赖</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> app = <span class="built_in">require</span>(<span class="string">'../app'</span>);</span><br><span class="line"><span class="keyword">var</span> debug = <span class="built_in">require</span>(<span class="string">'debug'</span>)(<span class="string">'express-study:server'</span>);</span><br><span class="line"><span class="keyword">var</span> http = <span class="built_in">require</span>(<span class="string">'http'</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Get port from environment and store in Express.</span></span><br><span class="line"><span class="comment"> * 定义启动端口</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> port = normalizePort(process.env.PORT || <span class="string">'3000'</span>);</span><br><span class="line">app.set(<span class="string">'port'</span>, port);</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Create HTTP server.</span></span><br><span class="line"><span class="comment"> *  创建HTTP服务器实例</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> server = http.createServer(app);</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Listen on provided port, on all network interfaces.</span></span><br><span class="line"><span class="comment"> * 启动网络服务监听端口</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line">server.listen(port);</span><br><span class="line">server.on(<span class="string">'error'</span>, onError);</span><br><span class="line">server.on(<span class="string">'listening'</span>, onListening);</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Normalize a port into a number, string, or false.</span></span><br><span class="line"><span class="comment"> *  端口标准化函数</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">normalizePort</span>(<span class="params">val</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> port = <span class="built_in">parseInt</span>(val, <span class="number">10</span>);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (<span class="built_in">isNaN</span>(port)) &#123;</span><br><span class="line">    <span class="comment">// named pipe</span></span><br><span class="line">    <span class="keyword">return</span> val;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (port &gt;= <span class="number">0</span>) &#123;</span><br><span class="line">    <span class="comment">// port number</span></span><br><span class="line">    <span class="keyword">return</span> port;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Event listener for HTTP server "error" event.</span></span><br><span class="line"><span class="comment"> * HTTP异常事件处理函数</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">onError</span>(<span class="params">error</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (error.syscall !== <span class="string">'listen'</span>) &#123;</span><br><span class="line">    <span class="keyword">throw</span> error;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">var</span> bind = <span class="keyword">typeof</span> port === <span class="string">'string'</span></span><br><span class="line">    ? <span class="string">'Pipe '</span> + port</span><br><span class="line">    : <span class="string">'Port '</span> + port;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// handle specific listen errors with friendly messages</span></span><br><span class="line">  <span class="keyword">switch</span> (error.code) &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">'EACCES'</span>:</span><br><span class="line">      <span class="built_in">console</span>.error(bind + <span class="string">' requires elevated privileges'</span>);</span><br><span class="line">      process.exit(<span class="number">1</span>);</span><br><span class="line">      <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">'EADDRINUSE'</span>:</span><br><span class="line">      <span class="built_in">console</span>.error(bind + <span class="string">' is already in use'</span>);</span><br><span class="line">      process.exit(<span class="number">1</span>);</span><br><span class="line">      <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">default</span>:</span><br><span class="line">      <span class="keyword">throw</span> error;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Event listener for HTTP server "listening" event.</span></span><br><span class="line"><span class="comment"> * 事件绑定函数</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">onListening</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> addr = server.address();</span><br><span class="line">  <span class="keyword">var</span> bind = <span class="keyword">typeof</span> addr === <span class="string">'string'</span></span><br><span class="line">    ? <span class="string">'pipe '</span> + addr</span><br><span class="line">    : <span class="string">'port '</span> + addr.port;</span><br><span class="line">  debug(<span class="string">'Listening on '</span> + bind);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>运行浏览：<br><img src="https://img.huyunshun.com/img1/imgclip_3.png" alt="">   </p>
+<p>接下来，我们把index.ejs页面切分成3个部分：header.ejs, index.ejs, footer.ejs，用于网站页面的模块化。</p>
+<p>header.ejs, 为页面的头部区域</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html lang=<span class="string">"zh-CN"</span>&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">    &lt;title&gt;&lt;%= title %&gt;&lt;<span class="regexp">/title&gt;</span></span><br><span class="line"><span class="regexp">    &lt;link rel="stylesheet" href="http:/</span><span class="regexp">/cdn.bootcss.com/</span>bootstrap/<span class="number">3.3</span><span class="number">.2</span>/css/bootstrap.min.css<span class="string">"&gt;</span></span><br><span class="line"><span class="string">    &lt;link rel='stylesheet' href='/stylesheets/style.css' /&gt;</span></span><br><span class="line"><span class="string">&lt;/head&gt;</span></span><br><span class="line"><span class="string">&lt;body&gt;</span></span><br></pre></td></tr></table></figure>
+<p>index.ejs, 为内容显示区域</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;% include header.ejs %&gt;</span><br><span class="line"></span><br><span class="line">&lt;div <span class="class"><span class="keyword">class</span></span>=<span class="string">"well jumbotron"</span>&gt;</span><br><span class="line">  &lt;h1&gt;&lt;%= title %&gt;&lt;<span class="regexp">/h1&gt;</span></span><br><span class="line"><span class="regexp">  &lt;p&gt;hello&lt;/</span>p&gt;</span><br><span class="line">&lt;<span class="regexp">/div&gt;</span></span><br><span class="line"><span class="regexp"></span></span><br><span class="line"><span class="regexp">&lt;% include footer.ejs %&gt;</span></span><br></pre></td></tr></table></figure>
+<p>footer.ejs，为页面底部区域</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;script src=<span class="string">"http://cdn.bootcss.com/jquery/1.11.2/jquery.min.js"</span>&gt;&lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">&lt;script src="http:/</span><span class="regexp">/cdn.bootcss.com/</span>bootstrap/<span class="number">3.3</span><span class="number">.2</span>/js/bootstrap.min.js<span class="string">"&gt;&lt;/script&gt;</span></span><br><span class="line"><span class="string">&lt;/body&gt;</span></span><br><span class="line"><span class="string">&lt;/html&gt;</span></span><br></pre></td></tr></table></figure>
+<h2 id="路由功能"><a href="#路由功能" class="headerlink" title="路由功能"></a>路由功能</h2><p>路由功能，是Express4以后全面改版的功能。在应用程序加载隐含路由中间件.   </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">app.route()函数，创建可链接的途径处理程序的路由路径。</span><br><span class="line">express.Router类，创建模块化安装路径的处理程序。</span><br></pre></td></tr></table></figure>
+<p>app.route方法会返回一个Route实例，它可以继续使用所有的HTTP方法，包括get,post,all,put,delete,head等。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">app.route(<span class="string">'/users'</span>)</span><br><span class="line">  .get(<span class="function"><span class="keyword">function</span>(<span class="params">req, res, next</span>) </span>&#123;&#125;)</span><br><span class="line">  .post(<span class="function"><span class="keyword">function</span>(<span class="params">req, res, next</span>) </span>&#123;&#125;)</span><br></pre></td></tr></table></figure>
+<p>express.Router类，则可以帮助我们更好的组织代码结构。<br>在app.js文件中，定义了app.use(‘/’, routes); routes是指向了routes目录下的index.js文件，./routes/index.js文件中，express.Router被定义使用，路径/*处理都会由routes/index.js文件里的Router来处理。如果我们要管理不同的路径，那么可以直接配置为多个不同的Router。</p>
+<p>  app.use(‘/user’, require(‘./routes/user’).user);<br>  app.use(‘/admin’, require(‘./routes/admin’).admin);<br>  app.use(‘/‘, require(‘./routes’));</p>
+
+      
+    </div>
+     <!-- 相关文章推荐 -->
+    
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/docker/" rel="tag"># docker</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/03/23/%E4%BD%BF%E7%94%A8%E6%B6%88%E6%81%AF%E6%9C%BA%E5%88%B6%E8%A1%A5%E5%81%BF%E5%A4%84%E7%90%86%E5%AE%9E%E4%BE%8B/" rel="next" title="使用消息机制补偿处理实例">
+                <i class="fa fa-chevron-left"></i> 使用消息机制补偿处理实例
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/04/02/%E9%AB%98%E5%8F%AF%E7%94%A8Redis%E6%9C%8D%E5%8A%A1%E5%92%8C%E5%8E%9F%E7%90%86/" rel="prev" title="高可用Redis服务和原理">
+                高可用Redis服务和原理 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+<span class="jiathis_txt">分享到：</span>
+<a class="jiathis_button_fav">收藏夹</a>
+<a class="jiathis_button_copy">复制网址</a>
+<a class="jiathis_button_email">邮件</a>
+<a class="jiathis_button_weixin">微信</a>
+<a class="jiathis_button_qzone">QQ空间</a>
+<a class="jiathis_button_tqq">腾讯微博</a>
+<a class="jiathis_button_douban">豆瓣</a>
+<a class="jiathis_button_share">一键分享</a>
+
+<a href="http://www.jiathis.com/share?uid=2140465" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+<a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+var jiathis_config={
+  data_track_clickback:true,
+  summary:"",
+  shortUrl:false,
+  hideMore:false
+}
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://img.huyunshun.com/img/20200522182348.png"
+                alt="初晨" />
+            
+              <p class="site-author-name" itemprop="name">初晨</p>
+              <p class="site-description motion-element" itemprop="description">永远不要说你知道本质，更别说真相了。</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">249</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">46</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+<!--近期文章版块-->
+            
+                <div class="links-of-blogroll motion-element links-of-blogroll-block">
+                  <div class="links-of-blogroll-title">
+                    <!-- modify icon to fire by szw -->
+                    <i class="fa fa-history fa-" aria-hidden="true"></i>
+                    近期文章
+                  </div>
+                  <ul class="links-of-blogroll-list">
+                    
+                    
+                      <li>
+                        <a href="/2020/05/22/WebSocket%E3%80%81Socket%E3%80%81TCP%E3%80%81HTTP%E5%8C%BA%E5%88%AB/" title="WebSocket、Socket、TCP、HTTP区别" target="_blank">WebSocket、Socket、TCP、HTTP区别</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/19/Springboot%E9%A1%B9%E7%9B%AE%E7%9A%84%E6%8E%A5%E5%8F%A3%E9%98%B2%E5%88%B7/" title="Springboot项目的接口防刷" target="_blank">Springboot项目的接口防刷</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/03/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Volatile%E5%85%B3%E9%94%AE%E5%AD%97%E5%8F%8A%E5%85%B6%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/" title="深入理解Volatile关键字及其实现原理" target="_blank">深入理解Volatile关键字及其实现原理</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/04/20/%E4%BD%BF%E7%94%A8vscode%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0%E7%8E%AF%E5%A2%83/" title="使用vscode搭建个人笔记环境" target="_blank">使用vscode搭建个人笔记环境</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/01/20/HBase%E4%BB%8B%E7%BB%8D%E5%AE%89%E8%A3%85%E4%B8%8E%E6%93%8D%E4%BD%9C/" title="HBase介绍安装与操作" target="_blank">HBase介绍安装与操作</a>
+                      </li>
+                    
+                  </ul>
+                </div>
+            
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Node-js简介"><span class="nav-number">1.</span> <span class="nav-text">Node.js简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#下载"><span class="nav-number">2.</span> <span class="nav-text">下载</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#安装"><span class="nav-number">3.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#NPM"><span class="nav-number">4.</span> <span class="nav-text">NPM</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#配置"><span class="nav-number">5.</span> <span class="nav-text">配置</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#测试"><span class="nav-number">6.</span> <span class="nav-text">测试</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Express"><span class="nav-number">7.</span> <span class="nav-text">Express</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#IDE工程结构"><span class="nav-number">8.</span> <span class="nav-text">IDE工程结构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#package-json项目配置"><span class="nav-number">8.1.</span> <span class="nav-text">package.json项目配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#app-js核心文件"><span class="nav-number">8.2.</span> <span class="nav-text">app.js核心文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#路由功能"><span class="nav-number">8.3.</span> <span class="nav-text">路由功能</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Copyright</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

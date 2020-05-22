@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="idea," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="使用全局Maven（默认配置） 版本控制Git&#x2F;Svn （默认配置）IDEA内置的Git插件灰常好用，尤其是解决冲突性的代码。另外Git客户端推荐SourceTree。 自动导包和智能移除 （默认配置） Tomcat Server 自动编译开启自动编译之后，结合Ctrl+Shift+F9 会有热更新效果。    取消大小写敏感具体步骤： File | Settings | Editor | Gen">
+<meta property="og:type" content="article">
+<meta property="og:title" content="IDEA常用配置和快捷键">
+<meta property="og:url" content="https://huyunshun.com/2018/04/21/IDEA%E5%B8%B8%E7%94%A8%E9%85%8D%E7%BD%AE%E5%92%8C%E5%BF%AB%E6%8D%B7%E9%94%AE/index.html">
+<meta property="og:site_name" content="简">
+<meta property="og:description" content="使用全局Maven（默认配置） 版本控制Git&#x2F;Svn （默认配置）IDEA内置的Git插件灰常好用，尤其是解决冲突性的代码。另外Git客户端推荐SourceTree。 自动导包和智能移除 （默认配置） Tomcat Server 自动编译开启自动编译之后，结合Ctrl+Shift+F9 会有热更新效果。    取消大小写敏感具体步骤： File | Settings | Editor | Gen">
+<meta property="og:image" content="https://img.huyunshun.com/img/20200421164519.png">
+<meta property="og:image" content="https://img.huyunshun.com/img/20200421164547.png">
+<meta property="og:image" content="https://img.huyunshun.com/img/20200421164617.png">
+<meta property="og:image" content="https://img.huyunshun.com/img/20200421164637.png">
+<meta property="og:image" content="https://img.huyunshun.com/img/20200421164659.png">
+<meta property="og:image" content="https://img.huyunshun.com/img/20200421164720.png">
+<meta property="og:image" content="https://img.huyunshun.com/img/20200421164729.png">
+<meta property="og:image" content="https://img.huyunshun.com/img/20200421164816.png">
+<meta property="og:image" content="https://img.huyunshun.com/img/20200421164837.png">
+<meta property="og:image" content="https://img.huyunshun.com/img/20200421164919.png">
+<meta property="og:image" content="https://img.huyunshun.com/img/20200421164936.png">
+<meta property="article:published_time" content="2018-04-21T08:43:17.000Z">
+<meta property="article:modified_time" content="2020-05-20T10:04:24.680Z">
+<meta property="article:author" content="初晨">
+<meta property="article:tag" content="idea">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img.huyunshun.com/img/20200421164519.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://huyunshun.com/2018/04/21/IDEA常用配置和快捷键/"/>
+
+
+
+
+
+  <title>IDEA常用配置和快捷键 | 简</title>
+  
+
+
+
+
+
+
+
+
+  <script type="text/javascript" src="/js/src/love.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
+
+  <!-- 看板娘 -->
+    
+        <script async src="/live2d-widget/autoload.js"></script>
+    
+ <!-- 飘动的彩带） -->
+  <script src="/js/src/piao.js" type="text/javascript"></script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">简</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">人生短暂，学海无边，而大道至简。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://huyunshun.com/2018/04/21/IDEA%E5%B8%B8%E7%94%A8%E9%85%8D%E7%BD%AE%E5%92%8C%E5%BF%AB%E6%8D%B7%E9%94%AE/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="初晨">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://img.huyunshun.com/img/20200522182348.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="简">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">IDEA常用配置和快捷键</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-21T16:43:17+08:00">
+                2018-04-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E5%85%B7/" itemprop="url" rel="index">
+                    <span itemprop="name">工具</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><h3 id="全局Maven（默认配置）"><a href="#全局Maven（默认配置）" class="headerlink" title="全局Maven（默认配置）"></a>全局Maven（默认配置）</h3><p><img src="https://img.huyunshun.com/img/20200421164519.png" alt="20200421164519"></p>
+<h3 id="版本控制Git-Svn-（默认配置）"><a href="#版本控制Git-Svn-（默认配置）" class="headerlink" title="版本控制Git/Svn （默认配置）"></a>版本控制Git/Svn （默认配置）</h3><p>IDEA内置的Git插件灰常好用，尤其是解决冲突性的代码。另外Git客户端推荐SourceTree。<br><img src="https://img.huyunshun.com/img/20200421164547.png" alt="20200421164547"></p>
+<h3 id="自动导包和智能移除-（默认配置）"><a href="#自动导包和智能移除-（默认配置）" class="headerlink" title="自动导包和智能移除 （默认配置）"></a>自动导包和智能移除 （默认配置）</h3><p><img src="https://img.huyunshun.com/img/20200421164617.png" alt="20200421164617"></p>
+<h3 id="Tomcat-Server"><a href="#Tomcat-Server" class="headerlink" title="Tomcat Server"></a>Tomcat Server</h3><p><img src="https://img.huyunshun.com/img/20200421164637.png" alt="20200421164637"></p>
+<h3 id="自动编译"><a href="#自动编译" class="headerlink" title="自动编译"></a>自动编译</h3><p>开启自动编译之后，结合Ctrl+Shift+F9 会有热更新效果。</p>
+<p><img src="https://img.huyunshun.com/img/20200421164659.png" alt="20200421164659"></p>
+<p><img src="https://img.huyunshun.com/img/20200421164720.png" alt="20200421164720"></p>
+<p><img src="https://img.huyunshun.com/img/20200421164729.png" alt="20200421164729"></p>
+<h3 id="取消大小写敏感"><a href="#取消大小写敏感" class="headerlink" title="取消大小写敏感"></a>取消大小写敏感</h3><p>具体步骤：</p>
+<pre><code>File | Settings | Editor | General | Code Completion Case | Sensitive Completion = None
+取消大小敏感，在编写代码的时候，代码的自动提示将更加全面和丰富。</code></pre><p><img src="https://img.huyunshun.com/img/20200421164816.png" alt="20200421164816"></p>
+<h3 id="调整字体"><a href="#调整字体" class="headerlink" title="调整字体"></a>调整字体</h3><p><img src="https://img.huyunshun.com/img/20200421164837.png" alt="20200421164837"></p>
+<h3 id="关闭Intellij-IDEA自动更新"><a href="#关闭Intellij-IDEA自动更新" class="headerlink" title="关闭Intellij IDEA自动更新"></a>关闭Intellij IDEA自动更新</h3><p><img src="https://img.huyunshun.com/img/20200421164919.png" alt="20200421164919"></p>
+<h3 id="文件编码设置"><a href="#文件编码设置" class="headerlink" title="文件编码设置"></a>文件编码设置</h3><p><img src="https://img.huyunshun.com/img/20200421164936.png" alt="20200421164936"></p>
+<h3 id="类和方法注释模板"><a href="#类和方法注释模板" class="headerlink" title="类和方法注释模板"></a>类和方法注释模板</h3><p>1.修改类注释模板<br>在File-&gt;Settings-&gt;Editor-&gt;File and Code Templates下分别修改Class，Interface，Enum等注释模板，Class模板部分修改如下，其余的举一反三进行修改。</p>
+<p>2.方法注释模板修改<br>在File-&gt;Settings-&gt;Editor-&gt;Live Templates下添加自定义Template Group，并在自定义Template Group下添加自定义Template</p>
+<p>生成serialVersionUID</p>
+<p>默认情况下Intellij IDEA关闭了继承了Java.io.Serializable的类生成serialVersionUID的警告，如果需要提示生成serialVersionUID，那么需要做以下设置:在File-&gt;Settings-&gt;Editor-&gt;Inspections下勾选中Java-&gt;Serialization issues-&gt;Serializable class without ‘serialVersionUID’，将光标放到类名上按Atl＋Enter键就会提示生成serialVersionUID了</p>
+<h2 id="快捷键"><a href="#快捷键" class="headerlink" title="快捷键"></a>快捷键</h2><pre><code>1. 按【鼠标中键】快速打开智能提示，取代alt+enter 。
+
+File-&gt;Settings-&gt; Keymap-&gt; 搜索 Show Intention Actions -&gt; 添加快捷键为鼠标中键。
+
+2. 按【F2】快速修改文件名，告别双手操作。
+
+File-&gt;Settings-&gt; Keymap-&gt; 搜索 Rename -&gt; 将快捷键设置为F2 。
+
+3. 按【F3】直接打开文件所在目录，浏览一步到位。
+
+File-&gt;Settings-&gt; Keymap-&gt; 搜索 Show In Explorer -&gt; 将快捷键设置为F3 。
+
+4. 按【Ctrl+右键】直接打开实现类，方便开发查询。
+
+File-&gt;Settings-&gt; Keymap-&gt; 搜索 implementation-&gt;  Add Mouse Shortcut 将快捷键设置为Ctrl+ 鼠标右键。
+
+Maven自动下载源码包，告别反编译，直接上源码注释！！
+
+File | Settings | Build, Execution, Deployment | Build Tools | Maven | Importing
+
+将Automatically Download  的 Source 勾上
+
+
+快捷键        介绍
+Ctrl + B        进入光标所在的方法/变量的接口或是定义处，等效于Ctrl + 左键单击
+Ctrl + D        复制光标所在行或复制选择内容，并把复制内容插入光标位置下面
+Ctrl + F        在当前文件进行文本查找
+Ctrl + H        查看类的继承结构
+Ctrl + N        通过类名定位文件
+Ctrl + O        快速重写父类方法
+Ctrl + P        方法参数提示
+Ctrl + Y        删除光标所在行或删除选中的行
+Ctrl + W        递进式选择代码块
+Ctrl + Z        撤销
+Ctrl + 1,2,3…9        定位到对应数值的书签位置 结合Ctrl + Shift + 1,2,3…9使用
+Ctrl + F1        在光标所在的错误代码出显示错误信息
+Ctrl + F12        弹出当前文件结构层，可以在弹出的层上直接输入进行筛选
+Ctrl + Space        基础代码补全默认在Windows系统上被输入法占用，需要进行修改，建议修改为Ctrl + 逗号
+Ctrl + /        注释光标所在行代码，会根据当前不同文件类型使用不同的注释符号
+Alt相关
+快捷键        介绍
+Alt + Q        弹出一个提示，显示当前类的声明/上下文信息
+Alt + Enter        根据光标所在问题，提供快速修复选择
+Shift相关
+快捷键        介绍
+Shift + F3        在查找模式下，定位到上一个匹配处
+Ctrl+Alt相关
+快捷键        介绍
+Ctrl + Alt + B        在某个调用的方法名上使用会跳到具体的实现处
+Ctrl + Alt + L        格式化代码 可以对当前文件和整个包目录使用
+Ctrl + Alt + M        快速抽取方法
+Ctrl + Alt + O        优化导入的类和包 可以对当前文件和整个包目录使用
+Ctrl + Alt + T        对选中的代码弹出环绕选项弹出层
+Ctrl + Alt + V        快速引进变量
+Ctrl + Alt + F7        寻找类或是变量被调用的地方，以弹出框的方式显示
+Ctrl + Alt + 左方向键        退回到上一个操作的地方
+Ctrl + Alt + 右方向键        前进到上一个操作的地方
+Ctrl+Shift相关
+快捷键        介绍
+Ctrl + Shift + F        根据输入内容查找整个项目或指定目录内文件
+Ctrl + Shift + H        查看方法的继承结构
+Ctrl + Shift + J        自动将下一行合并到当前行末尾
+Ctrl + Shift + N        通过文件名定位打开文件/目录，打开目录需要在输入的内容后面多加一个正斜杠
+Ctrl + Shift + R        根据输入内容替换对应内容，范围为整个项目或指定目录内文件
+Ctrl + Shift + U        对选中的代码进行大/小写轮流转换
+Ctrl + Shift + W        递进式取消选择代码块
+Ctrl + Shift + Z        取消撤销
+Ctrl + Shift + /        代码块注释
+Ctrl + Shift + +        展开所有代码
+Ctrl + Shift + -        折叠所有代码
+Ctrl + Shift + 1,2,3…9        快速添加指定数值的书签
+Ctrl + Shift + F7        高亮显示所有该选中文本，按Esc高亮消失
+Ctrl + Shift + Space        智能代码提示
+Ctrl + Shift + Enter        自动结束代码，行末自动添加分号
+Alt+Shift相关
+快捷键        介绍
+
+Ctrl+Alt+Shift相关
+快捷键        介绍
+
+其他
+快捷键        介绍
+F2        跳转到下一个高亮错误或警告位置
+F3        在查找模式下，定位到下一个匹配处
+F4        编辑源</code></pre>
+      
+    </div>
+     <!-- 相关文章推荐 -->
+    
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/idea/" rel="tag"># idea</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/04/21/Git%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8/" rel="next" title="Git安装使用">
+                <i class="fa fa-chevron-left"></i> Git安装使用
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/04/22/JAVA8%20%E5%AF%B9%E9%9B%86%E5%90%88%E7%9A%84%E5%A2%9E%E5%BC%BA/" rel="prev" title="JAVA8 对集合的增强">
+                JAVA8 对集合的增强 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+<span class="jiathis_txt">分享到：</span>
+<a class="jiathis_button_fav">收藏夹</a>
+<a class="jiathis_button_copy">复制网址</a>
+<a class="jiathis_button_email">邮件</a>
+<a class="jiathis_button_weixin">微信</a>
+<a class="jiathis_button_qzone">QQ空间</a>
+<a class="jiathis_button_tqq">腾讯微博</a>
+<a class="jiathis_button_douban">豆瓣</a>
+<a class="jiathis_button_share">一键分享</a>
+
+<a href="http://www.jiathis.com/share?uid=2140465" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+<a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+var jiathis_config={
+  data_track_clickback:true,
+  summary:"",
+  shortUrl:false,
+  hideMore:false
+}
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://img.huyunshun.com/img/20200522182348.png"
+                alt="初晨" />
+            
+              <p class="site-author-name" itemprop="name">初晨</p>
+              <p class="site-description motion-element" itemprop="description">永远不要说你知道本质，更别说真相了。</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">249</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">46</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+<!--近期文章版块-->
+            
+                <div class="links-of-blogroll motion-element links-of-blogroll-block">
+                  <div class="links-of-blogroll-title">
+                    <!-- modify icon to fire by szw -->
+                    <i class="fa fa-history fa-" aria-hidden="true"></i>
+                    近期文章
+                  </div>
+                  <ul class="links-of-blogroll-list">
+                    
+                    
+                      <li>
+                        <a href="/2020/05/22/WebSocket%E3%80%81Socket%E3%80%81TCP%E3%80%81HTTP%E5%8C%BA%E5%88%AB/" title="WebSocket、Socket、TCP、HTTP区别" target="_blank">WebSocket、Socket、TCP、HTTP区别</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/19/Springboot%E9%A1%B9%E7%9B%AE%E7%9A%84%E6%8E%A5%E5%8F%A3%E9%98%B2%E5%88%B7/" title="Springboot项目的接口防刷" target="_blank">Springboot项目的接口防刷</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/03/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Volatile%E5%85%B3%E9%94%AE%E5%AD%97%E5%8F%8A%E5%85%B6%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/" title="深入理解Volatile关键字及其实现原理" target="_blank">深入理解Volatile关键字及其实现原理</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/04/20/%E4%BD%BF%E7%94%A8vscode%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0%E7%8E%AF%E5%A2%83/" title="使用vscode搭建个人笔记环境" target="_blank">使用vscode搭建个人笔记环境</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/01/20/HBase%E4%BB%8B%E7%BB%8D%E5%AE%89%E8%A3%85%E4%B8%8E%E6%93%8D%E4%BD%9C/" title="HBase介绍安装与操作" target="_blank">HBase介绍安装与操作</a>
+                      </li>
+                    
+                  </ul>
+                </div>
+            
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#使用"><span class="nav-number">1.</span> <span class="nav-text">使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#全局Maven（默认配置）"><span class="nav-number">1.1.</span> <span class="nav-text">全局Maven（默认配置）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#版本控制Git-Svn-（默认配置）"><span class="nav-number">1.2.</span> <span class="nav-text">版本控制Git&#x2F;Svn （默认配置）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#自动导包和智能移除-（默认配置）"><span class="nav-number">1.3.</span> <span class="nav-text">自动导包和智能移除 （默认配置）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Tomcat-Server"><span class="nav-number">1.4.</span> <span class="nav-text">Tomcat Server</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#自动编译"><span class="nav-number">1.5.</span> <span class="nav-text">自动编译</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#取消大小写敏感"><span class="nav-number">1.6.</span> <span class="nav-text">取消大小写敏感</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#调整字体"><span class="nav-number">1.7.</span> <span class="nav-text">调整字体</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#关闭Intellij-IDEA自动更新"><span class="nav-number">1.8.</span> <span class="nav-text">关闭Intellij IDEA自动更新</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#文件编码设置"><span class="nav-number">1.9.</span> <span class="nav-text">文件编码设置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#类和方法注释模板"><span class="nav-number">1.10.</span> <span class="nav-text">类和方法注释模板</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#快捷键"><span class="nav-number">2.</span> <span class="nav-text">快捷键</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Copyright</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Predicate 谓词对象Java8起为Collection集合新增了一个removeIf(Predicate)方法，该方法将会批量删除符合filter条件的所有元素。该方法需要一个Predicate对象作为参数 removeIf(Predicate pre) 该方法将会批量删除符合条件的所有元素 123456789hashSet.removeIf(new Predicate&lt;String">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JAVA8 对集合的增强">
+<meta property="og:url" content="https://huyunshun.com/2018/04/22/JAVA8%20%E5%AF%B9%E9%9B%86%E5%90%88%E7%9A%84%E5%A2%9E%E5%BC%BA/index.html">
+<meta property="og:site_name" content="简">
+<meta property="og:description" content="Predicate 谓词对象Java8起为Collection集合新增了一个removeIf(Predicate)方法，该方法将会批量删除符合filter条件的所有元素。该方法需要一个Predicate对象作为参数 removeIf(Predicate pre) 该方法将会批量删除符合条件的所有元素 123456789hashSet.removeIf(new Predicate&lt;String">
+<meta property="article:published_time" content="2018-04-21T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-05-20T10:04:24.685Z">
+<meta property="article:author" content="初晨">
+<meta property="article:tag" content="编程">
+<meta property="article:tag" content="开发">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://huyunshun.com/2018/04/22/JAVA8 对集合的增强/"/>
+
+
+
+
+
+  <title>JAVA8 对集合的增强 | 简</title>
+  
+
+
+
+
+
+
+
+
+  <script type="text/javascript" src="/js/src/love.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
+
+  <!-- 看板娘 -->
+    
+        <script async src="/live2d-widget/autoload.js"></script>
+    
+ <!-- 飘动的彩带） -->
+  <script src="/js/src/piao.js" type="text/javascript"></script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">简</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">人生短暂，学海无边，而大道至简。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://huyunshun.com/2018/04/22/JAVA8%20%E5%AF%B9%E9%9B%86%E5%90%88%E7%9A%84%E5%A2%9E%E5%BC%BA/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="初晨">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://img.huyunshun.com/img/20200522182348.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="简">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">JAVA8 对集合的增强</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-22T00:00:00+08:00">
+                2018-04-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h4 id="Predicate-谓词对象"><a href="#Predicate-谓词对象" class="headerlink" title="Predicate 谓词对象"></a>Predicate 谓词对象</h4><p>Java8起为Collection集合新增了一个removeIf(Predicate)方法，该方法将会批量删除符合filter条件的所有元素。该方法需要一个Predicate对象作为参数</p>
+<p>removeIf(Predicate pre) 该方法将会批量删除符合条件的所有元素</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">hashSet.removeIf(<span class="keyword">new</span> Predicate&lt;String&gt;() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">test</span><span class="params">(String s)</span> </span>&#123;</span><br><span class="line">                <span class="keyword">if</span> (s.equals(<span class="string">"hu"</span>)) &#123;</span><br><span class="line">                    <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br></pre></td></tr></table></figure>
+<p>Predicate 简化集合操作</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">       ArrayList&lt;String&gt; list = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">       System.out.println(<span class="string">"list中包含a的个数"</span> + total(list, ele -&gt; ele.contains(<span class="string">"a"</span>)));</span><br><span class="line">       System.out.println(<span class="string">"长度大于5的元素个数"</span> + total(list, <span class="keyword">new</span> Predicate&lt;String&gt;() &#123;</span><br><span class="line">           <span class="meta">@Override</span></span><br><span class="line">           <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">test</span><span class="params">(String s)</span> </span>&#123;</span><br><span class="line">               <span class="keyword">if</span> (s.length() &gt; <span class="number">5</span>) &#123;</span><br><span class="line">                   <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">               &#125;</span><br><span class="line">               <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;));</span><br><span class="line">       System.out.println(<span class="string">"集合中包含c的元素个数"</span> + total(list, ele -&gt; ele.contains(<span class="string">"c"</span>)));</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">total</span><span class="params">(Collection&lt;String&gt; collection, Predicate&lt;String&gt; p)</span> </span>&#123;</span><br><span class="line">       <span class="keyword">int</span> total = <span class="number">0</span>;</span><br><span class="line">       <span class="keyword">for</span> (String s : collection) &#123;</span><br><span class="line">           <span class="keyword">if</span> (p.test(s)) &#123;</span><br><span class="line">               total++;</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;</span><br><span class="line">       <span class="keyword">return</span> total;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="Steam-流式API"><a href="#Steam-流式API" class="headerlink" title="Steam 流式API"></a>Steam 流式API</h4><p>Java8新增了Stream、InStream、LongStream、DoubleStream等流式API，这些API代表多个支持串行和并行聚集操作的元素。</p>
+<p>Java8为上面每个流式API提供了对应的Builder</p>
+<p>Stream 通用接口  Stream.Builder</p>
+<p>IntSteam 对应的int类型的流  IntStream.Builder</p>
+<p>LongStream 对应的long类型的流  LongStream.Builder</p>
+<p>DoubleStream 对应的double类型的流  DoubleStream.Builder</p>
+<h4 id="使用Stream步骤"><a href="#使用Stream步骤" class="headerlink" title="使用Stream步骤"></a>使用Stream步骤</h4><p>1、使用Stream或XxxStream的builder()类方法创建该Stream对应的Builder</p>
+<p>2、重复调用Builder的add()方法向该流中添加多个元素</p>
+<p>3、Builder的build()获取对应的Stream</p>
+<p>4、调用Stream的聚集方法(Stream提供了大量的聚集方法供用户调用 ) 每个Stream只能调用一次聚集方法，Stream调用聚集方法后流就会关闭，并且不可重用。</p>
+<ul>
+<li>中间方法：中间操作允许流保持打开状态，并允许直接调用后续方法。</li>
+<li>末端方法：末端方法是对流的最终操作。对某个流操作执行末端方法后，该流将被消耗，且不再可用。例如sum() count() average()等都是末端方法</li>
+<li>有状态的方法：这种方法会给流增加一些新的属性。例如元素的唯一性、元素的最大数量、保证元素以排序的方式被处理等。</li>
+<li>有状态的方法往往需要更大的性能开销</li>
+<li>短路方法：短路方法可以尽早结束对流的操作，不必检查所有的元素</li>
+</ul>
+<h4 id="Stream-API"><a href="#Stream-API" class="headerlink" title="Stream API"></a>Stream API</h4><h5 id="中间方法"><a href="#中间方法" class="headerlink" title="中间方法"></a>中间方法</h5><p>filter(Predicate predicate) 过滤Stream中所有不符合Predicate的元素(也就是说返回一个符合Predicate条件的流)</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">IntStream.Builder builder = IntStream.builder();</span><br><span class="line">builder.add(<span class="number">1</span>);</span><br><span class="line">builder.add(<span class="number">2</span>);</span><br><span class="line">builder.add(<span class="number">3</span>);</span><br><span class="line">builder.add(<span class="number">4</span>);</span><br><span class="line"></span><br><span class="line">IntStream stream = builder.build();</span><br><span class="line">IntStream filterStream = stream.filter(<span class="keyword">new</span> IntPredicate() &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">test</span><span class="params">(<span class="keyword">int</span> value)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (value % <span class="number">2</span> == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br><span class="line">filterStream.forEach(i -&gt; System.out.println(i));</span><br><span class="line">filterStream.close();</span><br></pre></td></tr></table></figure>
+<p>mapToXxx(ToXxxFunction mapper): 使用ToXxxFunction对流中的元素执行一对一的转换。该方法返回一个新Stream中包含了ToXxxFunction转换生成的所有元素</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">LongStream.Builder builder &#x3D; LongStream.builder();</span><br><span class="line">builder.add(4l);</span><br><span class="line">builder.add(10l);</span><br><span class="line">builder.add(9l);</span><br><span class="line">builder.add(7l);</span><br><span class="line">IntStream intStream &#x3D; builder.build().mapToInt(new LongToIntFunction() &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public int applyAsInt(long value) &#123;</span><br><span class="line">        return (int) (value + 2);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br><span class="line">intStream.forEach(value -&gt; System.out.println(value));</span><br></pre></td></tr></table></figure>
+<p>peek(Cosumer action) 依次对每个元素执行一些操作，返回的流与原有流包含相同的元素</p>
+<p>distinct()：该方法用于排序流中所有重复的元素(判断重复依据是equels())。返回由该流的不同元素组成的流</p>
+<p>sorted()该方法用于排序流中的元素在后续的访问中处于有序状态。是有状态的方法</p>
+<p>limit(long maxSize) 该方法用于保证对该流的后续访问中最大允许的访问的元素个数。是一个有状态的、短路的方法。</p>
+<h5 id="末端方法"><a href="#末端方法" class="headerlink" title="末端方法"></a>末端方法</h5><p>forEach(Consumer action) 遍历流中所有元素，对每个元素执行action</p>
+<p>toArray()：将流中所有元素转换为一个数组</p>
+<p>reduce()：用于通过某种操作来合并流中的元素</p>
+<p>min()：返回流中所有元素的最小值</p>
+<p>max()：返回流中所有元素的最大值</p>
+<p>count()：返回流中所有元素的数量</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">IntStream.Builder builder &#x3D; IntStream.builder();</span><br><span class="line">builder.add(1);</span><br><span class="line">builder.add(2);</span><br><span class="line">builder.add(3);</span><br><span class="line">builder.add(4);</span><br><span class="line">builder.add(5);</span><br><span class="line">IntStream intStream &#x3D; builder.build();</span><br><span class="line">OptionalInt max &#x3D; intStream.max();</span><br><span class="line">int min &#x3D; intStream.min().getAsInt();</span><br><span class="line">int sum &#x3D; intStream.sum();</span><br><span class="line">long count &#x3D; intStream.count();</span><br><span class="line">double average &#x3D; intStream.average().getAsDouble();</span><br><span class="line">System.out.println(&quot;最大值&quot;+max.getAsInt());</span><br><span class="line">System.out.println(&quot;最小值&quot; + min);</span><br><span class="line">System.out.println(&quot;元素个数&quot;+count);</span><br><span class="line">        System.out.println(&quot;元素总和&quot;+sum);</span><br><span class="line">        System.out.println(&quot;所有元素的平均值&quot; + average);</span><br></pre></td></tr></table></figure>
+<p>anyMatch(Predicate predicate) 判断流中是否至少包含一个元素符合predicate条件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">IntStream.Builder builder &#x3D; IntStream.builder();</span><br><span class="line">builder.add(1);</span><br><span class="line">builder.add(2);</span><br><span class="line">builder.add(3);</span><br><span class="line">builder.add(4);</span><br><span class="line">builder.add(5);</span><br><span class="line">builder.add(6);</span><br><span class="line">IntStream build &#x3D; builder.build();</span><br><span class="line">boolean b &#x3D; build.anyMatch(new IntPredicate() &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public boolean test(int value) &#123;</span><br><span class="line">        if (value % 2 &#x3D;&#x3D; 0) &#123;</span><br><span class="line">            return true;</span><br><span class="line">        &#125;</span><br><span class="line">        return false;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>allMatch(Predicate predicate): 判断流中是否每个元素都符合predicate条件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">boolean allMatch &#x3D; build.allMatch(new IntPredicate() &#123;</span><br><span class="line">          @Override</span><br><span class="line">          public boolean test(int value) &#123;</span><br><span class="line">              if (value % 1 &#x3D;&#x3D; 0) &#123;</span><br><span class="line">                  return true;</span><br><span class="line">              &#125;</span><br><span class="line">              return false;</span><br><span class="line">          &#125;</span><br><span class="line">      &#125;);</span><br><span class="line">      System.out.println(&quot;all&quot;+allMatch);</span><br></pre></td></tr></table></figure>
+<p>anyMatch(Predicate predicate)：判断流中是否每个元素都符合Predicate条件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"> boolean b &#x3D; build.anyMatch(new IntPredicate() &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public boolean test(int value) &#123;</span><br><span class="line">        if (value % 2 &#x3D;&#x3D; 0) &#123;</span><br><span class="line">            return true;</span><br><span class="line">        &#125;</span><br><span class="line">        return false;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>noneMatch(Predicate predicate) 判断流中是否所有元素都不符合predicate条件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">boolean b &#x3D; build.noneMatch(new IntPredicate() &#123;</span><br><span class="line">            @Override</span><br><span class="line">            public boolean test(int value) &#123;</span><br><span class="line">                if (value &#x2F; 7 &#x3D;&#x3D; 0) &#123;</span><br><span class="line">                    return true;</span><br><span class="line">                &#125;</span><br><span class="line">                return false;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">        System.out.println(b);</span><br></pre></td></tr></table></figure>
+<p>findFirst() 返回流中的第一个元素</p>
+<p>findAny() 返回流中的任意一个元素</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">LongStream.Builder builder &#x3D; LongStream.builder();</span><br><span class="line">builder.add(10);</span><br><span class="line">builder.add(20);</span><br><span class="line">builder.add(30);</span><br><span class="line">builder.add(40);</span><br><span class="line">builder.add(50);</span><br><span class="line">builder.add(60);</span><br><span class="line">LongStream longStream &#x3D; builder.build();</span><br><span class="line">System.out.println(longStream.findAny().getAsLong());</span><br></pre></td></tr></table></figure>
+<h4 id="Stream操作集合"><a href="#Stream操作集合" class="headerlink" title="Stream操作集合"></a>Stream操作集合</h4><p>Java8使用流式API操作集合，Collection接口中提供了一个stream()默认方法，该方法可以返回该集合对应的流，接下来即可通过流式API来操作</p>
+<p>通过Map获取  Map不能直接获取流，必须通过键的集合、键值对的集合获取Set的流</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Map&lt;Integer,String&gt; map &#x3D; new HashMap&lt;&gt;();</span><br><span class="line">……</span><br><span class="line">&#x2F;&#x2F;1.获取“键”的流：</span><br><span class="line">Stream&lt;Integer&gt; keysSteram &#x3D; map.keySet().stream();</span><br><span class="line">&#x2F;&#x2F;2.获取“值”的流：</span><br><span class="line">Stream&lt;String&gt; valueStream &#x3D; map.values().stream();</span><br><span class="line">&#x2F;&#x2F;3.获取“键值对”的流：</span><br><span class="line">Stream&lt;Map.Entry&lt;Integer,String&gt;&gt; entryStream &#x3D; map.entrySet().stream();</span><br></pre></td></tr></table></figure>
+<p>通过引用类型的数组获取流</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Integer[] arr &#x3D; &#123;1,2,3,432,3,2,324,32&#125;;</span><br><span class="line">Stream&lt;Integer&gt; intStream &#x3D; Stream.&lt;Integer&gt;of(arr);</span><br></pre></td></tr></table></figure>
+<p>通过基本类型的数组获取流</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">int[] arr &#x3D; &#123;1,4,234,32,32,523,432&#125;;</span><br><span class="line">IntStream intStream &#x3D; IntStream.of(arr);</span><br></pre></td></tr></table></figure>
+<p>通过零散的数据获取流</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Stream&lt;Integer&gt; intStream &#x3D; Stream.of(1,3,2,43,24,325,43,324,325,24,2);</span><br></pre></td></tr></table></figure>
+
+<h5 id="常用方法"><a href="#常用方法" class="headerlink" title="常用方法"></a>常用方法</h5><p>filter方法 过滤</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">LinkedList&lt;String&gt; list &#x3D; new LinkedList&lt;&gt;();</span><br><span class="line">        list.stream().filter(s -&gt; s.startsWith(&quot;张&quot;))</span><br><span class="line">                .forEach(s -&gt; System.out.println(s));</span><br></pre></td></tr></table></figure>
+<p>count方法_统计个数</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">long zCount &#x3D; list.stream()</span><br><span class="line">               .filter(s -&gt; s.startsWith(&quot;张&quot;))</span><br><span class="line">               .count();</span><br><span class="line">       System.out.println(&quot;张姓学员数量有&quot;+zCount);</span><br></pre></td></tr></table></figure>
+<p>limit (long maxSize) 该方法用于保证对该流的后续访问中最大允许访问的元素个数，短路的有状态的方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">list.stream()</span><br><span class="line">               .filter(s -&gt; s.startsWith(&quot;张&quot;))</span><br><span class="line">               .limit(3)</span><br><span class="line">               .forEach(s -&gt; System.out.println(s));</span><br></pre></td></tr></table></figure>
+<p>skip方法_跳过前几个</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">list.stream()</span><br><span class="line">                .filter(s-&gt;s.startsWith(&quot;张&quot;))</span><br><span class="line">                .skip(2)</span><br><span class="line">                .forEach(s-&gt; System.out.println(s));</span><br></pre></td></tr></table></figure>
+<p>map方法_转换</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">LinkedList&lt;String&gt; list &#x3D; new LinkedList&lt;&gt;();</span><br><span class="line">       list.add(&quot;10&quot;);</span><br><span class="line">       list.add(&quot;26&quot;);</span><br><span class="line">       list.stream().map(s -&gt; Integer.parseInt(s) + 5)</span><br><span class="line">               .forEach(s -&gt; System.out.println(s));</span><br></pre></td></tr></table></figure>
+<p>concat方法_组合</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">List&lt;String&gt; list1 &#x3D; new ArrayList&lt;&gt;();</span><br><span class="line">      List&lt;String&gt; list2 &#x3D; new ArrayList&lt;&gt;();</span><br><span class="line">      Stream.concat(list1.stream(), list2.stream()).forEach(s -&gt; System.out.println(s));</span><br></pre></td></tr></table></figure>
+<p>distinct() 用于排除流中所有重复的元素，去重使用，有状态的方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">LinkedList&lt;String&gt; linkedList &#x3D; new LinkedList&lt;&gt;();</span><br><span class="line">       linkedList.add(&quot;s1&quot;);</span><br><span class="line">       linkedList.add(&quot;s1&quot;);</span><br><span class="line">       linkedList.add(&quot;s6&quot;);</span><br><span class="line">       linkedList.stream().distinct().forEach(s -&gt; System.out.println(s));</span><br></pre></td></tr></table></figure>
+<p>sorted() 排序方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">LinkedList&lt;Integer&gt; integers &#x3D; new LinkedList&lt;&gt;();</span><br><span class="line">      integers.add(1);</span><br><span class="line">      integers.add(2);</span><br><span class="line">      &#x2F;&#x2F;使用sorted排序</span><br><span class="line">      integers.stream().sorted().forEach(s -&gt; System.out.println(s));</span><br></pre></td></tr></table></figure>
+<p>min() 返回流中所有元素的最小值</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">LinkedList&lt;Integer&gt; integers &#x3D; new LinkedList&lt;&gt;();</span><br><span class="line">       integers.add(1);</span><br><span class="line">       integers.add(2);</span><br><span class="line">       integers.add(5000);</span><br><span class="line">       Integer minInt &#x3D; integers.stream().min(new Comparator&lt;Integer&gt;() &#123;</span><br><span class="line">           @Override</span><br><span class="line">           public int compare(Integer o1, Integer o2) &#123;</span><br><span class="line">               return o2 - o1;</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;).get();</span><br><span class="line">       System.out.println(&quot;最小值为&quot; + minInt);</span><br></pre></td></tr></table></figure>
+<p>max()返回流中所有元素的最大值</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Integer minInt &#x3D; integers.stream().max(new Comparator&lt;Integer&gt;() &#123;</span><br><span class="line">           @Override</span><br><span class="line">           public int compare(Integer o1, Integer o2) &#123;</span><br><span class="line">               return o1 - o2;</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;).get();</span><br></pre></td></tr></table></figure>
+<p>anyMatch(Predicate pre) 判断流中是否至少包含一个元素符合Predicate条件，返回true代表有元素包含，返回false代表没有元素包含</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">LinkedList&lt;Integer&gt; list &#x3D; new LinkedList&lt;&gt;();</span><br><span class="line">     list.add(1);</span><br><span class="line">     list.add(2);</span><br><span class="line">     list.add(3);</span><br><span class="line">     list.add(4);</span><br><span class="line">     list.add(5);</span><br><span class="line">     boolean match &#x3D; list.stream().anyMatch(i -&gt; i &gt; 2);</span><br><span class="line">     System.out.println(match);</span><br></pre></td></tr></table></figure>
+<p>allMatch(Predicate predicate) 判断流中是否每个元素都符合条件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">LinkedList&lt;Integer&gt; list &#x3D; new LinkedList&lt;&gt;();</span><br><span class="line">       list.add(2);</span><br><span class="line">       list.add(4);</span><br><span class="line">       list.add(6);</span><br><span class="line">       list.add(8);</span><br><span class="line">       &#x2F;&#x2F;查看是否元素全部包含</span><br><span class="line">       boolean b &#x3D; list.stream().allMatch(i -&gt; i % 2 &#x3D;&#x3D; 0);</span><br><span class="line">       System.out.println(&quot;集合中全部元素是否&quot; + b);</span><br></pre></td></tr></table></figure>
+<p>noneMatch(Predicate predicate) 判断流中是否所有元素都不符合Predicate条件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">LinkedList&lt;Integer&gt; integers &#x3D; new LinkedList&lt;&gt;();</span><br><span class="line">        integers.add(1);</span><br><span class="line">        integers.add(2);</span><br><span class="line">        integers.add(3);</span><br><span class="line">        integers.add(4);</span><br><span class="line">        integers.add(5);</span><br><span class="line">        boolean b &#x3D; integers.stream().noneMatch(i -&gt; i &gt; 6);</span><br><span class="line">        System.out.println(b);</span><br></pre></td></tr></table></figure>
+<p>findFirst() 返回流中的第一个元素</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">LinkedList&lt;Integer&gt; integers &#x3D; new LinkedList&lt;&gt;();</span><br><span class="line">       integers.offer(2);</span><br><span class="line">       integers.offer(4);</span><br><span class="line">       integers.offer(6);</span><br><span class="line">       integers.offer(8);</span><br><span class="line">       Integer firtst &#x3D; integers.stream().findFirst().get();</span><br><span class="line">       System.out.println(firtst);</span><br></pre></td></tr></table></figure>
+<p>findAny() 返回流中的任意一个元素</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">LinkedList&lt;Integer&gt; list &#x3D; new LinkedList&lt;&gt;();</span><br><span class="line">      list.add(2);</span><br><span class="line">      list.add(4);</span><br><span class="line">      list.add(6);</span><br><span class="line">      list.add(8);</span><br><span class="line">      Integer integer &#x3D; list.stream().findAny().get();</span><br></pre></td></tr></table></figure>
+<p>Stream流的结果收集到集合和数组中</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">collect(Collectors.toList()) 将流的结果转化为list</span><br><span class="line">collect(Collectors.toSet()) 将流的结果转化为Set</span><br><span class="line">toArray() 将流的结果提取到数组</span><br></pre></td></tr></table></figure>
+      
+    </div>
+     <!-- 相关文章推荐 -->
+    
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/04/21/IDEA%E5%B8%B8%E7%94%A8%E9%85%8D%E7%BD%AE%E5%92%8C%E5%BF%AB%E6%8D%B7%E9%94%AE/" rel="next" title="IDEA常用配置和快捷键">
+                <i class="fa fa-chevron-left"></i> IDEA常用配置和快捷键
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/04/29/%E6%96%AD%E7%82%B9%E7%BB%AD%E4%BC%A0%E5%92%8C%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%8B%E8%BD%BD%E5%8E%9F%E7%90%86/" rel="prev" title="断点续传和多线程下载原理(转)">
+                断点续传和多线程下载原理(转) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+<span class="jiathis_txt">分享到：</span>
+<a class="jiathis_button_fav">收藏夹</a>
+<a class="jiathis_button_copy">复制网址</a>
+<a class="jiathis_button_email">邮件</a>
+<a class="jiathis_button_weixin">微信</a>
+<a class="jiathis_button_qzone">QQ空间</a>
+<a class="jiathis_button_tqq">腾讯微博</a>
+<a class="jiathis_button_douban">豆瓣</a>
+<a class="jiathis_button_share">一键分享</a>
+
+<a href="http://www.jiathis.com/share?uid=2140465" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+<a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+var jiathis_config={
+  data_track_clickback:true,
+  summary:"",
+  shortUrl:false,
+  hideMore:false
+}
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://img.huyunshun.com/img/20200522182348.png"
+                alt="初晨" />
+            
+              <p class="site-author-name" itemprop="name">初晨</p>
+              <p class="site-description motion-element" itemprop="description">永远不要说你知道本质，更别说真相了。</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">249</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">46</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+<!--近期文章版块-->
+            
+                <div class="links-of-blogroll motion-element links-of-blogroll-block">
+                  <div class="links-of-blogroll-title">
+                    <!-- modify icon to fire by szw -->
+                    <i class="fa fa-history fa-" aria-hidden="true"></i>
+                    近期文章
+                  </div>
+                  <ul class="links-of-blogroll-list">
+                    
+                    
+                      <li>
+                        <a href="/2020/05/22/WebSocket%E3%80%81Socket%E3%80%81TCP%E3%80%81HTTP%E5%8C%BA%E5%88%AB/" title="WebSocket、Socket、TCP、HTTP区别" target="_blank">WebSocket、Socket、TCP、HTTP区别</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/19/Springboot%E9%A1%B9%E7%9B%AE%E7%9A%84%E6%8E%A5%E5%8F%A3%E9%98%B2%E5%88%B7/" title="Springboot项目的接口防刷" target="_blank">Springboot项目的接口防刷</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/03/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Volatile%E5%85%B3%E9%94%AE%E5%AD%97%E5%8F%8A%E5%85%B6%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/" title="深入理解Volatile关键字及其实现原理" target="_blank">深入理解Volatile关键字及其实现原理</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/04/20/%E4%BD%BF%E7%94%A8vscode%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0%E7%8E%AF%E5%A2%83/" title="使用vscode搭建个人笔记环境" target="_blank">使用vscode搭建个人笔记环境</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/01/20/HBase%E4%BB%8B%E7%BB%8D%E5%AE%89%E8%A3%85%E4%B8%8E%E6%93%8D%E4%BD%9C/" title="HBase介绍安装与操作" target="_blank">HBase介绍安装与操作</a>
+                      </li>
+                    
+                  </ul>
+                </div>
+            
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#Predicate-谓词对象"><span class="nav-number">1.</span> <span class="nav-text">Predicate 谓词对象</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Steam-流式API"><span class="nav-number">2.</span> <span class="nav-text">Steam 流式API</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#使用Stream步骤"><span class="nav-number">3.</span> <span class="nav-text">使用Stream步骤</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Stream-API"><span class="nav-number">4.</span> <span class="nav-text">Stream API</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#中间方法"><span class="nav-number">4.1.</span> <span class="nav-text">中间方法</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#末端方法"><span class="nav-number">4.2.</span> <span class="nav-text">末端方法</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Stream操作集合"><span class="nav-number">5.</span> <span class="nav-text">Stream操作集合</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#常用方法"><span class="nav-number">5.1.</span> <span class="nav-text">常用方法</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Copyright</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

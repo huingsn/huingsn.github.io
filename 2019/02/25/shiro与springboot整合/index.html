@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="shiro," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="shiro主要有三大功能模块 1. Subject：主体，一般指用户。 2. SecurityManager：安全管理器，管理所有Subject，可以配合内部安全组件。(类似于SpringMVC中的DispatcherServlet) 3. Realms：用于进行权限信息的验证，一般需要自己实现。具体功能 1. Authentication：身份认证&#x2F;登录(账号密码验证)。 2. Authoriz">
+<meta property="og:type" content="article">
+<meta property="og:title" content="shiro与springboot整合">
+<meta property="og:url" content="https://huyunshun.com/2019/02/25/shiro%E4%B8%8Espringboot%E6%95%B4%E5%90%88/index.html">
+<meta property="og:site_name" content="简">
+<meta property="og:description" content="shiro主要有三大功能模块 1. Subject：主体，一般指用户。 2. SecurityManager：安全管理器，管理所有Subject，可以配合内部安全组件。(类似于SpringMVC中的DispatcherServlet) 3. Realms：用于进行权限信息的验证，一般需要自己实现。具体功能 1. Authentication：身份认证&#x2F;登录(账号密码验证)。 2. Authoriz">
+<meta property="og:image" content="https://img.huyunshun.com/img/20200513145018.png">
+<meta property="og:image" content="https://img.huyunshun.com/img/20200513145212.png">
+<meta property="og:image" content="https://img.huyunshun.com/img/20200513145910.png">
+<meta property="og:image" content="https://img.huyunshun.com/img/20200513145925.png">
+<meta property="og:image" content="https://img.huyunshun.com/img/20200513145957.png">
+<meta property="og:image" content="https://img.huyunshun.com/img/20200513172101.png">
+<meta property="article:published_time" content="2019-02-24T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-05-20T10:04:24.708Z">
+<meta property="article:author" content="初晨">
+<meta property="article:tag" content="shiro">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img.huyunshun.com/img/20200513145018.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://huyunshun.com/2019/02/25/shiro与springboot整合/"/>
+
+
+
+
+
+  <title>shiro与springboot整合 | 简</title>
+  
+
+
+
+
+
+
+
+
+  <script type="text/javascript" src="/js/src/love.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
+
+  <!-- 看板娘 -->
+    
+        <script async src="/live2d-widget/autoload.js"></script>
+    
+ <!-- 飘动的彩带） -->
+  <script src="/js/src/piao.js" type="text/javascript"></script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">简</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">人生短暂，学海无边，而大道至简。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://huyunshun.com/2019/02/25/shiro%E4%B8%8Espringboot%E6%95%B4%E5%90%88/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="初晨">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://img.huyunshun.com/img/20200522182348.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="简">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">shiro与springboot整合</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-02-25T00:00:00+08:00">
+                2019-02-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/shiro/" itemprop="url" rel="index">
+                    <span itemprop="name">shiro</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>shiro主要有三大功能模块</p>
+<pre><code>1. Subject：主体，一般指用户。
+2. SecurityManager：安全管理器，管理所有Subject，可以配合内部安全组件。(类似于SpringMVC中的DispatcherServlet)
+3. Realms：用于进行权限信息的验证，一般需要自己实现。</code></pre><p>具体功能</p>
+<pre><code>1. Authentication：身份认证/登录(账号密码验证)。
+2. Authorization：授权，即角色或者权限验证。
+3. Session Manager：会话管理，用户登录后的session相关管理。
+4. Cryptography：加密，密码加密等。
+5. Web Support：Web支持，集成Web环境。
+6. Caching：缓存，用户信息、角色、权限等缓存到如redis等缓存中。
+7. Concurrency：多线程并发验证，在一个线程中开启另一个线程，可以把权限自动传播过去。
+8. Testing：测试支持；
+9. Run As：允许一个用户假装为另一个用户（如果他们允许）的身份进行访问。
+10. Remember Me：记住我，登录后，下次再来的话不用登录了。</code></pre><h2 id="整合shiro"><a href="#整合shiro" class="headerlink" title="整合shiro"></a>整合shiro</h2><h3 id="创建数据库表如下"><a href="#创建数据库表如下" class="headerlink" title="创建数据库表如下"></a>创建数据库表如下</h3><p><img src="https://img.huyunshun.com/img/20200513145018.png" alt="20200513145018"></p>
+<p><img src="https://img.huyunshun.com/img/20200513145212.png" alt="20200513145212"></p>
+<h3 id="pom"><a href="#pom" class="headerlink" title="pom"></a>pom</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">project</span> <span class="attr">xmlns</span>=<span class="string">"http://maven.apache.org/POM/4.0.0"</span></span></span><br><span class="line"><span class="tag">         <span class="attr">xmlns:xsi</span>=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span></span></span><br><span class="line"><span class="tag">         <span class="attr">xsi:schemaLocation</span>=<span class="string">"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">modelVersion</span>&gt;</span>4.0.0<span class="tag">&lt;/<span class="name">modelVersion</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.hu<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-shiro<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0-SNAPSHOT<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">packaging</span>&gt;</span>jar<span class="tag">&lt;/<span class="name">packaging</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">parent</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-parent<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.1.3.RELEASE<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">parent</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>commons-logging<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>commons-logging<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.1.3<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.shiro<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>shiro-core<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.4.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.shiro<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>shiro-spring<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.4.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.shiro<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>shiro-web<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.4.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-web<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.projectlombok<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>lombok<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.18.10<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-data-jpa<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.alibaba<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>druid-spring-boot-starter<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.1.13<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>mysql<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>mysql-connector-java<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>5.1.47<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-thymeleaf<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.alibaba<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>fastjson<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.2.48<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">build</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">plugins</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-maven-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">plugins</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">build</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">project</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h3 id="控制器"><a href="#控制器" class="headerlink" title="控制器"></a>控制器</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Controller</span></span><br><span class="line"><span class="meta">@RequestMapping</span>(<span class="string">"/user"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UsersController</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> UserService userService;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@RequestMapping</span>(<span class="string">"login"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> ModelAndView <span class="title">login</span><span class="params">(User user, ServletRequest request)</span> </span>&#123;</span><br><span class="line">        ModelAndView view = <span class="keyword">new</span> ModelAndView();</span><br><span class="line">        <span class="comment">//得到 Subject，并且通过用户名/密码创建 身份验证 Token（即用户身份/凭证）</span></span><br><span class="line">        Subject subject = SecurityUtils.getSubject();</span><br><span class="line">        UsernamePasswordToken token = <span class="keyword">new</span> UsernamePasswordToken(user.getUsername(), user.getPassword());</span><br><span class="line">        <span class="keyword">if</span> (!subject.isAuthenticated()) &#123;</span><br><span class="line">            subject.login(token);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//获取上一次请求路径</span></span><br><span class="line">        SavedRequest savedRequest = WebUtils.getSavedRequest(request);</span><br><span class="line">        String url = <span class="string">""</span>;</span><br><span class="line">        <span class="keyword">if</span> (savedRequest != <span class="keyword">null</span>) &#123;</span><br><span class="line">            url = savedRequest.getRequestUrl();</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            url = <span class="string">"list"</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        view.setViewName(<span class="string">"redirect:"</span> + url);</span><br><span class="line">        <span class="keyword">return</span> view;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@RequestMapping</span>(<span class="string">"list"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> ModelAndView <span class="title">list</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        ModelAndView view = <span class="keyword">new</span> ModelAndView();</span><br><span class="line">        view.addObject(<span class="string">"users"</span>, <span class="keyword">this</span>.userService.getUsers());</span><br><span class="line">        view.setViewName(<span class="string">"/page/list.html"</span>);</span><br><span class="line">        <span class="keyword">return</span> view;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@RequestMapping</span>(<span class="string">"register"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> ModelAndView <span class="title">register</span><span class="params">(User user)</span> <span class="keyword">throws</span> Exception</span>&#123;</span><br><span class="line">        ModelAndView view = <span class="keyword">new</span> ModelAndView();</span><br><span class="line">        <span class="keyword">if</span> (!StringUtils.isEmpty(user.getUsername()) &amp;&amp; !StringUtils.isEmpty(user.getPassword())) &#123;</span><br><span class="line">            userService.createUser(user);</span><br><span class="line">        &#125;</span><br><span class="line">        view.setViewName(<span class="string">"redirect:/login.html"</span>);</span><br><span class="line">        <span class="keyword">return</span> view;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@RequestMapping</span>(<span class="string">"logout"</span>)</span><br><span class="line">    <span class="meta">@ResponseBody</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">logout</span><span class="params">(User user)</span> </span>&#123;</span><br><span class="line">        Subject subject = SecurityUtils.getSubject();</span><br><span class="line"></span><br><span class="line">        <span class="comment">/*Session session = subject.getSession(false);</span></span><br><span class="line"><span class="comment">        if(session!=null)&#123;</span></span><br><span class="line"><span class="comment">            session.removeAttribute(WebUtils.SAVED_REQUEST_KEY);</span></span><br><span class="line"><span class="comment">        &#125;*/</span></span><br><span class="line">        subject.logout();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="string">"已注销"</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 权限控制</span></span><br><span class="line">    <span class="meta">@RequiresPermissions</span>(<span class="string">"sys:user:add"</span>)</span><br><span class="line">    <span class="meta">@RequestMapping</span>(<span class="string">"add"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> ModelAndView <span class="title">add</span><span class="params">(User user)</span> <span class="keyword">throws</span> Exception</span>&#123;</span><br><span class="line">        ModelAndView view = <span class="keyword">new</span> ModelAndView();</span><br><span class="line">        <span class="keyword">if</span> (!StringUtils.isEmpty(user.getUsername()) &amp;&amp; !StringUtils.isEmpty(user.getPassword())) &#123;</span><br><span class="line">            userService.createUser(user);</span><br><span class="line">            view.setViewName(<span class="string">"redirect:list"</span>);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            view.addObject(<span class="string">"action"</span>,<span class="string">"add"</span>);</span><br><span class="line">            view.setViewName(<span class="string">"/page/add.html"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> view;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//代表用户角色为admin才可以访问 相当于 subject.checkRole("admin")</span></span><br><span class="line">    <span class="meta">@RequiresRoles</span>(<span class="string">"admin"</span>)</span><br><span class="line">    <span class="meta">@RequestMapping</span>(<span class="string">"/update"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> ModelAndView <span class="title">update</span><span class="params">(User user)</span> </span>&#123;</span><br><span class="line">        ModelAndView view = <span class="keyword">new</span> ModelAndView();</span><br><span class="line">        <span class="keyword">if</span> (!StringUtils.isEmpty(user.getUsername()) &amp;&amp; !StringUtils.isEmpty(user.getPassword())) &#123;</span><br><span class="line">            userService.changePassword(user.getUsername(), user.getPassword());</span><br><span class="line">            view.setViewName(<span class="string">"redirect:list"</span>);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            view.addObject(<span class="string">"action"</span>,<span class="string">"update"</span>);</span><br><span class="line">            view.addObject(<span class="string">"user"</span>, <span class="keyword">this</span>.userService.getUser(user.getId()));</span><br><span class="line">            view.setViewName(<span class="string">"/page/add.html"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> view;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//代表用户有新增的权限才可以访问</span></span><br><span class="line">    <span class="comment">// 相当于 subject.checkPermitted("system:user:delete")</span></span><br><span class="line">    <span class="meta">@RequiresPermissions</span>(<span class="string">"sys:user:delete"</span>)</span><br><span class="line">    <span class="meta">@RequestMapping</span>(<span class="string">"delete"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> ModelAndView <span class="title">delete</span><span class="params">(User user)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (user.getId() != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">this</span>.userService.deleteUser(user.getId());</span><br><span class="line">        &#125;</span><br><span class="line">        ModelAndView view = <span class="keyword">new</span> ModelAndView();</span><br><span class="line">        view.setViewName(<span class="string">"redirect:list"</span>);</span><br><span class="line">        <span class="keyword">return</span> view;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="业务类"><a href="#业务类" class="headerlink" title="业务类"></a>业务类</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.hu.service.impl;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.hu.dao.PermissionDao;</span><br><span class="line"><span class="keyword">import</span> com.hu.dao.UserDao;</span><br><span class="line"><span class="keyword">import</span> com.hu.dao.UserRoleDao;</span><br><span class="line"><span class="keyword">import</span> com.hu.entity.User;</span><br><span class="line"><span class="keyword">import</span> com.hu.entity.UserRole;</span><br><span class="line"><span class="keyword">import</span> com.hu.service.UserService;</span><br><span class="line"><span class="keyword">import</span> com.hu.util.PasswordHelper;</span><br><span class="line"><span class="keyword">import</span> com.hu.util.Util;</span><br><span class="line"><span class="keyword">import</span> org.springframework.beans.factory.annotation.Autowired;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Service;</span><br><span class="line"><span class="keyword">import</span> org.springframework.transaction.annotation.Transactional;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.ArrayList;</span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"><span class="keyword">import</span> java.util.Set;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserServiceImpl</span> <span class="keyword">implements</span> <span class="title">UserService</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> UserDao userDao;</span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> UserRoleDao userRoleDao;</span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> PermissionDao permissionDao;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="meta">@Transactional</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> User <span class="title">createUser</span><span class="params">(User user)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>.userDao.findUserByUsername(user.getUsername()) != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> Exception(<span class="string">"用户名已存在"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        user.setUserId(Util.getUUID());</span><br><span class="line">        PasswordHelper.encryptPassword(user);</span><br><span class="line">        user.setStatus(<span class="number">0</span>);</span><br><span class="line">        <span class="keyword">return</span> userDao.save(user);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">deleteUser</span><span class="params">(Integer id)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>.userDao.deleteUser(id);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> User <span class="title">getUser</span><span class="params">(Integer id)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>.userDao.getOne(id);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">changePassword</span><span class="params">(String userId, String newPassword)</span> </span>&#123;</span><br><span class="line">        User user = <span class="keyword">this</span>.userDao.findUserByUsername(userId);</span><br><span class="line">        user.setPassword(newPassword);</span><br><span class="line">        PasswordHelper.encryptPassword(user);</span><br><span class="line">        <span class="keyword">return</span> userDao.save(user) == <span class="keyword">null</span> ? -<span class="number">1</span> : <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addUserRoles</span><span class="params">(String userId, String... roleIds)</span> </span>&#123;</span><br><span class="line">        List&lt;UserRole&gt; roles = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        <span class="keyword">for</span> (String roleId : roleIds) &#123;</span><br><span class="line">            roles.add(<span class="keyword">new</span> UserRole(userId, roleId));</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">this</span>.userRoleDao.saveAll(roles);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">delUserRoles</span><span class="params">(String userId, String... roleIds)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (String roleId : roleIds) &#123;</span><br><span class="line">            <span class="keyword">this</span>.userRoleDao.delRole(userId, roleId);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> List&lt;User&gt; <span class="title">getUsers</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>.userDao.findAll();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> User <span class="title">findByUsername</span><span class="params">(String username)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>.userDao.findUserByUsername(username);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Set&lt;String&gt; <span class="title">findRoles</span><span class="params">(String username)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>.userDao.findRoles(username);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Set&lt;String&gt; <span class="title">findPermissions</span><span class="params">(String username)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>.userDao.findPermissions(username);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="主html"><a href="#主html" class="headerlink" title="主html"></a>主html</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">xmlns:th</span>=<span class="string">"http://www.thymeleaf.org"</span> <span class="attr">lang</span>=<span class="string">"zh-CN"</span> &gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">"utf-8"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">http-equiv</span>=<span class="string">"X-UA-Compatible"</span> <span class="attr">content</span>=<span class="string">"IE=edge"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">name</span>=<span class="string">"viewport"</span> <span class="attr">content</span>=<span class="string">"width=device-width, initial-scale=1"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>用户信息<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">link</span> <span class="attr">href</span>=<span class="string">"../css/bootstrap.min.css"</span> <span class="attr">rel</span>=<span class="string">"stylesheet"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"../js/jquery-2.1.0.min.js"</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"../js/bootstrap.min.js"</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">style</span> <span class="attr">type</span>=<span class="string">"text/css"</span>&gt;</span></span><br><span class="line">        td, th &#123;</span><br><span class="line">            text-align: center;</span><br><span class="line">        &#125;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"container"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">h3</span> <span class="attr">style</span>=<span class="string">"text-align: center"</span>&gt;</span>用户列表<span class="tag">&lt;/<span class="name">h3</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">table</span> <span class="attr">border</span>=<span class="string">"1"</span> <span class="attr">class</span>=<span class="string">"table table-bordered table-hover"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">tr</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">td</span> <span class="attr">colspan</span>=<span class="string">"2"</span> <span class="attr">align</span>=<span class="string">"center"</span>&gt;</span><span class="tag">&lt;<span class="name">a</span> <span class="attr">class</span>=<span class="string">"btn btn-primary"</span> <span class="attr">href</span>=<span class="string">"add.html"</span> <span class="attr">th:href</span>=<span class="string">"@&#123;/user/add&#125;"</span>&gt;</span>添加用户<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">td</span> <span class="attr">colspan</span>=<span class="string">"2"</span> <span class="attr">align</span>=<span class="string">"center"</span>&gt;</span><span class="tag">&lt;<span class="name">a</span> <span class="attr">class</span>=<span class="string">"btn btn-primary"</span> <span class="attr">href</span>=<span class="string">"logout.html"</span> <span class="attr">th:href</span>=<span class="string">"@&#123;/user/logout&#125;"</span>&gt;</span>退出<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">tr</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">tr</span> <span class="attr">class</span>=<span class="string">"success"</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">th</span>&gt;</span>ID<span class="tag">&lt;/<span class="name">th</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">th</span>&gt;</span>用户名<span class="tag">&lt;/<span class="name">th</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">th</span>&gt;</span>操作<span class="tag">&lt;/<span class="name">th</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">tr</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">tr</span> <span class="attr">th:each</span>=<span class="string">"user:$&#123;users&#125;"</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">td</span> <span class="attr">th:text</span>=<span class="string">"$&#123;user.userId&#125;"</span>&gt;</span><span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">td</span> <span class="attr">th:text</span>=<span class="string">"$&#123;user.username&#125;"</span>&gt;</span><span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">td</span>&gt;</span><span class="tag">&lt;<span class="name">a</span> <span class="attr">class</span>=<span class="string">"btn btn-default btn-sm"</span> <span class="attr">href</span>=<span class="string">"update.html"</span> <span class="attr">th:href</span>=<span class="string">"@&#123;/user/update(id=$&#123;user.id&#125;)&#125;"</span>&gt;</span>修改<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="symbol">&amp;nbsp;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">a</span> <span class="attr">class</span>=<span class="string">"btn btn-default btn-sm"</span> <span class="attr">href</span>=<span class="string">"delete.html"</span> <span class="attr">th:href</span>=<span class="string">"@&#123;/user/delete(id=$&#123;user.id&#125;)&#125;"</span>&gt;</span>删除<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">tr</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">table</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h3 id="密码规则"><a href="#密码规则" class="headerlink" title="密码规则"></a>密码规则</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PasswordHelper</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> RandomNumberGenerator randomNumberGenerator = <span class="keyword">new</span> SecureRandomNumberGenerator();</span><br><span class="line">    <span class="comment">//这些要与Realm中一致</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> String algorithmName = <span class="string">"md5"</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">static</span> <span class="keyword">int</span> hashIterations = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">public</span>  <span class="keyword">void</span> <span class="title">encryptPassword</span><span class="params">(User user)</span> </span>&#123;</span><br><span class="line">        <span class="comment">//加盐</span></span><br><span class="line">        user.setSalt(randomNumberGenerator.nextBytes().toHex());</span><br><span class="line">        String newPassword = <span class="keyword">new</span> SimpleHash(algorithmName, user.getPassword(), ByteSource.Util.bytes(user.getSalt()),hashIterations).toHex();</span><br><span class="line">        user.setPassword(newPassword);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="Realm"><a href="#Realm" class="headerlink" title="Realm"></a>Realm</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserRealm</span> <span class="keyword">extends</span> <span class="title">AuthorizingRealm</span> <span class="keyword">implements</span> <span class="title">Serializable</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> UserService userService;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 授权</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> principals</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> AuthorizationInfo <span class="title">doGetAuthorizationInfo</span><span class="params">(PrincipalCollection principals)</span> </span>&#123;</span><br><span class="line">        String username = (String) principals.getPrimaryPrincipal();</span><br><span class="line">        SimpleAuthorizationInfo authorizationInfo = <span class="keyword">new</span> SimpleAuthorizationInfo();</span><br><span class="line">        <span class="keyword">return</span> authorizationInfo;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 认证</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> AuthenticationInfo <span class="title">doGetAuthenticationInfo</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">            AuthenticationToken token)</span> <span class="keyword">throws</span> AuthenticationException </span>&#123;</span><br><span class="line">        String username = (String) token.getPrincipal();</span><br><span class="line">        User user = userService.findByUsername(username);</span><br><span class="line">        <span class="keyword">if</span>(user == <span class="keyword">null</span>)&#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> UnknownAccountException(); <span class="comment">//没找到账号</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>(user.getStatus()==<span class="number">1</span>)&#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> LockedAccountException(); <span class="comment">//账号被锁定</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        SimpleAuthenticationInfo authenticationInfo = <span class="keyword">new</span> SimpleAuthenticationInfo(</span><br><span class="line">                user.getUsername(),</span><br><span class="line">                user.getPassword(),</span><br><span class="line">                ByteSource.Util.bytes(user.getSalt()),</span><br><span class="line">                getName());</span><br><span class="line">        <span class="keyword">return</span> authenticationInfo;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="ShiroConfig"><a href="#ShiroConfig" class="headerlink" title="ShiroConfig"></a>ShiroConfig</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ShiroConfig</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> ShiroFilterFactoryBean <span class="title">shiroFilter</span><span class="params">(SecurityManager securityManager)</span></span>&#123;</span><br><span class="line">        ShiroFilterFactoryBean shiroFilterFactoryBean = <span class="keyword">new</span> ShiroFilterFactoryBean();</span><br><span class="line">        shiroFilterFactoryBean.setSecurityManager(securityManager);</span><br><span class="line">        <span class="comment">//如果没有登录，返回的json</span></span><br><span class="line">        <span class="comment">/*shiroFilterFactoryBean.getFilters().put("authc", new UserFilter() &#123;</span></span><br><span class="line"><span class="comment">            @Override</span></span><br><span class="line"><span class="comment">            protected void redirectToLogin(ServletRequest request, ServletResponse response) throws IOException &#123;</span></span><br><span class="line"><span class="comment">                HttpServletResponse resp = (HttpServletResponse) response;</span></span><br><span class="line"><span class="comment">                HttpResponseUtils.renderJson(resp, com.hu.util.R.UNLOGIN());</span></span><br><span class="line"><span class="comment">            &#125;</span></span><br><span class="line"><span class="comment">        &#125;);*/</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">//拦截器.</span></span><br><span class="line">        Map&lt;String, String&gt; filterChainDefinitionMap = <span class="keyword">new</span> LinkedHashMap&lt;&gt;();</span><br><span class="line">        filterChainDefinitionMap.put(<span class="string">"/500*"</span>, <span class="string">"anon"</span>);</span><br><span class="line">        filterChainDefinitionMap.put(<span class="string">"/reg.html"</span>, <span class="string">"anon"</span>);</span><br><span class="line">        filterChainDefinitionMap.put(<span class="string">"/user/login*"</span>, <span class="string">"anon"</span>);</span><br><span class="line">        filterChainDefinitionMap.put(<span class="string">"/user/register*"</span>, <span class="string">"anon"</span>);</span><br><span class="line">        filterChainDefinitionMap.put(<span class="string">"/user/**"</span>, <span class="string">"authc"</span>);</span><br><span class="line">        filterChainDefinitionMap.put(<span class="string">"/page/**"</span>, <span class="string">"authc"</span>);</span><br><span class="line">        filterChainDefinitionMap.put(<span class="string">"/**"</span>, <span class="string">"authc"</span>);</span><br><span class="line">        <span class="comment">//不设置默认会自动寻找Web工程根目录下的"/login.jsp"页面</span></span><br><span class="line">        shiroFilterFactoryBean.setLoginUrl(<span class="string">"/login.html"</span>);</span><br><span class="line">        <span class="comment">//未授权跳转</span></span><br><span class="line">        shiroFilterFactoryBean.setUnauthorizedUrl(<span class="string">"/page/fail.html"</span>);</span><br><span class="line">        shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);</span><br><span class="line">        <span class="keyword">return</span> shiroFilterFactoryBean;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//凭证匹配器 密码校验交给Shiro的SimpleAuthenticationInfo进行处理</span></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> HashedCredentialsMatcher <span class="title">hashedCredentialsMatcher</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        HashedCredentialsMatcher hashedCredentialsMatcher = <span class="keyword">new</span> HashedCredentialsMatcher();</span><br><span class="line">        hashedCredentialsMatcher.setHashAlgorithmName(<span class="string">"md5"</span>);<span class="comment">//使用MD5算法;</span></span><br><span class="line">        <span class="comment">//hashedCredentialsMatcher.setHashIterations(2);//散列的次数</span></span><br><span class="line">        <span class="keyword">return</span> hashedCredentialsMatcher;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">//自定义Realm</span></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> UserRealm <span class="title">myShiroRealm</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        UserRealm myShiroRealm = <span class="keyword">new</span> UserRealm();</span><br><span class="line">        myShiroRealm.setCredentialsMatcher(hashedCredentialsMatcher());</span><br><span class="line">        <span class="keyword">return</span> myShiroRealm;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//获得SecurityManager 实例</span></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> SecurityManager <span class="title">securityManager</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        DefaultWebSecurityManager securityManager = <span class="keyword">new</span> DefaultWebSecurityManager();</span><br><span class="line">        <span class="comment">//指定 securityManager 的 realms 实现，可以设置多个</span></span><br><span class="line">        <span class="comment">//securityManager 会按照 realms 指定的顺序进行身份认证。此处我们使用显示指定顺序的方式指定了 Realm 的顺序，</span></span><br><span class="line">        <span class="comment">// 如果不设置，那么 securityManager 会按照 realm 声明的顺序进行使用（即无需设置 realms 属性，其会自动发现 ）。</span></span><br><span class="line">        securityManager.setRealm(myShiroRealm());</span><br><span class="line">        <span class="keyword">return</span> securityManager;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> LifecycleBeanPostProcessor <span class="title">lifecycleBeanPostProcessor</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> LifecycleBeanPostProcessor();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>测试，必须要登录才可以使用功能。</p>
+<h2 id="权限控制"><a href="#权限控制" class="headerlink" title="权限控制"></a>权限控制</h2><p>权限表增加权限，在角色表添加角色，并且选了用户和角色的对应关系。</p>
+<p><img src="https://img.huyunshun.com/img/20200513145910.png" alt="20200513145910"></p>
+<p><img src="https://img.huyunshun.com/img/20200513145925.png" alt="20200513145925"></p>
+<p><img src="https://img.huyunshun.com/img/20200513145957.png" alt="20200513145957"></p>
+<p>授权</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> AuthorizationInfo <span class="title">doGetAuthorizationInfo</span><span class="params">(PrincipalCollection principals)</span> </span>&#123;</span><br><span class="line">    String username = (String) principals.getPrimaryPrincipal();</span><br><span class="line">    SimpleAuthorizationInfo authorizationInfo = <span class="keyword">new</span> SimpleAuthorizationInfo();</span><br><span class="line">    <span class="comment">//在数据库中查询用户拥有的角色/权限</span></span><br><span class="line">    authorizationInfo.setRoles(userService.findRoles(username));</span><br><span class="line">    authorizationInfo.setStringPermissions(userService.findPermissions(username));</span><br><span class="line">    <span class="keyword">return</span> authorizationInfo;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在配置类中加入AOP</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"> <span class="comment">// 授权使用注解  需要开启Spring AOP</span></span><br><span class="line"> <span class="comment">// 自动代理所有的advisor</span></span><br><span class="line"> <span class="comment">// DefaultAdvisorAutoProxyCreator创建代理更加通用强大</span></span><br><span class="line"> <span class="comment">// a.指定一个DefaultAdvisorAutoProxyCreator Bean的定义.</span></span><br><span class="line"> <span class="comment">// b.会自动代理Advisor的类</span></span><br><span class="line"> <span class="meta">@Bean</span></span><br><span class="line"> <span class="meta">@DependsOn</span>(&#123;<span class="string">"lifecycleBeanPostProcessor"</span>&#125;)</span><br><span class="line"> <span class="function"><span class="keyword">public</span> DefaultAdvisorAutoProxyCreator <span class="title">advisorAutoProxyCreator</span><span class="params">()</span></span>&#123;</span><br><span class="line">     DefaultAdvisorAutoProxyCreator proxyCreator = <span class="keyword">new</span> DefaultAdvisorAutoProxyCreator();</span><br><span class="line">     proxyCreator.setProxyTargetClass(<span class="keyword">true</span>);</span><br><span class="line">     <span class="keyword">return</span> proxyCreator;</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"> <span class="comment">// 属于StaticMethodMatcherPointcutAdvisor</span></span><br><span class="line"><span class="meta">@Bean</span></span><br><span class="line"> <span class="function"><span class="keyword">public</span> AuthorizationAttributeSourceAdvisor <span class="title">authorizationAttributeSourceAdvisor</span><span class="params">()</span></span>&#123;</span><br><span class="line">     AuthorizationAttributeSourceAdvisor advisor = <span class="keyword">new</span> AuthorizationAttributeSourceAdvisor();</span><br><span class="line">     advisor.setSecurityManager(securityManager());</span><br><span class="line">     <span class="keyword">return</span> advisor;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<p>增加处理类：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyException</span> <span class="keyword">implements</span> <span class="title">HandlerExceptionResolver</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> ModelAndView <span class="title">resolveException</span><span class="params">(HttpServletRequest request,</span></span></span><br><span class="line"><span class="function"><span class="params">                                         HttpServletResponse response, Object handler, Exception ex)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        ModelAndView modelAndView = <span class="keyword">new</span> ModelAndView();</span><br><span class="line">        Map&lt;String, Object&gt; attributes = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">        <span class="keyword">if</span> (ex <span class="keyword">instanceof</span> UnauthorizedException) &#123;</span><br><span class="line">            attributes.put(<span class="string">"msg"</span>, <span class="string">"用户无权限"</span>);</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (ex <span class="keyword">instanceof</span> UnknownAccountException) &#123;</span><br><span class="line">            attributes.put(<span class="string">"msg"</span>, <span class="string">"用户名密码有误"</span>);</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (ex <span class="keyword">instanceof</span> IncorrectCredentialsException) &#123;</span><br><span class="line">            attributes.put(<span class="string">"msg"</span>, <span class="string">"用户名密码有误"</span>);</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (ex <span class="keyword">instanceof</span> LockedAccountException) &#123;</span><br><span class="line">            attributes.put(<span class="string">"msg"</span>, <span class="string">"账号已被锁定"</span>);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            attributes.put(<span class="string">"msg"</span>, ex.getMessage());</span><br><span class="line">        &#125;</span><br><span class="line">        modelAndView.addAllObjects(attributes);</span><br><span class="line">        modelAndView.setViewName(<span class="string">"/500"</span>);</span><br><span class="line">        <span class="keyword">return</span> modelAndView;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在控制器中加入相应的注解，测试、没有权限的不能访问相关功能。</p>
+<h2 id="会话管理"><a href="#会话管理" class="headerlink" title="会话管理"></a>会话管理</h2><p>会话管理器管理着应用中所有 Subject 的会话的创建、维护、删除、失效、验证等工作。是 Shiro 的核心组件，顶层组件 SecurityManager 直接继承了 SessionManager，且提供了SessionsSecurityManager 实现直接把会话管理委托给相应的 SessionManager，DefaultSecurityManager 及 DefaultWebSecurityManager 默认 SecurityManager 都继承了 SessionsSecurityManager。</p>
+<p>Shiro 提供了三个默认实现：</p>
+<pre><code>DefaultSessionManager：DefaultSecurityManager 使用的默认实现，用于 JavaSE 环境；
+ServletContainerSessionManager：DefaultWebSecurityManager 使用的默认实现，用于 Web 环境，其直接使用 Servlet 容器的会话；
+DefaultWebSessionManager：用于 Web 环境的实现，可以替代 ServletContainerSessionManager，自己维护着会话，直接废弃了 Servlet 容器的会话管理。</code></pre><p>可以设置会话的全局过期时间（毫秒为单位），默认30分钟：sessionManager. globalSessionTimeout=1800000   </p>
+<h3 id="会话监听器"><a href="#会话监听器" class="headerlink" title="会话监听器"></a>会话监听器</h3><p>会话监听器用于监听会话创建、过期及停止事件：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MySessionListener1</span> <span class="keyword">implements</span> <span class="title">SessionListener</span> </span>&#123;  </span><br><span class="line">    <span class="meta">@Override</span>  </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onStart</span><span class="params">(Session session)</span> </span>&#123;<span class="comment">//会话创建时触发  </span></span><br><span class="line">        System.out.println(<span class="string">"会话创建："</span> + session.getId());  </span><br><span class="line">    &#125;  </span><br><span class="line">    <span class="meta">@Override</span>  </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onExpiration</span><span class="params">(Session session)</span> </span>&#123;<span class="comment">//会话过期时触发  </span></span><br><span class="line">        System.out.println(<span class="string">"会话过期："</span> + session.getId());  </span><br><span class="line">    &#125;  </span><br><span class="line">    <span class="meta">@Override</span>  </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onStop</span><span class="params">(Session session)</span> </span>&#123;<span class="comment">//退出/会话过期时触发  </span></span><br><span class="line">        System.out.println(<span class="string">"会话停止："</span> + session.getId());  </span><br><span class="line">    &#125;    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如果只想监听某一个事件，可以继承SessionListenerAdapter实现：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MySessionListener2</span> <span class="keyword">extends</span> <span class="title">SessionListenerAdapter</span> </span>&#123;  </span><br><span class="line">    <span class="meta">@Override</span>  </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onStart</span><span class="params">(Session session)</span> </span>&#123;  </span><br><span class="line">        System.out.println(<span class="string">"会话创建："</span> + session.getId());  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="会话存储-持久化"><a href="#会话存储-持久化" class="headerlink" title="会话存储 / 持久化"></a>会话存储 / 持久化</h3><p>Shiro 提供 SessionDAO 用于会话的 CRUD，即 DAO（Data Access Object）模式实现，如 DefaultSessionManager 在创建完 session 后会调用该方法；如保存到关系数据库/文件系统/NoSQL 数据库；即可以实现会话的持久化；返回会话 ID；主要此处返回的ID.equals(session.getId())；</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//如DefaultSessionManager在创建完session后会调用该方法；如保存到关系数据库/文件系统/NoSQL数据库；即可以实现会话的持久化；返回会话ID；主要此处返回的ID.equals(session.getId())；  </span></span><br><span class="line"><span class="function">Serializable <span class="title">create</span><span class="params">(Session session)</span></span>;  </span><br><span class="line"><span class="comment">//根据会话ID获取会话  </span></span><br><span class="line"><span class="function">Session <span class="title">readSession</span><span class="params">(Serializable sessionId)</span> <span class="keyword">throws</span> UnknownSessionException</span>;  </span><br><span class="line"><span class="comment">//更新会话；如更新会话最后访问时间/停止会话/设置超时时间/设置移除属性等会调用  </span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">update</span><span class="params">(Session session)</span> <span class="keyword">throws</span> UnknownSessionException</span>;  </span><br><span class="line"><span class="comment">//删除会话；当会话过期/会话停止（如用户退出时）会调用  </span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">delete</span><span class="params">(Session session)</span></span>;  </span><br><span class="line"><span class="comment">//获取当前所有活跃用户，如果用户量多此方法影响性能  </span></span><br><span class="line"><span class="function">Collection&lt;Session&gt; <span class="title">getActiveSessions</span><span class="params">()</span></span>;</span><br></pre></td></tr></table></figure>
+<p><img src="https://img.huyunshun.com/img/20200513172101.png" alt="20200513172101"></p>
+<p>AbstractSessionDAO提供了SessionDAO的基础实现，如生成会话ID等；CachingSessionDAO提供了对开发者透明的会话缓存的功能，只需要设置相应的CacheManager即可；MemorySessionDAO直接在内存中进行会话维护；而EnterpriseCacheSessionDAO提供了缓存功能的会话维护，默认情况下使用MapCache实现，内部使用ConcurrentHashMap保存缓存的会话。</p>
+<p>Shiro 提供了使用 Ehcache 进行会话存储，Ehcache 可以配合 TerraCotta 实现容器无关的分布式集群。</p>
+<p>首先增加依赖：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.shiro<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>shiro-ehcache<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.2.2<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>shiro-web.ini 文件：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">sessionDAO&#x3D;org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO</span><br><span class="line">sessionDAO. activeSessionsCacheName&#x3D;shiro-activeSessionCache</span><br><span class="line">sessionManager.sessionDAO&#x3D;$sessionDAO</span><br><span class="line">cacheManager &#x3D; org.apache.shiro.cache.ehcache.EhCacheManager</span><br><span class="line">cacheManager.cacheManagerConfigFile&#x3D;classpath:ehcache.xml</span><br><span class="line">securityManager.cacheManager &#x3D; $cacheManager</span><br></pre></td></tr></table></figure>
+<pre><code>sessionDAO. activeSessionsCacheName：设置 Session 缓存名字，默认就是 shiro-activeSessionCache；
+cacheManager：缓存管理器，用于管理缓存的，此处使用 Ehcache 实现；
+cacheManager.cacheManagerConfigFile：设置 ehcache 缓存的配置文件；
+securityManager.cacheManager：设置 SecurityManager 的 cacheManager，会自动设置实现了 CacheManagerAware 接口的相应对象，如 SessionDAO 的 cacheManager；</code></pre><p>配置 ehcache.xml：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">cache</span> <span class="attr">name</span>=<span class="string">"shiro-activeSessionCache"</span></span></span><br><span class="line"><span class="tag">       <span class="attr">maxEntriesLocalHeap</span>=<span class="string">"10000"</span></span></span><br><span class="line"><span class="tag">       <span class="attr">overflowToDisk</span>=<span class="string">"false"</span></span></span><br><span class="line"><span class="tag">       <span class="attr">eternal</span>=<span class="string">"false"</span></span></span><br><span class="line"><span class="tag">       <span class="attr">diskPersistent</span>=<span class="string">"false"</span></span></span><br><span class="line"><span class="tag">       <span class="attr">timeToLiveSeconds</span>=<span class="string">"0"</span></span></span><br><span class="line"><span class="tag">       <span class="attr">timeToIdleSeconds</span>=<span class="string">"0"</span></span></span><br><span class="line"><span class="tag">       <span class="attr">statistics</span>=<span class="string">"true"</span>/&gt;</span></span><br></pre></td></tr></table></figure>
+<p>Cache 的名字为 shiro-activeSessionCache，即设置的 sessionDAO 的 activeSessionsCacheName 属性值。</p>
+<p>另外可以通过如下 ini 配置设置会话 ID 生成器：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sessionIdGenerator&#x3D;org.apache.shiro.session.mgt.eis.JavaUuidSessionIdGenerator</span><br><span class="line">sessionDAO.sessionIdGenerator&#x3D;$sessionIdGenerator</span><br></pre></td></tr></table></figure>
+<p>用于生成会话 ID，默认就是 JavaUuidSessionIdGenerator，使用 java.util.UUID 生成。</p>
+<p>如果需要存储到数据库 自定义实现 SessionDAO，继承 CachingSessionDAO 即可：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MySessionDAO</span> <span class="keyword">extends</span> <span class="title">CachingSessionDAO</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> JdbcTemplate jdbcTemplate = JdbcTemplateUtils.jdbcTemplate();</span><br><span class="line">     <span class="function"><span class="keyword">protected</span> Serializable <span class="title">doCreate</span><span class="params">(Session session)</span> </span>&#123;</span><br><span class="line">        Serializable sessionId = generateSessionId(session);</span><br><span class="line">        assignSessionId(session, sessionId);</span><br><span class="line">        String sql = <span class="string">"insert into sessions(id, session) values(?,?)"</span>;</span><br><span class="line">        jdbcTemplate.update(sql, sessionId, SerializableUtils.serialize(session));</span><br><span class="line">        <span class="keyword">return</span> session.getId();</span><br><span class="line">    &#125;</span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">doUpdate</span><span class="params">(Session session)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(session <span class="keyword">instanceof</span> ValidatingSession &amp;&amp; !((ValidatingSession)session).isValid()) &#123;</span><br><span class="line">        <span class="keyword">return</span>; <span class="comment">//如果会话过期/停止 没必要再更新了</span></span><br><span class="line">    &#125;</span><br><span class="line">        String sql = <span class="string">"update sessions set session=? where id=?"</span>;</span><br><span class="line">        jdbcTemplate.update(sql, SerializableUtils.serialize(session), session.getId());</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">doDelete</span><span class="params">(Session session)</span> </span>&#123;</span><br><span class="line">        String sql = <span class="string">"delete from sessions where id=?"</span>;</span><br><span class="line">        jdbcTemplate.update(sql, session.getId());</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">protected</span> Session <span class="title">doReadSession</span><span class="params">(Serializable sessionId)</span> </span>&#123;</span><br><span class="line">        String sql = <span class="string">"select session from sessions where id=?"</span>;</span><br><span class="line">        List&lt;String&gt; sessionStrList = jdbcTemplate.queryForList(sql, String<span class="class">.<span class="keyword">class</span>, <span class="title">sessionId</span>)</span>;</span><br><span class="line">        <span class="keyword">if</span>(sessionStrList.size() == <span class="number">0</span>) <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">return</span> SerializableUtils.deserialize(sessionStrList.get(<span class="number">0</span>));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>doCreate/doUpdate/doDelete/doReadSession 分别代表创建 / 修改 / 删除 / 读取会话；此处通过把会话序列化后存储到数据库实现；接着在 shiro-web.ini 中配置：</p>
+<p>sessionDAO=com.github.zhangkaitao.shiro.chapter10.session.dao.MySessionDAO</p>
+<p>其他设置和之前一样，因为继承了 CachingSessionDAO；所有在读取时会先查缓存中是否存在，如果找不到才到数据库中查找。</p>
+<h3 id="使用Redis作为Session缓存"><a href="#使用Redis作为Session缓存" class="headerlink" title="使用Redis作为Session缓存"></a>使用Redis作为Session缓存</h3><p>需要shiro重写SessionDAO，继承AbstractSessionDAO，实现Redis Session的增刪改查操作 </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Data</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ShiroRedisSessionDao</span> <span class="keyword">extends</span> <span class="title">AbstractSessionDAO</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> RedisTemplate&lt;Serializable, Object&gt; redisTemplate;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Serializable <span class="title">create</span><span class="params">(<span class="keyword">final</span> Session session)</span> </span>&#123;</span><br><span class="line">        Serializable id = <span class="keyword">super</span>.create(session);</span><br><span class="line">        redisTemplate.opsForValue().set(Contans.getKeys(id), session, <span class="number">3600L</span>, TimeUnit.MINUTES);</span><br><span class="line">        <span class="keyword">return</span> id;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> Serializable <span class="title">doCreate</span><span class="params">(Session session)</span> </span>&#123;</span><br><span class="line">        Serializable sessionId = <span class="keyword">super</span>.generateSessionId(session);</span><br><span class="line">        <span class="keyword">super</span>.assignSessionId(session, sessionId);</span><br><span class="line">        <span class="keyword">return</span> sessionId;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//根据会话ID获取会话</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Session <span class="title">readSession</span><span class="params">(Serializable sessionId)</span> <span class="keyword">throws</span> UnknownSessionException </span>&#123;</span><br><span class="line">        Session session = doReadSession(sessionId);</span><br><span class="line">        <span class="keyword">if</span> (session == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> UnknownSessionException(<span class="string">"There is no session with id ["</span> + sessionId + <span class="string">"]"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> session;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> Session <span class="title">doReadSession</span><span class="params">(<span class="keyword">final</span> Serializable sessionId)</span> </span>&#123;</span><br><span class="line">        Session session = (SimpleSession) <span class="keyword">this</span>.redisTemplate.opsForValue().get(Contans.getKeys(sessionId));</span><br><span class="line">        <span class="keyword">if</span> (session == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> UnknownSessionException(<span class="string">"There is no session with id ["</span> + sessionId + <span class="string">"]"</span>);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> session;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">update</span><span class="params">(<span class="keyword">final</span> Session session)</span> <span class="keyword">throws</span> UnknownSessionException </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (session <span class="keyword">instanceof</span> SimpleSession) &#123;</span><br><span class="line">            <span class="keyword">final</span> Serializable id = session.getId();</span><br><span class="line">            redisTemplate.opsForValue().set(Contans.getKeys(id), session, <span class="number">3600L</span>, TimeUnit.MINUTES);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">delete</span><span class="params">(Session session)</span> </span>&#123;</span><br><span class="line">        redisTemplate.delete(CollectionUtils.arrayToList(Contans.getKeys(session.getId())));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取当前所有活跃用户，如果用户量多此方法影响性能</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Collection&lt;Session&gt; <span class="title">getActiveSessions</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>配置Redis不做介绍</p>
+<p>配置ShiroConfig</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br></pre></td><td class="code"><pre><span class="line">    <span class="comment">/* @Bean</span></span><br><span class="line"><span class="comment">     public SimpleCookie rememberMeCookie()&#123;</span></span><br><span class="line"><span class="comment">         //这个参数是cookie的名称，对应前端的checkbox的name = rememberMe</span></span><br><span class="line"><span class="comment">         SimpleCookie simpleCookie = new SimpleCookie("rememberMe");</span></span><br><span class="line"><span class="comment">         //setcookie的httponly属性如果设为true的话，会增加对xss防护的安全系数。它有以下特点：</span></span><br><span class="line"><span class="comment">         //setcookie()的第七个参数</span></span><br><span class="line"><span class="comment">         //设为true后，只能通过http访问，javascript无法访问</span></span><br><span class="line"><span class="comment">         //防止xss读取cookie</span></span><br><span class="line"><span class="comment">         simpleCookie.setHttpOnly(true);</span></span><br><span class="line"><span class="comment">         simpleCookie.setPath("/");</span></span><br><span class="line"><span class="comment">         //记住我cookie生效时间30天 ,单位秒;</span></span><br><span class="line"><span class="comment">         simpleCookie.setMaxAge(2592000);</span></span><br><span class="line"><span class="comment">         return simpleCookie;</span></span><br><span class="line"><span class="comment">     &#125;</span></span><br><span class="line"><span class="comment">     //cookie管理对象;记住我功能,rememberMe管理器</span></span><br><span class="line"><span class="comment">     @Bean</span></span><br><span class="line"><span class="comment">     public CookieRememberMeManager rememberMeManager()&#123;</span></span><br><span class="line"><span class="comment">         CookieRememberMeManager cookieRememberMeManager = new CookieRememberMeManager();</span></span><br><span class="line"><span class="comment">         cookieRememberMeManager.setCookie(rememberMeCookie());</span></span><br><span class="line"><span class="comment">         //rememberMe cookie加密的密钥 建议每个项目都不一样 默认AES算法 密钥长度(128 256 512 位)</span></span><br><span class="line"><span class="comment">         cookieRememberMeManager.setCipherKey(Base64.decode("4AvVheFLUs0KTA3K23frgdg=="));</span></span><br><span class="line"><span class="comment">         return cookieRememberMeManager;</span></span><br><span class="line"><span class="comment">     &#125;*/</span></span><br><span class="line">    <span class="comment">//自定义Realm</span></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> UserRealm <span class="title">myShiroRealm</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        UserRealm myShiroRealm = <span class="keyword">new</span> UserRealm();</span><br><span class="line">        <span class="keyword">return</span> myShiroRealm;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//配置核心安全事务管理器</span></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> SecurityManager <span class="title">securityManager</span><span class="params">(SessionDAO sessionDAO)</span> </span>&#123;</span><br><span class="line">        DefaultWebSecurityManager securityManager = <span class="keyword">new</span> DefaultWebSecurityManager();</span><br><span class="line">        <span class="comment">//指定 securityManager 的 realms 实现，可以设置多个</span></span><br><span class="line">        <span class="comment">//securityManager 会按照 realms 指定的顺序进行身份认证。此处我们使用显示指定顺序的方式指定了 Realm 的顺序，</span></span><br><span class="line">        <span class="comment">// 如果不设置，那么 securityManager 会按照 realm 声明的顺序进行使用（即无需设置 realms 属性，其会自动发现 ）。</span></span><br><span class="line">        securityManager.setRealm(myShiroRealm());</span><br><span class="line">        <span class="comment">//配置自定义session管理，使用redis</span></span><br><span class="line">        securityManager.setSessionManager(sessionManager(sessionDAO));</span><br><span class="line">        <span class="comment">//配置记住我</span></span><br><span class="line"><span class="comment">//        securityManager.setRememberMeManager(rememberMeManager());</span></span><br><span class="line">        <span class="comment">//配置redis缓存</span></span><br><span class="line"><span class="comment">//        securityManager.setCacheManager(cacheManager());</span></span><br><span class="line">        <span class="keyword">return</span> securityManager;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 解决无权限页面不跳转 shiroFilterFactoryBean.setUnauthorizedUrl("/page/fail.html") 无效</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * shiro的源代码ShiroFilterFactoryBean.Java定义的filter必须满足filter instanceof AuthorizationFilter，</span></span><br><span class="line"><span class="comment">     * 只有perms，roles，ssl，rest，port才是属于AuthorizationFilter，而anon，authcBasic，auchc，user是AuthenticationFilter，</span></span><br><span class="line"><span class="comment">     * 所以unauthorizedUrl设置后页面不跳转 Shiro注解模式下，登录失败与没有权限都是通过抛出异常。</span></span><br><span class="line"><span class="comment">     * 并且默认并没有去处理或者捕获这些异常。在SpringMVC下需要配置捕获相应异常来通知用户信息</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> SimpleMappingExceptionResolver <span class="title">simpleMappingExceptionResolver</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        SimpleMappingExceptionResolver simpleMappingExceptionResolver=<span class="keyword">new</span> SimpleMappingExceptionResolver();</span><br><span class="line">        Properties properties=<span class="keyword">new</span> Properties();</span><br><span class="line">        <span class="comment">//这里的 /unauthorized 是页面，不是访问的路径</span></span><br><span class="line">        properties.setProperty(<span class="string">"org.apache.shiro.authz.UnauthorizedException"</span>,<span class="string">"/page/fail.html"</span>);</span><br><span class="line">        properties.setProperty(<span class="string">"org.apache.shiro.authz.UnauthenticatedException"</span>,<span class="string">"/page/fail.html"</span>);</span><br><span class="line">        simpleMappingExceptionResolver.setExceptionMappings(properties);</span><br><span class="line">        <span class="keyword">return</span> simpleMappingExceptionResolver;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> SessionDAO <span class="title">sessionDAO</span><span class="params">(RedisTemplate redisTemplate)</span> </span>&#123;</span><br><span class="line">        ShiroRedisSessionDao sessionDao = <span class="keyword">new</span> ShiroRedisSessionDao();</span><br><span class="line">        sessionDao.setRedisTemplate(redisTemplate);</span><br><span class="line">        <span class="keyword">return</span> sessionDao;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//配置会话管理器</span></span><br><span class="line">    <span class="comment">//SessionManager是session的真正管理者，负责shiro的session管理；</span></span><br><span class="line">    <span class="meta">@Bean</span>(<span class="string">"sessionManager"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> SessionManager <span class="title">sessionManager</span><span class="params">(SessionDAO sessionDAO)</span> </span>&#123;</span><br><span class="line">        DefaultWebSessionManager sessionManager = <span class="keyword">new</span> DefaultWebSessionManager();</span><br><span class="line">        sessionManager.setSessionDAO(sessionDAO);</span><br><span class="line">        sessionManager.setSessionIdCookie(simpleCookie());</span><br><span class="line">        List&lt;SessionListener&gt; arrayList = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        arrayList.add(sessionListener());</span><br><span class="line">        sessionManager.setSessionListeners(arrayList);</span><br><span class="line">        <span class="keyword">return</span> sessionManager;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean</span>(<span class="string">"sessionListener"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> SessionListener <span class="title">sessionListener</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> ShiroRedisSessionListener();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//配置保存sessionId的cookie</span></span><br><span class="line">    <span class="comment">//这里的cookie 不是上面的记住我 cookie</span></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> SimpleCookie <span class="title">simpleCookie</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">//这个参数是cookie的名称</span></span><br><span class="line">        SimpleCookie simpleCookie = <span class="keyword">new</span> SimpleCookie(<span class="string">"sid"</span>);</span><br><span class="line">        <span class="comment">//setcookie的httponly属性如果设为true的话，会增加对xss防护的安全系数。它有以下特点：</span></span><br><span class="line">        <span class="comment">//setcookie()的第七个参数</span></span><br><span class="line">        <span class="comment">//设为true后，只能通过http访问，javascript无法访问</span></span><br><span class="line">        <span class="comment">//防止xss读取cookie</span></span><br><span class="line">        simpleCookie.setHttpOnly(<span class="keyword">true</span>);</span><br><span class="line">        simpleCookie.setPath(<span class="string">"/"</span>);</span><br><span class="line">        <span class="comment">//maxAge=-1表示浏览器关闭时失效此Cookie</span></span><br><span class="line">        simpleCookie.setMaxAge(-<span class="number">1</span>);</span><br><span class="line">        <span class="keyword">return</span> simpleCookie;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="会话验证"><a href="#会话验证" class="headerlink" title="会话验证"></a>会话验证</h2><p>定期的检测会话是否过期，Shiro 提供了会话验证调度器 SessionValidationScheduler实现。</p>
+<p>可以通过如下 ini 配置开启会话验证：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">sessionValidationScheduler&#x3D;org.apache.shiro.session.mgt.ExecutorServiceSessionValidationScheduler</span><br><span class="line">sessionValidationScheduler.interval &#x3D; 3600000</span><br><span class="line">sessionValidationScheduler.sessionManager&#x3D;$sessionManager</span><br><span class="line">sessionManager.globalSessionTimeout&#x3D;1800000</span><br><span class="line">sessionManager.sessionValidationSchedulerEnabled&#x3D;true</span><br><span class="line">sessionManager.sessionValidationScheduler&#x3D;$sessionValidationScheduler</span><br></pre></td></tr></table></figure>
+<p>Shiro 也提供了使用 Quartz 会话验证调度器：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sessionValidationScheduler&#x3D;org.apache.shiro.session.mgt.quartz.QuartzSessionValidationScheduler</span><br><span class="line">sessionValidationScheduler.sessionValidationInterval &#x3D; 3600000</span><br><span class="line">sessionValidationScheduler.sessionManager&#x3D;$sessionManager</span><br></pre></td></tr></table></figure>
+<p>使用时需要导入 shiro-quartz 依赖：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.shiro<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>shiro-quartz<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.2.2<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>会话验证调度器实现都是直接调用 AbstractValidatingSessionManager 的 validateSessions 方法进行验证，其直接调用 SessionDAO 的 getActiveSessions 方法获取所有会话进行验证，如果会话比较多，会影响性能；可以考虑如分页获取会话并进行验证，如：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"> <span class="function"><span class="keyword">public</span> Collection&lt;Session&gt; <span class="title">getActiveSessions</span><span class="params">()</span> </span>&#123;</span><br><span class="line">     <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<p>在此方法中分页获取，如果在会话过期时不想删除过期的会话，可以通过如下 ini 配置进行设置：</p>
+<p>sessionManager.deleteInvalidSessions=false</p>
+<p>默认是开启的，在会话过期后会调用 SessionDAO 的 delete 方法删除会话：如会话时持久化存储的，可以调用此方法进行删除。</p>
+<p>如果是在获取会话时验证了会话已过期，将抛出 InvalidSessionException。</p>
+<h3 id="sessionFactory"><a href="#sessionFactory" class="headerlink" title="sessionFactory"></a>sessionFactory</h3><p>sessionFactory 是创建会话的工厂，根据相应的 Subject 上下文信息来创建会话；默认提供了 SimpleSessionFactory 用来创建 SimpleSession 会话。</p>
+<p>首先自定义一个 Session：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">OnlineSession</span> <span class="keyword">extends</span> <span class="title">SimpleSession</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">enum</span> OnlineStatus &#123;</span><br><span class="line">        on_line(<span class="string">"在线"</span>), hidden(<span class="string">"隐身"</span>), force_logout(<span class="string">"强制退出"</span>);</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">final</span> String info;</span><br><span class="line">        <span class="function"><span class="keyword">private</span> <span class="title">OnlineStatus</span><span class="params">(String info)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">this</span>.info = info;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> String <span class="title">getInfo</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> info;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">private</span> String userAgent; <span class="comment">//用户浏览器类型</span></span><br><span class="line">    <span class="keyword">private</span> OnlineStatus status = OnlineStatus.on_line; <span class="comment">//在线状态</span></span><br><span class="line">    <span class="keyword">private</span> String systemHost; <span class="comment">//用户登录时系统IP</span></span><br><span class="line">    <span class="comment">//省略其他</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>OnlineSession 用于保存当前登录用户的在线状态，支持如离线等状态的控制。</p>
+<p>接着自定义 SessionFactory：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">OnlineSessionFactory</span> <span class="keyword">implements</span> <span class="title">SessionFactory</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Session <span class="title">createSession</span><span class="params">(SessionContext initData)</span> </span>&#123;</span><br><span class="line">        OnlineSession session = <span class="keyword">new</span> OnlineSession();</span><br><span class="line">        <span class="keyword">if</span> (initData != <span class="keyword">null</span> &amp;&amp; initData <span class="keyword">instanceof</span> WebSessionContext) &#123;</span><br><span class="line">            WebSessionContext sessionContext = (WebSessionContext) initData;</span><br><span class="line">            HttpServletRequest request = (HttpServletRequest) sessionContext.getServletRequest();</span><br><span class="line">            <span class="keyword">if</span> (request != <span class="keyword">null</span>) &#123;</span><br><span class="line">                session.setHost(IpUtils.getIpAddr(request));</span><br><span class="line">                session.setUserAgent(request.getHeader(<span class="string">"User-Agent"</span>));</span><br><span class="line">                session.setSystemHost(request.getLocalAddr() + <span class="string">":"</span> + request.getLocalPort());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> session;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>根据会话上下文创建相应的 OnlineSession。</p>
+<p>最后在 shiro-web.ini 配置文件中配置：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sessionFactory&#x3D;org.apache.shiro.session.mgt.OnlineSessionFactory</span><br><span class="line">sessionManager.sessionFactory&#x3D;$sessionFactory</span><br></pre></td></tr></table></figure>
+<h2 id="缓存"><a href="#缓存" class="headerlink" title="缓存"></a>缓存</h2><p>Shiro 提供了类似于 Spring 的 Cache 抽象，即 Shiro 本身不实现 Cache，但是对 Cache 进行了又抽象，方便更换不同的底层 Cache 实现。Shiro提供的缓存抽象API接口正是：org.apache.shiro.cache.CacheManager。</p>
+<p>Shiro支持在2个地方定义缓存管理器，既可以在SecurityManager中定义，也可以在Realm中定义，任选其一即可。</p>
+<p>通常我们都会自定义Realm实现，例如将权限数据存放在数据库中，那么在Realm实现中定义缓存管理器再合适不过了。</p>
+<p>Shiro设计成既可以在Realm，也可以在SecurityManager中设置缓存管理器，分别在Realm和SecurityManager定义的缓存管理器，他们的区别和联系，请看源码：<br>下面，我们追踪一下org.apache.shiro.mgt.RealmSecurityManage的源码实现：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">applyCacheManagerToRealms</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    CacheManager cacheManager = getCacheManager();</span><br><span class="line">    Collection&lt;Realm&gt; realms = getRealms();</span><br><span class="line">    <span class="keyword">if</span> (cacheManager != <span class="keyword">null</span> &amp;&amp; realms != <span class="keyword">null</span> &amp;&amp; !realms.isEmpty()) &#123;</span><br><span class="line">        <span class="keyword">for</span> (Realm realm : realms) &#123;</span><br><span class="line">            <span class="keyword">if</span> (realm <span class="keyword">instanceof</span> CacheManagerAware) &#123;</span><br><span class="line">                ((CacheManagerAware) realm).setCacheManager(cacheManager);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>真正使用CacheManager的组件是Realm。</p>
+<h3 id="缓存方案"><a href="#缓存方案" class="headerlink" title="缓存方案"></a>缓存方案</h3><p>基于Redis的集中式缓存方案</p>
+<p>本地缓存的实现有几种方式：（1）直接存放到JVM堆内存（2）使用NIO存放在堆外内存，自定义实现或者借助于第三方缓存组件。<br>不论是采用集中式缓存还是使用本地缓存，shiro的权限数据本身都是直接存放在本地的，不同的是缓存标志的存放位置。采用本地缓存方案是，我们将缓存标志也存放在本地，这样就避免了查询缓存标志的网络请求，能更进一步提升缓存效率</p>
+<h3 id="缓存更新"><a href="#缓存更新" class="headerlink" title="缓存更新"></a>缓存更新</h3><p>shiro框架的服务端进行了多实例部署，首先需要对session进行同步，因为shiro的认证信息是存放在session中的；其次，当前端操作在某个实例上修改了权限时，需要通知后端服务的多个实例重新获取最新的权限数据。</p>
+<p>zookeeper最核心的功能就是统一配置，同时还可以用来实现服务注册与发现，在这里使用的zookeeper特性是：watcher机制。当某个节点的状态发生改变时，监控该节点状态的组件将会收到通知。</p>
+<h3 id="缓存实现"><a href="#缓存实现" class="headerlink" title="缓存实现"></a>缓存实现</h3><p>把权限信息存到redis</p>
+<h4 id="Cache"><a href="#Cache" class="headerlink" title="Cache"></a>Cache</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Data</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ShiroRedisCache</span>&lt;<span class="title">K</span>, <span class="title">V</span>&gt; <span class="keyword">implements</span> <span class="title">Cache</span>&lt;<span class="title">K</span>, <span class="title">V</span>&gt; </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> RedisTemplate&lt;K, V&gt; redisTemplate;</span><br><span class="line">    <span class="keyword">private</span> K keyPrefix;</span><br><span class="line">    <span class="keyword">private</span> RedisSerializer&lt;Object&gt; keySerializer=<span class="keyword">new</span> JdkSerializationRedisSerializer();</span><br><span class="line">    <span class="keyword">private</span> RedisSerializer&lt;Object&gt; valueSerializer=<span class="keyword">new</span> JdkSerializationRedisSerializer();</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ShiroRedisCache</span><span class="params">(K keyPrefix, RedisTemplate&lt;K, V&gt; redisTemplate)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.keyPrefix = keyPrefix;</span><br><span class="line">        <span class="keyword">this</span>.redisTemplate = redisTemplate;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">clear</span><span class="params">()</span> <span class="keyword">throws</span> CacheException </span>&#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@SuppressWarnings</span>(<span class="string">"unchecked"</span>)</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> V <span class="title">get</span><span class="params">(K k)</span> <span class="keyword">throws</span> CacheException </span>&#123;</span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">byte</span>[] keyByte = getKey(k);</span><br><span class="line">        <span class="keyword">byte</span>[] result = <span class="keyword">this</span>.redisTemplate.execute(<span class="keyword">new</span> RedisCallback&lt;<span class="keyword">byte</span>[]&gt;() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="keyword">public</span> <span class="keyword">byte</span>[] doInRedis(RedisConnection connection) <span class="keyword">throws</span> DataAccessException &#123;</span><br><span class="line">                <span class="keyword">return</span> connection.get(keyByte);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">        <span class="keyword">return</span> (V) <span class="keyword">this</span>.valueSerializer.deserialize(result);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">byte</span>[] getKey(K k) &#123;</span><br><span class="line">        <span class="keyword">if</span> (k <span class="keyword">instanceof</span> String) &#123;</span><br><span class="line">            <span class="keyword">return</span> (<span class="keyword">this</span>.keyPrefix+(String) k).getBytes();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>.keySerializer.serialize(k);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Set&lt;K&gt; <span class="title">keys</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">byte</span>[] pattern=(<span class="keyword">this</span>.keyPrefix+<span class="string">"*"</span>).getBytes();</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>.redisTemplate.execute(<span class="keyword">new</span> RedisCallback&lt;Set&lt;K&gt;&gt;()&#123;</span><br><span class="line">            <span class="meta">@SuppressWarnings</span>(<span class="string">"unchecked"</span>)</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> Set&lt;K&gt; <span class="title">doInRedis</span><span class="params">(RedisConnection connection)</span> <span class="keyword">throws</span> DataAccessException </span>&#123;</span><br><span class="line">                Set&lt;<span class="keyword">byte</span>[]&gt; keys=connection.keys(pattern);</span><br><span class="line">                <span class="keyword">if</span>(CollectionUtils.isEmpty(keys))&#123;</span><br><span class="line">                    <span class="keyword">return</span> Collections.emptySet();</span><br><span class="line">                &#125;</span><br><span class="line">                Set&lt;K&gt; newKeys = <span class="keyword">new</span> HashSet&lt;K&gt;();</span><br><span class="line">                <span class="keyword">for</span>(<span class="keyword">byte</span>[] key:keys)&#123;</span><br><span class="line">                    newKeys.add((K)key);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">return</span> newKeys;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> V <span class="title">put</span><span class="params">(K k, <span class="keyword">final</span> V v)</span> <span class="keyword">throws</span> CacheException </span>&#123;</span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">byte</span>[] key = getKey(k);</span><br><span class="line">        <span class="keyword">final</span> V perV=get(k);</span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">byte</span>[] values = <span class="keyword">this</span>.valueSerializer.serialize(v);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>.redisTemplate.execute(<span class="keyword">new</span> RedisCallback&lt;V&gt;() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> V <span class="title">doInRedis</span><span class="params">(RedisConnection connection)</span> <span class="keyword">throws</span> DataAccessException </span>&#123;</span><br><span class="line">                connection.set(key, values);</span><br><span class="line">                <span class="keyword">return</span> perV;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> V <span class="title">remove</span><span class="params">(K k)</span> <span class="keyword">throws</span> CacheException </span>&#123;</span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">byte</span>[] key = getKey(k);</span><br><span class="line">        <span class="keyword">final</span> V perV=get(k);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>.redisTemplate.execute(<span class="keyword">new</span> RedisCallback&lt;V&gt;() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> V <span class="title">doInRedis</span><span class="params">(RedisConnection connection)</span> <span class="keyword">throws</span> DataAccessException </span>&#123;</span><br><span class="line">                connection.del(key);</span><br><span class="line">                <span class="keyword">return</span> perV;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">size</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>.redisTemplate.execute(<span class="keyword">new</span> RedisCallback&lt;Long&gt;() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> Long <span class="title">doInRedis</span><span class="params">(RedisConnection connection)</span> <span class="keyword">throws</span> DataAccessException </span>&#123;</span><br><span class="line">                <span class="keyword">return</span> connection.dbSize();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;).intValue();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Collection&lt;V&gt; <span class="title">values</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        Set&lt;K&gt; keys = keys();</span><br><span class="line">        <span class="keyword">if</span> (!CollectionUtils.isEmpty(keys)) &#123;</span><br><span class="line">            List&lt;V&gt; values = <span class="keyword">new</span> ArrayList&lt;V&gt;(keys.size());</span><br><span class="line">            <span class="keyword">for</span> (K key : keys) &#123;</span><br><span class="line">                V value = get(key);</span><br><span class="line">                <span class="keyword">if</span> (value != <span class="keyword">null</span>) &#123;</span><br><span class="line">                    values.add(value);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> Collections.unmodifiableList(values);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> Collections.emptyList();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span></span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"Cd"</span>.matches(<span class="string">"^[A-Z]+$"</span>));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="CacheManager"><a href="#CacheManager" class="headerlink" title="CacheManager"></a>CacheManager</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Data</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ShiroRedisCacheManager</span> <span class="keyword">implements</span> <span class="title">CacheManager</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> ConcurrentHashMap&lt;String, ShiroRedisCache&gt; caches = <span class="keyword">new</span> ConcurrentHashMap&lt;String, ShiroRedisCache&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> RedisTemplate redisTemplate;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> String keyPrefix;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@SuppressWarnings</span>(<span class="string">"unchecked"</span>)</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> &lt;K, V&gt; <span class="function">Cache&lt;K, V&gt; <span class="title">getCache</span><span class="params">(String name)</span> <span class="keyword">throws</span> CacheException </span>&#123;</span><br><span class="line">        ShiroRedisCache&lt;K, V&gt; cache = (ShiroRedisCache&lt;K, V&gt;) caches.get(name);</span><br><span class="line">        <span class="keyword">if</span> (cache == <span class="keyword">null</span>) &#123;</span><br><span class="line">            cache = <span class="keyword">new</span> ShiroRedisCache&lt;&gt;(keyPrefix, <span class="keyword">this</span>.redisTemplate);</span><br><span class="line">            caches.put(name, cache);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> cache;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Contans</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> String keyPrefix = <span class="string">"shiro-session:"</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> String keyPrefixCache = <span class="string">"shiro-cache:"</span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> String <span class="title">getKeys</span><span class="params">(Serializable id)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> Contans.keyPrefix + id.toString();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>修改配置信息，把缓存管理器配置到Shiro中</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">    <span class="comment">//配置核心安全事务管理器</span></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> SecurityManager <span class="title">securityManager</span><span class="params">(SessionDAO sessionDAO,CacheManager cacheManager)</span> </span>&#123;</span><br><span class="line">        DefaultWebSecurityManager securityManager = <span class="keyword">new</span> DefaultWebSecurityManager();</span><br><span class="line">        <span class="comment">//指定 securityManager 的 realms 实现，可以设置多个</span></span><br><span class="line">        <span class="comment">//securityManager 会按照 realms 指定的顺序进行身份认证。此处我们使用显示指定顺序的方式指定了 Realm 的顺序，</span></span><br><span class="line">        <span class="comment">// 如果不设置，那么 securityManager 会按照 realm 声明的顺序进行使用（即无需设置 realms 属性，其会自动发现 ）。</span></span><br><span class="line">        securityManager.setRealm(myShiroRealm());</span><br><span class="line">        <span class="comment">//配置自定义session管理，使用redis</span></span><br><span class="line">        securityManager.setSessionManager(sessionManager(sessionDAO));</span><br><span class="line">        <span class="comment">//配置记住我</span></span><br><span class="line"><span class="comment">//        securityManager.setRememberMeManager(rememberMeManager());</span></span><br><span class="line">        <span class="comment">//配置redis缓存</span></span><br><span class="line">        securityManager.setCacheManager(cacheManager);</span><br><span class="line">        <span class="keyword">return</span> securityManager;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> CacheManager <span class="title">cacheManager</span><span class="params">(RedisTemplate redisTemplate)</span></span>&#123;</span><br><span class="line">        ShiroRedisCacheManager shiroRedisCacheManager = <span class="keyword">new</span> ShiroRedisCacheManager();</span><br><span class="line">        shiroRedisCacheManager.setKeyPrefix(Contans.keyPrefixCache);</span><br><span class="line">        shiroRedisCacheManager.setRedisTemplate(redisTemplate);</span><br><span class="line">        <span class="keyword">return</span> shiroRedisCacheManager;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<pre><code>之后，访问用到权限的页面，就会在redis中缓存授权信息。</code></pre><p>详细，见  <a href="https://github.com/huingsn/my-project" target="_blank" rel="noopener">https://github.com/huingsn/my-project</a></p>
+<h2 id="单点登录"><a href="#单点登录" class="headerlink" title="单点登录"></a>单点登录</h2><p><a href="https://www.w3cschool.cn/shiro/48371if3.html" target="_blank" rel="noopener">https://www.w3cschool.cn/shiro/48371if3.html</a></p>
+
+      
+    </div>
+     <!-- 相关文章推荐 -->
+    
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/shiro/" rel="tag"># shiro</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/02/22/BeanFactory%E5%92%8CFactoryBean/" rel="next" title="BeanFactory和FactoryBean">
+                <i class="fa fa-chevron-left"></i> BeanFactory和FactoryBean
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/03/01/ES%E4%BB%8B%E7%BB%8D%E5%92%8C%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE/" rel="prev" title="ES介绍和安装配置">
+                ES介绍和安装配置 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+<span class="jiathis_txt">分享到：</span>
+<a class="jiathis_button_fav">收藏夹</a>
+<a class="jiathis_button_copy">复制网址</a>
+<a class="jiathis_button_email">邮件</a>
+<a class="jiathis_button_weixin">微信</a>
+<a class="jiathis_button_qzone">QQ空间</a>
+<a class="jiathis_button_tqq">腾讯微博</a>
+<a class="jiathis_button_douban">豆瓣</a>
+<a class="jiathis_button_share">一键分享</a>
+
+<a href="http://www.jiathis.com/share?uid=2140465" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+<a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+var jiathis_config={
+  data_track_clickback:true,
+  summary:"",
+  shortUrl:false,
+  hideMore:false
+}
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://img.huyunshun.com/img/20200522182348.png"
+                alt="初晨" />
+            
+              <p class="site-author-name" itemprop="name">初晨</p>
+              <p class="site-description motion-element" itemprop="description">永远不要说你知道本质，更别说真相了。</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">249</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">46</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+<!--近期文章版块-->
+            
+                <div class="links-of-blogroll motion-element links-of-blogroll-block">
+                  <div class="links-of-blogroll-title">
+                    <!-- modify icon to fire by szw -->
+                    <i class="fa fa-history fa-" aria-hidden="true"></i>
+                    近期文章
+                  </div>
+                  <ul class="links-of-blogroll-list">
+                    
+                    
+                      <li>
+                        <a href="/2020/05/22/WebSocket%E3%80%81Socket%E3%80%81TCP%E3%80%81HTTP%E5%8C%BA%E5%88%AB/" title="WebSocket、Socket、TCP、HTTP区别" target="_blank">WebSocket、Socket、TCP、HTTP区别</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/19/Springboot%E9%A1%B9%E7%9B%AE%E7%9A%84%E6%8E%A5%E5%8F%A3%E9%98%B2%E5%88%B7/" title="Springboot项目的接口防刷" target="_blank">Springboot项目的接口防刷</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/03/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Volatile%E5%85%B3%E9%94%AE%E5%AD%97%E5%8F%8A%E5%85%B6%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/" title="深入理解Volatile关键字及其实现原理" target="_blank">深入理解Volatile关键字及其实现原理</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/04/20/%E4%BD%BF%E7%94%A8vscode%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0%E7%8E%AF%E5%A2%83/" title="使用vscode搭建个人笔记环境" target="_blank">使用vscode搭建个人笔记环境</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/01/20/HBase%E4%BB%8B%E7%BB%8D%E5%AE%89%E8%A3%85%E4%B8%8E%E6%93%8D%E4%BD%9C/" title="HBase介绍安装与操作" target="_blank">HBase介绍安装与操作</a>
+                      </li>
+                    
+                  </ul>
+                </div>
+            
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#整合shiro"><span class="nav-number">1.</span> <span class="nav-text">整合shiro</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#创建数据库表如下"><span class="nav-number">1.1.</span> <span class="nav-text">创建数据库表如下</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#pom"><span class="nav-number">1.2.</span> <span class="nav-text">pom</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#控制器"><span class="nav-number">1.3.</span> <span class="nav-text">控制器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#业务类"><span class="nav-number">1.4.</span> <span class="nav-text">业务类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#主html"><span class="nav-number">1.5.</span> <span class="nav-text">主html</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#密码规则"><span class="nav-number">1.6.</span> <span class="nav-text">密码规则</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Realm"><span class="nav-number">1.7.</span> <span class="nav-text">Realm</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ShiroConfig"><span class="nav-number">1.8.</span> <span class="nav-text">ShiroConfig</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#权限控制"><span class="nav-number">2.</span> <span class="nav-text">权限控制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#会话管理"><span class="nav-number">3.</span> <span class="nav-text">会话管理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#会话监听器"><span class="nav-number">3.1.</span> <span class="nav-text">会话监听器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#会话存储-持久化"><span class="nav-number">3.2.</span> <span class="nav-text">会话存储 &#x2F; 持久化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用Redis作为Session缓存"><span class="nav-number">3.3.</span> <span class="nav-text">使用Redis作为Session缓存</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#会话验证"><span class="nav-number">4.</span> <span class="nav-text">会话验证</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#sessionFactory"><span class="nav-number">4.1.</span> <span class="nav-text">sessionFactory</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#缓存"><span class="nav-number">5.</span> <span class="nav-text">缓存</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#缓存方案"><span class="nav-number">5.1.</span> <span class="nav-text">缓存方案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#缓存更新"><span class="nav-number">5.2.</span> <span class="nav-text">缓存更新</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#缓存实现"><span class="nav-number">5.3.</span> <span class="nav-text">缓存实现</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Cache"><span class="nav-number">5.3.1.</span> <span class="nav-text">Cache</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#CacheManager"><span class="nav-number">5.3.2.</span> <span class="nav-text">CacheManager</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#单点登录"><span class="nav-number">6.</span> <span class="nav-text">单点登录</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Copyright</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

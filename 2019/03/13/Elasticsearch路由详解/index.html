@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Elasticsearch," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="ELasticSearch路由在ELasticSearch 里面，路由功能算是一个高级用法，大多数时候我们用的都是系统默认的路由功能，一个es索引可以分成shard和每个shard又可以有多个replia，那么添加进去的数据，在如何分布在各个shard上面的，而查询的时候文档是如何路由的。 默认情况下，索引数据的分片规则，是下面的公式： shard  &#x3D; hash(_routing) % num_">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Elasticsearch路由详解">
+<meta property="og:url" content="https://huyunshun.com/2019/03/13/Elasticsearch%E8%B7%AF%E7%94%B1%E8%AF%A6%E8%A7%A3/index.html">
+<meta property="og:site_name" content="简">
+<meta property="og:description" content="ELasticSearch路由在ELasticSearch 里面，路由功能算是一个高级用法，大多数时候我们用的都是系统默认的路由功能，一个es索引可以分成shard和每个shard又可以有多个replia，那么添加进去的数据，在如何分布在各个shard上面的，而查询的时候文档是如何路由的。 默认情况下，索引数据的分片规则，是下面的公式： shard  &#x3D; hash(_routing) % num_">
+<meta property="og:image" content="https://img.huyunshun.com/img1/Elasticsearch/asdfdasgsdg324324265dghfghdfg.png">
+<meta property="article:published_time" content="2019-03-12T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-05-20T10:04:24.670Z">
+<meta property="article:author" content="初晨">
+<meta property="article:tag" content="Elasticsearch">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img.huyunshun.com/img1/Elasticsearch/asdfdasgsdg324324265dghfghdfg.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://huyunshun.com/2019/03/13/Elasticsearch路由详解/"/>
+
+
+
+
+
+  <title>Elasticsearch路由详解 | 简</title>
+  
+
+
+
+
+
+
+
+
+  <script type="text/javascript" src="/js/src/love.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
+
+  <!-- 看板娘 -->
+    
+        <script async src="/live2d-widget/autoload.js"></script>
+    
+ <!-- 飘动的彩带） -->
+  <script src="/js/src/piao.js" type="text/javascript"></script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">简</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">人生短暂，学海无边，而大道至简。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://huyunshun.com/2019/03/13/Elasticsearch%E8%B7%AF%E7%94%B1%E8%AF%A6%E8%A7%A3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="初晨">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://img.huyunshun.com/img/20200522182348.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="简">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Elasticsearch路由详解</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-03-13T00:00:00+08:00">
+                2019-03-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Elasticsearch/" itemprop="url" rel="index">
+                    <span itemprop="name">Elasticsearch</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="ELasticSearch路由"><a href="#ELasticSearch路由" class="headerlink" title="ELasticSearch路由"></a>ELasticSearch路由</h1><p>在ELasticSearch 里面，路由功能算是一个高级用法，大多数时候我们用的都是系统默认的路由功能，一个es索引可以分成shard和每个shard又可以有多个replia，那么添加进去的数据，在如何分布在各个shard上面的，而查询的时候文档是如何路由的。</p>
+<p>默认情况下，索引数据的分片规则，是下面的公式：</p>
+<p>shard  = hash(_routing) % num_primary_shards</p>
+<p>routing 是用来进行hash计算的路由值，默认是使用文档id值。我们可以在索引文档时通过routing参数指定别的路由值，number_of_primary_shards：创建索引时指定的主分片数</p>
+<p>ES默认是基于hash的分片，保证在每个shard上数据量都近似平均，这样就不会出现负载不均衡的情况，然后在检索的时候，ES默认会搜索所有的shard上的数据，然后在master节点上面汇聚处理后，返回最终结果。</p>
+<p>有时候，会有另外一种情况，比如说存储一年的数据，如果按照hash去索引，那就是分布非常的均匀，这样的话无论查询什么数据都会去所有的shard上面查询，如果数据量比较大，那么响应速度就比较慢，但这时，我们通过调查发现，一年12个月的数据本身分布并不均匀，有几个月的数据偏多，有几个月的数据偏少，理想情况下，数据偏少的月，查询性能应该更快，但如果是基于hash分片，那么我们并不能实现这种需求，因为hash分片，查询时候必须命中所有的shard之后，查询的结果才是准的，这样一来每次查询都要扫描所有的shard，比如我已经知道数据本身就是1月份的，那其实最好情况下，只查询1月份的数据就行，而不需要把一年的数据都扫描一遍，导致最终结果就是慢的更慢，快的也慢所以我们要针对性的做优化。</p>
+<p>那么如何优化，其实思路也比较明确了，那就是按照月份分区，每一个月份的数据都存放在指定的分区中，如果mysql那就是每一个月份一张表，然后查询的时候，直接查询对应月份的数据即可，在es和solr中原理也大致如此，唯一不同的地方在以es 和 solr都比较方便的支持了路由字段的设置而如果数据库，则需要自己通过中间件的方式来搞定，比如说mycat等。</p>
+<h2 id="使用路由"><a href="#使用路由" class="headerlink" title="使用路由"></a>使用路由</h2><p>es中使用路由字段，看一个官网给的一个例子</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">#指定了一个用户的属性作为路由进行分区，然后查询的时候也必须指定路由。</span><br><span class="line"></span><br><span class="line">PUT my_index&#x2F;my_type&#x2F;1?routing&#x3D;user1&amp;refresh&#x3D;true </span><br><span class="line">&#123;</span><br><span class="line">  &quot;title&quot;: &quot;This is a document&quot;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">GET my_index&#x2F;my_type&#x2F;1?routing&#x3D;user1</span><br></pre></td></tr></table></figure>
+<p>注意，只要在索引的时候加入了路由字段，那么在以后的get、delete、update中都必须指定使用路由字段，否则会出现问题。</p>
+<p>路由字段，也是可以被查询的：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">GET my_index&#x2F;_search</span><br><span class="line">&#123;</span><br><span class="line">  &quot;query&quot;: &#123;</span><br><span class="line">    &quot;terms&quot;: &#123;</span><br><span class="line">      &quot;_routing&quot;: [ &quot;user1&quot; ] </span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>也可以指定多个路由字段：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">GET my_index&#x2F;_search?routing&#x3D;user1,user2 </span><br><span class="line">&#123;</span><br><span class="line">  &quot;query&quot;: &#123;</span><br><span class="line">    &quot;match&quot;: &#123;</span><br><span class="line">      &quot;title&quot;: &quot;document&quot;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果指定了多个用户属性，那么只会查询关联了这两个route属性的shard</p>
+<p>如果加入路由字段之后，其他的操作都必须指定字段，为了避免在使用时忘了添加路由字段，导致同类型数据会分布在多个shard上面，这就违反了路由的原则，所以我们可以在mapping中设置路由字段是必需字段，否则会提示错误：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">PUT my_index2</span><br><span class="line">&#123;</span><br><span class="line">  &quot;mappings&quot;: &#123;</span><br><span class="line">    &quot;my_type&quot;: &#123;</span><br><span class="line">      &quot;_routing&quot;: &#123;</span><br><span class="line">        &quot;required&quot;: true </span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">PUT my_index2&#x2F;my_type&#x2F;1 </span><br><span class="line">&#123;</span><br><span class="line">  &quot;text&quot;: &quot;No routing value provided&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>缺失字段会抛出异常：routing_missing_exception</p>
+<p>还需要注意的是如果使用了路由字段，那么_id字段只能由用户来保证唯一性，因为同一个id的数据，如果路由字段不一样，他是可以被存在到多个shard中的，而默认情况下是不会出现这种情况的。</p>
+<h1 id="集群"><a href="#集群" class="headerlink" title="集群"></a>集群</h1><h2 id="集群组成"><a href="#集群组成" class="headerlink" title="集群组成"></a>集群组成</h2><p>首先启动的一定是主节点，主节点存储的是集群的元数据信息；</p>
+<p>Node2节点启动之前会配置集群的名称Cluster-name：ess，然后配置可以作为主节点的ip地址信息discovery.zen.ping.unicast.hosts: [“10.0.1.11”,“10.0.1.12”]，配置自己的ip地址networ.host: 10.0.1.12；</p>
+<p>Node2启动的过程中会去找到主节点Node1告诉Node1我要加入到集群里面了，主节点Node1接收到请求以后看Node2是否满足加入集群的条件，如果满足就把node2的ip地址加入的元信息里面，然后广播给集群中的其他节点有新节点加入，并把最新的元信息发送给其他的节点去更新；</p>
+<p>集群中的所有节点的元信息都是和主节点一致的，因为一旦有新的节点加入进来，主节点会通知其他的节点同步元信息。</p>
+<p>集群有节点出现故障，如主节点挂了，会重新选择主节点。</p>
+<h2 id="集群中创建索引的流程"><a href="#集群中创建索引的流程" class="headerlink" title="集群中创建索引的流程"></a>集群中创建索引的流程</h2><ul>
+<li>1、首先请求转发到master节点；</li>
+<li>2、选择节点 的分片、副本、记录元信息；</li>
+<li>3、通知给参与存放索引分片、副本的节点从节点创建分片、副本；</li>
+<li>4、参与的节点向主节点反馈结果；</li>
+<li>5、等待时间到了，master向一个节点反馈信息，节点响应请求；</li>
+<li>6、主节点将元信息广播给所有的从节点。</li>
+</ul>
+<p><img src="https://img.huyunshun.com/img1/Elasticsearch/asdfdasgsdg324324265dghfghdfg.png" alt=""></p>
+<h2 id="在集群中索引文档"><a href="#在集群中索引文档" class="headerlink" title="在集群中索引文档"></a>在集群中索引文档</h2><p>索引文档的步骤：</p>
+<ul>
+<li>1、node2计算文档的路由值得到文档存放的分片（假定路由选定的是分片0）。</li>
+<li>2、将文档转发给分片0(P0)的主分片节点 node1。</li>
+<li>3、node1索引文档，同步给副本（R0）节点node3索引文档。</li>
+<li>4、node1向node2反馈结果</li>
+<li>5、node2作出响应</li>
+</ul>
+<h2 id="文档是如何路由的"><a href="#文档是如何路由的" class="headerlink" title="文档是如何路由的"></a>文档是如何路由的</h2><p>shard  = hash(_routing) % num_primary_shards</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">number_of_primary_shards：创建索引时候指定的主分片数参数值</span><br><span class="line">routing：用来进行hash计算的路由值，默认是使用文档id值。我们可以在索引文档时通过routing参数指定别的路由值</span><br><span class="line">在索引、删除、更新、查询中都可以使用routing参数（可多值）指定操作的分片。</span><br></pre></td></tr></table></figure>
+
+<h2 id="在集群中进行搜索流程"><a href="#在集群中进行搜索流程" class="headerlink" title="在集群中进行搜索流程"></a>在集群中进行搜索流程</h2><p>搜索的步骤：如要搜索 索引 s0</p>
+<ul>
+<li>1、node2解析查询。</li>
+<li>2、node2将查询发给索引s0的分片/副本（R1,R2,R0）节点</li>
+<li>3、各节点执行查询，将结果发给Node2</li>
+<li>4、Node2合并结果，作出响应。</li>
+</ul>
+<h2 id="Master节点的工作任务"><a href="#Master节点的工作任务" class="headerlink" title="Master节点的工作任务"></a>Master节点的工作任务</h2><ul>
+<li><ol>
+<li>存储集群的元信息，如集群名称、集群中的节点</li>
+</ol>
+</li>
+<li><ol start="2">
+<li>转发创建索引和索引文档的请求</li>
+</ol>
+</li>
+<li><ol start="3">
+<li>和其他的节点进行通信，告诉其他节点有新的节点加入等</li>
+</ol>
+</li>
+</ul>
+
+      
+    </div>
+     <!-- 相关文章推荐 -->
+    
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Elasticsearch/" rel="tag"># Elasticsearch</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/03/12/Elasticsearch%E5%88%86%E8%AF%8D%E5%99%A8/" rel="next" title="Elasticsearch分词器">
+                <i class="fa fa-chevron-left"></i> Elasticsearch分词器
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/03/14/Elasticsearch%E6%90%9C%E7%B4%A2%EF%BC%88API%E5%92%8CDSL%EF%BC%89/" rel="prev" title="Elasticsearch搜索（API和DSL）">
+                Elasticsearch搜索（API和DSL） <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+<span class="jiathis_txt">分享到：</span>
+<a class="jiathis_button_fav">收藏夹</a>
+<a class="jiathis_button_copy">复制网址</a>
+<a class="jiathis_button_email">邮件</a>
+<a class="jiathis_button_weixin">微信</a>
+<a class="jiathis_button_qzone">QQ空间</a>
+<a class="jiathis_button_tqq">腾讯微博</a>
+<a class="jiathis_button_douban">豆瓣</a>
+<a class="jiathis_button_share">一键分享</a>
+
+<a href="http://www.jiathis.com/share?uid=2140465" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+<a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+var jiathis_config={
+  data_track_clickback:true,
+  summary:"",
+  shortUrl:false,
+  hideMore:false
+}
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://img.huyunshun.com/img/20200522182348.png"
+                alt="初晨" />
+            
+              <p class="site-author-name" itemprop="name">初晨</p>
+              <p class="site-description motion-element" itemprop="description">永远不要说你知道本质，更别说真相了。</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">249</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">46</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+<!--近期文章版块-->
+            
+                <div class="links-of-blogroll motion-element links-of-blogroll-block">
+                  <div class="links-of-blogroll-title">
+                    <!-- modify icon to fire by szw -->
+                    <i class="fa fa-history fa-" aria-hidden="true"></i>
+                    近期文章
+                  </div>
+                  <ul class="links-of-blogroll-list">
+                    
+                    
+                      <li>
+                        <a href="/2020/05/22/WebSocket%E3%80%81Socket%E3%80%81TCP%E3%80%81HTTP%E5%8C%BA%E5%88%AB/" title="WebSocket、Socket、TCP、HTTP区别" target="_blank">WebSocket、Socket、TCP、HTTP区别</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/19/Springboot%E9%A1%B9%E7%9B%AE%E7%9A%84%E6%8E%A5%E5%8F%A3%E9%98%B2%E5%88%B7/" title="Springboot项目的接口防刷" target="_blank">Springboot项目的接口防刷</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/03/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Volatile%E5%85%B3%E9%94%AE%E5%AD%97%E5%8F%8A%E5%85%B6%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/" title="深入理解Volatile关键字及其实现原理" target="_blank">深入理解Volatile关键字及其实现原理</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/04/20/%E4%BD%BF%E7%94%A8vscode%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0%E7%8E%AF%E5%A2%83/" title="使用vscode搭建个人笔记环境" target="_blank">使用vscode搭建个人笔记环境</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/01/20/HBase%E4%BB%8B%E7%BB%8D%E5%AE%89%E8%A3%85%E4%B8%8E%E6%93%8D%E4%BD%9C/" title="HBase介绍安装与操作" target="_blank">HBase介绍安装与操作</a>
+                      </li>
+                    
+                  </ul>
+                </div>
+            
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#ELasticSearch路由"><span class="nav-number">1.</span> <span class="nav-text">ELasticSearch路由</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#使用路由"><span class="nav-number">1.1.</span> <span class="nav-text">使用路由</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#集群"><span class="nav-number">2.</span> <span class="nav-text">集群</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#集群组成"><span class="nav-number">2.1.</span> <span class="nav-text">集群组成</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#集群中创建索引的流程"><span class="nav-number">2.2.</span> <span class="nav-text">集群中创建索引的流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#在集群中索引文档"><span class="nav-number">2.3.</span> <span class="nav-text">在集群中索引文档</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#文档是如何路由的"><span class="nav-number">2.4.</span> <span class="nav-text">文档是如何路由的</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#在集群中进行搜索流程"><span class="nav-number">2.5.</span> <span class="nav-text">在集群中进行搜索流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Master节点的工作任务"><span class="nav-number">2.6.</span> <span class="nav-text">Master节点的工作任务</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Copyright</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

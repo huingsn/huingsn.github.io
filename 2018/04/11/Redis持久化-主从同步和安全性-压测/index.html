@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="集群,Redis," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="持久化方式1、快照方式（RDB 默认）这种方式就是将内存中数据以快照的方式写入到二进制文件中，默认的文件名为dump.rdb。 客户端也可以使用 e save 或者 e bgsave 命令通知 redis 做一次快照持久化。save 操作是在主线程中保存快照的，由于 redis 是用一个主线程来处理所有客户端的请求，这种方式会阻塞所有客户端请求。所以不推荐使用。 另一点需要注意的是，每次快照持久化">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis持久化-主从同步和安全性-压测">
+<meta property="og:url" content="https://huyunshun.com/2018/04/11/Redis%E6%8C%81%E4%B9%85%E5%8C%96-%E4%B8%BB%E4%BB%8E%E5%90%8C%E6%AD%A5%E5%92%8C%E5%AE%89%E5%85%A8%E6%80%A7-%E5%8E%8B%E6%B5%8B/index.html">
+<meta property="og:site_name" content="简">
+<meta property="og:description" content="持久化方式1、快照方式（RDB 默认）这种方式就是将内存中数据以快照的方式写入到二进制文件中，默认的文件名为dump.rdb。 客户端也可以使用 e save 或者 e bgsave 命令通知 redis 做一次快照持久化。save 操作是在主线程中保存快照的，由于 redis 是用一个主线程来处理所有客户端的请求，这种方式会阻塞所有客户端请求。所以不推荐使用。 另一点需要注意的是，每次快照持久化">
+<meta property="article:published_time" content="2018-04-10T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-05-20T10:04:24.690Z">
+<meta property="article:author" content="初晨">
+<meta property="article:tag" content="集群">
+<meta property="article:tag" content="Redis">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://huyunshun.com/2018/04/11/Redis持久化-主从同步和安全性-压测/"/>
+
+
+
+
+
+  <title>Redis持久化-主从同步和安全性-压测 | 简</title>
+  
+
+
+
+
+
+
+
+
+  <script type="text/javascript" src="/js/src/love.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
+
+  <!-- 看板娘 -->
+    
+        <script async src="/live2d-widget/autoload.js"></script>
+    
+ <!-- 飘动的彩带） -->
+  <script src="/js/src/piao.js" type="text/javascript"></script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">简</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">人生短暂，学海无边，而大道至简。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://huyunshun.com/2018/04/11/Redis%E6%8C%81%E4%B9%85%E5%8C%96-%E4%B8%BB%E4%BB%8E%E5%90%8C%E6%AD%A5%E5%92%8C%E5%AE%89%E5%85%A8%E6%80%A7-%E5%8E%8B%E6%B5%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="初晨">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://img.huyunshun.com/img/20200522182348.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="简">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Redis持久化-主从同步和安全性-压测</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-11T00:00:00+08:00">
+                2018-04-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Redis/" itemprop="url" rel="index">
+                    <span itemprop="name">Redis</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="持久化方式"><a href="#持久化方式" class="headerlink" title="持久化方式"></a>持久化方式</h2><h3 id="1、快照方式（RDB-默认）"><a href="#1、快照方式（RDB-默认）" class="headerlink" title="1、快照方式（RDB 默认）"></a>1、快照方式（RDB 默认）</h3><p>这种方式就是将内存中数据以快照的方式写入到二进制文件中，默认的文件名为dump.rdb。</p>
+<p>客户端也可以使用 e save 或者 e bgsave 命令通知 redis 做一次快照持久化。save 操作是在主线程中保存快照的，由于 redis 是用一个主线程来处理所有客户端的请求，这种方式会阻塞所有客户端请求。所以不推荐使用。</p>
+<p>另一点需要注意的是，每次快照持久化都是将内存数据完整写入到磁盘一次，并不是增量的只同步增量数据。如果数据量大的话，写操作会比较多，必然会引起大量的磁盘 IO 操作，可能会严重影响性能。</p>
+<p>注意：由于快照方式是在一定间隔时间做一次的，所以如果 redis 意外当机的话，就会丢失最后一次快照后的所有数据修改。</p>
+<h3 id="2、日志追加方式（AOF）"><a href="#2、日志追加方式（AOF）" class="headerlink" title="2、日志追加方式（AOF）"></a>2、日志追加方式（AOF）</h3><p>这种方式 redis 会将每一个收到的写命令都通过 write 函数追加到文件中(默认appendonly.aof)。当 redis 重启时会通过重新执行文件中保存的写命令来在内存中重建整个数据库的内容。</p>
+<p>当然由于操作系统会在内核中缓存 write 做的修改，所以可能不是立即写到磁盘上。这样的持久化还是有可能会丢失部分修改。不过我们可以通过配置文件告诉redis 我们想要通过 fsync 函数强制操作系统写入到磁盘的时机。</p>
+<p>有三种方式如下（默认是 ：每秒 fsync 一次）<br>    appendonly yes #启用日志追加持久化方式<br>    #appendfsync always #每次收到写命令就立即强制写入磁盘，最慢的，但是保证完全的持久化，不推荐使用<br>    appendfsync everysec //每秒钟强制写入磁盘一次，在性能和持久化方面做了很好的折中，推荐<br>    #appendfsync no //完全依赖操作系统，性能最好,持久化没保证</p>
+<p>日志追加方式同时带来了另一个问题。持久化文件会变的越来越大。例如我们调用 incrtest 命令 100 次，文件中必须保存全部 100 条命令，其实有 99 条都是多余的。因为要恢复数据库状态其实文件中保存一条 set test 100 就够了。</p>
+<p>为了压缩这种持久化方式的日志文件 ，redis 提供了  bgrewriteaof 命令。收到此命令 redis 将使用与快照类似的方式将内存中的数据以命令的方式保存到临时文件中，最后替换原来的持久化日志文件。</p>
+<h3 id="虚拟内存"><a href="#虚拟内存" class="headerlink" title="虚拟内存"></a>虚拟内存</h3><p>redis 没有使用操作系统提供的虚拟内存机制而是自己在用户态实现了自己的虚拟内存机制</p>
+<p>对于redis 这样的内存数据库，内存总是不够用的。使用虚拟内存技术把那些不经常访问的数据交换到磁盘上。</p>
+<pre><code>vm-enabled yes #开启虚拟内存功能
+vm-swap-file /tmp/redis.swap #交换出来 value 保存的文件路径/tmp/redis.swap
+vm-max-memory 268435456 #redis 使用的最大内存上限（256MB），超过上限后redis 开始交换 value 到磁盘 swap 文件中。建议设置为系统空闲内存的 60%-80%
+vm-page-size 32 #每个 redis 页的大小 32 个字节
+vm-pages 134217728 #最多在文件中使用多少个页,交换文件的大小 =（vm-page-size * vm-pages）4GB
+vm-max-threads 8 #用于执行 value 对象换入换出的工作线程数量。0表示不使用工作线程</code></pre><p>redis 的虚拟内存在设计上为了保证 key 的查询速度，只会将 value 交换到 swap 文件中。 如果是由于太多 key  很小的 value  造成的内存问题，那么 redis  的虚拟内存并不能解决问题 。</p>
+<p>和操作系统一样 redis 也是按页来交换对象的。redis 规定同一个页只能保存一个对象。但是一个对象可以保存在多个页中。在 redis 使用的内存没超过 vm-max-memory 之前是不会交换任何 value 的。当超过最大内存限制后，redis 会选择把较老的对象交换到 swap文件中去。如果两个对象一样老会优先交换比较大的对象，精确的交换计算公 式swappability = age*log(size_in_memory)。</p>
+<p><strong>redis 虚拟内存工作方式</strong></p>
+<p>当 vm-max-threads  设为 0 时（阻塞方式）</p>
+<p>换出：主线程定期检查发现内存超出最大上限后，会直接以阻塞的方式，将选中的对象保存到 swap文件中，并释放对象占用的内存空间，此过程会一直重复直到下面条件满足</p>
+<pre><code>1.内存使用降到最大限制以下
+2.swap 文件满了。
+3.几乎全部的对象都被交换到磁盘了</code></pre><p>换入：当有客户端请求已经被换出的 value 时，主线程会以阻塞的方式从 swap 文件中加载对应的value 对象，加载时此时会阻塞所有客户端。然后处理该客户端的请求</p>
+<p>当 vm-max-threads  大于 0  时( ( 工作线程方式) )</p>
+<p>换出：当主线程检测到使用内存超过最大上限，会将选中要交换的对象信息放到一个队列中交给工作线程后台处理，主线程会继续处理客户端请求。</p>
+<p>换入：如果有客户端请求的 key 已经被换出了，主线程会先阻塞发出命令的客户端，然后将加载对象的信息放到一个队列中，让工作线程去加载。加载完毕后工作线程通知主线程。主线程再执行客户端的命令。这种方式只阻塞请求的 value 是已经被换出 key 的客户端。总的来说阻塞方式的性能会好一些，因为不需要线程同步、创建线程和恢复被阻塞的客户端等开销。但是也相应的牺牲了响应性。工作线程方式主线程不会阻塞在磁盘 IO 上，所以响应性更好。如果我们的应用不太经常发生换入换出，而且也不太在意有点延迟的话推荐使用阻塞方式。</p>
+<p><strong>主从主要是为了实现读写分离</strong></p>
+<p>Redis 支持将数据同步到多台从库上，这种特性对提高 读取性能非常有益。</p>
+<pre><code>1) master 可以有多个 slave。
+2) 除了多个 slave 连到相同的 master 外，slave 也可以连接其它 slave 形成图状结构。
+3) 主从复制不会阻塞 master。也就是说当一个或多个 slave 与 master 进行初次同步数据时，master 可以继续处理客户端发来的请求。相反 slave 在初次同步数据时则会阻塞不能处理客户端的请求。
+4) 主从复制可以用来提高系统的可伸缩性,我们可以用多个 slave 专门用于客户端的读请求，比如 sort 操作可以使用 slave 来处理。也可以用来做简单的数据冗余。
+5) 可以在 master 禁用数据持久化，只需要注释掉 master 配置文件中的所有 save 配置，然后只在 slave 上配置数据持久化。</code></pre><p><strong>Redis  主从复制的过程</strong></p>
+<p>当设置好 slave 服务器后，slave 会建立和 master 的连接，然后发送 sync 命令。无论第一次同步建立的连接还是连接断开后的重新连接，master 都会启动一个后台进程，将数据库快照保存到文件中，同时 master 主进程会开始收集新的写命令并缓存起来。</p>
+<p>后台进程完成写文件后，master 就发送文件给 slave，slave 将文件保存到磁盘上，然后加载到内存恢复数据库快照到 slave 上。接着 master 就会把缓存的命令转发给 slave。而且后续 master 收到的写命令都会通过开始建立的连接发送给slave。</p>
+<p>从master到slave的同步数据的命令和从 客户端发送的命令使用相同的协议格式。当 master 和 slave 的连接断开时 slave 可以自动重新建立连接。如果 master 同时收到多个 slave 发来的同步连接命令，只会启动一个进程来写数据库镜像，然后发送给所有 slave。<br>配置 slave 服务器很简单，只需要在配置文件中加入如下配置。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">slaveof 192.168.1.1 6379 #指定 master 的 ip 和端口</span><br><span class="line">slaveof &lt;materip&gt;&lt;materport&gt;</span><br><span class="line">materauth &lt;master-password&gt;</span><br></pre></td></tr></table></figure>
+<h2 id="安全性"><a href="#安全性" class="headerlink" title="安全性"></a>安全性</h2><pre><code>Redis设置密码：
+配置文件中：
+#requirepass foobared
+requirepass *****
+重启，再次进入：keys *
+    提示没有权限
+输入：auth ***
+重新进入，这样每次都有可以重新输入密码
+可以在登录客户端的时候登录授权：
+redis-cli -a ***
+
+发布和订阅：
+使用subscribe进行订阅监听
+使用publish惊醒发布消息广播。</code></pre><h2 id="压力测试"><a href="#压力测试" class="headerlink" title="压力测试"></a>压力测试</h2><p>Redis 自带了一个叫redis-benchmark的工具来模拟 N 个客户端同时发出 M 个请求。</p>
+<p>使用./redis-benchmark –help查看参数</p>
+<p>例子：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"># 运行默认配置下的测试</span><br><span class="line">$ redis-benchmark</span><br><span class="line"></span><br><span class="line"># 指定并发数20,总请求数为10W,redis server主机IP为192.168.1.1</span><br><span class="line">$ redis-benchmark -h 192.168.1.1 -p 6379 -n 100000 -c 20</span><br><span class="line"></span><br><span class="line"># 测试SET随机数性能</span><br><span class="line">$ redis-benchmark -t set -n 1000000 -r 100000000</span><br><span class="line"></span><br><span class="line"># 测试结果输出到csv</span><br><span class="line">$ redis-benchmark -t ping,set,get -n 100000 --csv</span><br><span class="line"></span><br><span class="line"># 执行特定命令下的测试</span><br><span class="line">$ redis-benchmark -r 10000 -n 10000 eval &#39;return redis.call(&quot;ping&quot;)&#39; 0</span><br><span class="line"></span><br><span class="line"># 测试list入队的速度</span><br><span class="line">$ redis-benchmark -r 10000 -n 10000 lpush mylist __rand_int__</span><br></pre></td></tr></table></figure>
+<pre><code>-t 选择你想测试的命令，比如redis-benchmark -t set
+-p 指定port redis-benchmark -p 6379
+-l 一直循环
+-c 指定客户端数量
+-n 指定request数量
+-q 运行在安静模式中
+-r 随机  -比如想设置 10 万随机 key 连续 SET 1 万次  redis-benchmark -t set -r 100000 -n 10000</code></pre><p>例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost bin]# .&#x2F;redis-benchmark -h 192.168.1.105 -p 6001 -t set -n 100000 -r 1000000</span><br><span class="line">&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D; SET &#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;</span><br><span class="line"> 100000 requests completed in 1.58 seconds</span><br><span class="line"> 50 parallel clients</span><br><span class="line"> 3 bytes payload</span><br><span class="line"> keep alive: 1</span><br><span class="line"></span><br><span class="line">90.70% &lt;&#x3D; 1 milliseconds</span><br><span class="line">99.50% &lt;&#x3D; 2 milliseconds</span><br><span class="line">99.91% &lt;&#x3D; 3 milliseconds</span><br><span class="line">99.94% &lt;&#x3D; 4 milliseconds</span><br><span class="line">99.95% &lt;&#x3D; 62 milliseconds</span><br><span class="line">100.00% &lt;&#x3D; 63 milliseconds</span><br><span class="line">100.00% &lt;&#x3D; 63 milliseconds</span><br><span class="line">63492.06 requests per second</span><br></pre></td></tr></table></figure>
+      
+    </div>
+     <!-- 相关文章推荐 -->
+    
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/%E9%9B%86%E7%BE%A4/" rel="tag"># 集群</a>
+          
+            <a href="/tags/Redis/" rel="tag"># Redis</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/04/10/Redis%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E5%92%8C%E6%93%8D%E4%BD%9C%E6%8C%87%E4%BB%A4/" rel="next" title="Redis数据类型和操作指令">
+                <i class="fa fa-chevron-left"></i> Redis数据类型和操作指令
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/04/13/Rabbit%E4%BB%8B%E7%BB%8D%E5%92%8C%E5%8E%9F%E7%90%86/" rel="prev" title="Rabbit介绍和原理及安装">
+                Rabbit介绍和原理及安装 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+<span class="jiathis_txt">分享到：</span>
+<a class="jiathis_button_fav">收藏夹</a>
+<a class="jiathis_button_copy">复制网址</a>
+<a class="jiathis_button_email">邮件</a>
+<a class="jiathis_button_weixin">微信</a>
+<a class="jiathis_button_qzone">QQ空间</a>
+<a class="jiathis_button_tqq">腾讯微博</a>
+<a class="jiathis_button_douban">豆瓣</a>
+<a class="jiathis_button_share">一键分享</a>
+
+<a href="http://www.jiathis.com/share?uid=2140465" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+<a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+var jiathis_config={
+  data_track_clickback:true,
+  summary:"",
+  shortUrl:false,
+  hideMore:false
+}
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://img.huyunshun.com/img/20200522182348.png"
+                alt="初晨" />
+            
+              <p class="site-author-name" itemprop="name">初晨</p>
+              <p class="site-description motion-element" itemprop="description">永远不要说你知道本质，更别说真相了。</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">249</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">46</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+<!--近期文章版块-->
+            
+                <div class="links-of-blogroll motion-element links-of-blogroll-block">
+                  <div class="links-of-blogroll-title">
+                    <!-- modify icon to fire by szw -->
+                    <i class="fa fa-history fa-" aria-hidden="true"></i>
+                    近期文章
+                  </div>
+                  <ul class="links-of-blogroll-list">
+                    
+                    
+                      <li>
+                        <a href="/2020/05/22/WebSocket%E3%80%81Socket%E3%80%81TCP%E3%80%81HTTP%E5%8C%BA%E5%88%AB/" title="WebSocket、Socket、TCP、HTTP区别" target="_blank">WebSocket、Socket、TCP、HTTP区别</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/19/Springboot%E9%A1%B9%E7%9B%AE%E7%9A%84%E6%8E%A5%E5%8F%A3%E9%98%B2%E5%88%B7/" title="Springboot项目的接口防刷" target="_blank">Springboot项目的接口防刷</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/03/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Volatile%E5%85%B3%E9%94%AE%E5%AD%97%E5%8F%8A%E5%85%B6%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/" title="深入理解Volatile关键字及其实现原理" target="_blank">深入理解Volatile关键字及其实现原理</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/04/20/%E4%BD%BF%E7%94%A8vscode%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0%E7%8E%AF%E5%A2%83/" title="使用vscode搭建个人笔记环境" target="_blank">使用vscode搭建个人笔记环境</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/01/20/HBase%E4%BB%8B%E7%BB%8D%E5%AE%89%E8%A3%85%E4%B8%8E%E6%93%8D%E4%BD%9C/" title="HBase介绍安装与操作" target="_blank">HBase介绍安装与操作</a>
+                      </li>
+                    
+                  </ul>
+                </div>
+            
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#持久化方式"><span class="nav-number">1.</span> <span class="nav-text">持久化方式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1、快照方式（RDB-默认）"><span class="nav-number">1.1.</span> <span class="nav-text">1、快照方式（RDB 默认）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2、日志追加方式（AOF）"><span class="nav-number">1.2.</span> <span class="nav-text">2、日志追加方式（AOF）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#虚拟内存"><span class="nav-number">1.3.</span> <span class="nav-text">虚拟内存</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安全性"><span class="nav-number">2.</span> <span class="nav-text">安全性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#压力测试"><span class="nav-number">3.</span> <span class="nav-text">压力测试</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Copyright</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

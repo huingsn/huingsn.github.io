@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Node," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="基于node,typescript封装，安装步骤略。 新建nodejs项目 npm init npm install –save mysql 简单封装123456789101112131415161718192021222324252627282930313233343536&#39;use strict&#39;;const mysql&#x3D;require(&#39;mysql&#39;);module.exports &#x3D; &amp;#1">
+<meta property="og:type" content="article">
+<meta property="og:title" content="TypeScript——orm实现">
+<meta property="og:url" content="https://huyunshun.com/2019/04/18/TypeScript%E2%80%94%E2%80%94orm%E5%AE%9E%E7%8E%B0/index.html">
+<meta property="og:site_name" content="简">
+<meta property="og:description" content="基于node,typescript封装，安装步骤略。 新建nodejs项目 npm init npm install –save mysql 简单封装123456789101112131415161718192021222324252627282930313233343536&#39;use strict&#39;;const mysql&#x3D;require(&#39;mysql&#39;);module.exports &#x3D; &amp;#1">
+<meta property="article:published_time" content="2019-04-17T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-05-20T10:04:24.689Z">
+<meta property="article:author" content="初晨">
+<meta property="article:tag" content="Node">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://huyunshun.com/2019/04/18/TypeScript——orm实现/"/>
+
+
+
+
+
+  <title>TypeScript——orm实现 | 简</title>
+  
+
+
+
+
+
+
+
+
+  <script type="text/javascript" src="/js/src/love.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
+
+  <!-- 看板娘 -->
+    
+        <script async src="/live2d-widget/autoload.js"></script>
+    
+ <!-- 飘动的彩带） -->
+  <script src="/js/src/piao.js" type="text/javascript"></script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">简</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">人生短暂，学海无边，而大道至简。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://huyunshun.com/2019/04/18/TypeScript%E2%80%94%E2%80%94orm%E5%AE%9E%E7%8E%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="初晨">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://img.huyunshun.com/img/20200522182348.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="简">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">TypeScript——orm实现</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-18T00:00:00+08:00">
+                2019-04-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Node/" itemprop="url" rel="index">
+                    <span itemprop="name">Node</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>基于node,typescript封装，安装步骤略。</p>
+<p>新建nodejs项目</p>
+<p>npm init</p>
+<p>npm install –save mysql</p>
+<h5 id="简单封装"><a href="#简单封装" class="headerlink" title="简单封装"></a>简单封装</h5><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">'use strict'</span>;</span><br><span class="line"><span class="keyword">const</span> mysql=<span class="built_in">require</span>(<span class="string">'mysql'</span>);</span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">    config: &#123;</span><br><span class="line">        host: <span class="string">'210.14.139.118'</span>,</span><br><span class="line">        port: <span class="number">44257</span>,</span><br><span class="line">        database: <span class="string">'jk_newcenter'</span>,</span><br><span class="line">        user: <span class="string">'jk_newcenter'</span>,</span><br><span class="line">        password: <span class="string">'aMF3va%d$cc'</span></span><br><span class="line">    &#125;,</span><br><span class="line">    connection: <span class="literal">null</span>,</span><br><span class="line">    <span class="comment">//创建连接池并连接</span></span><br><span class="line">    openConnection: <span class="function"><span class="keyword">function</span> (<span class="params">callback</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.connection = mysql.createConnection(<span class="keyword">this</span>.config);</span><br><span class="line">    &#125;,</span><br><span class="line">    closeConnection: <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> me = <span class="keyword">this</span>;</span><br><span class="line">        me.connection.end(<span class="function"><span class="keyword">function</span> (<span class="params">err</span>) </span>&#123;</span><br><span class="line">            <span class="built_in">console</span>.log(err);</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;,</span><br><span class="line"></span><br><span class="line">    execute: <span class="function"><span class="keyword">function</span> (<span class="params">config</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">const</span> me = <span class="keyword">this</span>;</span><br><span class="line">        <span class="keyword">this</span>.openConnection();</span><br><span class="line">        me.connection.query(config.sql, config.params, <span class="function"><span class="keyword">function</span> (<span class="params">err, res</span>) </span>&#123;</span><br><span class="line">            <span class="keyword">if</span> (err) &#123;</span><br><span class="line">                <span class="built_in">console</span>.log(err);</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (config.callback) &#123;</span><br><span class="line">                config.callback(res);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 关闭数据库连接</span></span><br><span class="line">            me.closeConnection();</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h5 id="完整封装"><a href="#完整封装" class="headerlink" title="完整封装"></a>完整封装</h5><p>连接池配置connection.ts：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> * <span class="keyword">as</span> mysql <span class="keyword">from</span> <span class="string">"mysql"</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> mysqlPool = mysql.createPool(&#123;</span><br><span class="line">    host: <span class="string">"172.16.3.34"</span>,</span><br><span class="line">    user: <span class="string">"root"</span>,</span><br><span class="line">    password: <span class="string">"root"</span>,</span><br><span class="line">    port: <span class="number">3306</span>,</span><br><span class="line">    database: <span class="string">"sonar"</span>,</span><br><span class="line">    connectionLimit: <span class="number">10000</span></span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> timeout = <span class="number">4000</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> interface ISqlResults &#123;</span><br><span class="line">    results: <span class="built_in">Array</span>&lt;any&gt;;</span><br><span class="line">    fields: <span class="built_in">Object</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">interface IQueryObject &#123;</span><br><span class="line">    [name: string]: string | number</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 实现增删改查基本方法</span></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> sqlQuery = <span class="function">(<span class="params">sql: mysql.QueryOptions</span>) =&gt;</span> <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params">resolve, reject</span>) =&gt;</span></span><br><span class="line">    mysqlPool.query(sql, (err, results, fields) =&gt; err ? reject(err) : resolve(<span class="xml"><span class="tag">&lt;<span class="name">ISqlResults</span>&gt;</span>&#123;results, fields&#125;))</span></span><br><span class="line"><span class="xml">);</span></span><br><span class="line"></span><br><span class="line"><span class="xml">export const and = (dataObject: IQueryObject) =&gt; &#123;</span></span><br><span class="line"><span class="xml">    let queryString = "";</span></span><br><span class="line"><span class="xml">    Object.keys(dataObject).forEach(key =&gt; &#123;</span></span><br><span class="line"><span class="xml">        queryString += mysql.escape(key) + "=" + dataObject[key] + " and "</span></span><br><span class="line"><span class="xml">    &#125;);</span></span><br><span class="line"><span class="xml">    return queryString.replace(/\sand\s$/, "")</span></span><br><span class="line"><span class="xml">&#125;;</span></span><br><span class="line"></span><br><span class="line"><span class="xml">export const tableQuery = (table: string, condition: IQueryObject | string) =&gt; sqlQuery(&#123;</span></span><br><span class="line"><span class="xml">    sql: typeof condition === "string" ?</span></span><br><span class="line"><span class="xml">        mysql.format("select * from ?? where ??", [table, condition]) :</span></span><br><span class="line"><span class="xml">        mysql.format("select * from ?? where ?", [table, condition]),</span></span><br><span class="line"><span class="xml">    timeout</span></span><br><span class="line"><span class="xml">&#125;);</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">export const insertTable = (table: string, data: IQueryObject | Array&lt;string | number&gt;) =&gt; sqlQuery(&#123;</span><br><span class="line">    sql: Array.isArray(data) ?</span><br><span class="line">        mysql.format("insert into ?? values(??)", [table, (&lt;Array&lt;string | number&gt;&gt;data).join(", ")]) :</span><br><span class="line">        mysql.format("insert into ?? set ?", [table, data]),</span><br><span class="line">    timeout</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">export const updateTable = (table: string, update: IQueryObject, condition: IQueryObject | string) =&gt; sqlQuery(&#123;</span><br><span class="line">    sql: typeof condition === "string" ?</span><br><span class="line">        mysql.format("update ?? set ? where ??", [table, update, condition]) :</span><br><span class="line">        mysql.format("update ?? set ? where ?", [table, update, condition]),</span><br><span class="line">    timeout</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">export const deleteRow = (table: string, condition: IQueryObject | string) =&gt; sqlQuery(&#123;</span><br><span class="line">    sql: typeof condition === "string" ?</span><br><span class="line">        mysql.format("delete from ?? where ??", [table, condition]) :</span><br><span class="line">        mysql.format("delete from ?? where ?", [table, condition]),</span><br><span class="line">    timeout</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">export default mysqlPool;</span><br></pre></td></tr></table></figure>
+<p>ORM核心操作MyOrm.ts</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; sqlQuery, insertTable, deleteRow, tableQuery, updateTable, ISqlResults &#125; <span class="keyword">from</span> <span class="string">"./connection"</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; format &#125; <span class="keyword">from</span> <span class="string">"mysql"</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> interface IField &#123;</span><br><span class="line">    [name: string]: string | number</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> interface IError &#123;</span><br><span class="line">    err: boolean;</span><br><span class="line">    message?: string;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> interface IORM&lt;TableType, TableTypeRest&gt; &#123;</span><br><span class="line">    fieldMap: IField;</span><br><span class="line">    map: IField;</span><br><span class="line">    table: string;</span><br><span class="line">    defaultValue: TableType;</span><br><span class="line"></span><br><span class="line">    fetchAll (condition: TableTypeRest | string): <span class="built_in">Promise</span>&lt;<span class="built_in">Array</span>&lt;TableType&gt;&gt;;</span><br><span class="line"></span><br><span class="line">    fetch (query: TableTypeRest | string): <span class="built_in">Promise</span>&lt;TableType&gt;;</span><br><span class="line"></span><br><span class="line">    insert (data: TableType): <span class="built_in">Promise</span>&lt;IError&gt;;</span><br><span class="line"></span><br><span class="line">    update (data: TableTypeRest, <span class="attr">condition</span>: TableTypeRest | string): <span class="built_in">Promise</span>&lt;IError&gt;;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">delete</span> (condition: TableTypeRest | string): <span class="built_in">Promise</span>&lt;IError&gt;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//ORM framework</span></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="class"><span class="keyword">class</span> <span class="title">MyOrm</span>&lt;<span class="title">Type</span>, <span class="title">TypeRest</span>&gt; <span class="title">implements</span> <span class="title">IORM</span>&lt;<span class="title">Type</span>, <span class="title">TypeRest</span>&gt; </span>&#123;</span><br><span class="line">    public fieldMap: IField;</span><br><span class="line">    public map: IField;</span><br><span class="line">    public table: string;</span><br><span class="line">    public defaultValue: Type;</span><br><span class="line"></span><br><span class="line">    public <span class="keyword">async</span> <span class="keyword">delete</span> (condition: TypeRest | string): <span class="built_in">Promise</span>&lt;IError&gt; &#123;</span><br><span class="line">        <span class="keyword">const</span> dbCondition: IField | string = <span class="keyword">typeof</span> condition === <span class="string">"string"</span> ? condition :</span><br><span class="line">            <span class="built_in">Object</span>.keys(condition).reduce(<span class="function">(<span class="params">acc, curKey</span>) =&gt;</span> &#123;acc[<span class="keyword">this</span>.fieldMap[curKey]] = condition[curKey];</span><br><span class="line">                <span class="keyword">return</span> acc;</span><br><span class="line">            &#125;, &#123;&#125;);</span><br><span class="line">        <span class="keyword">const</span> &#123; results, fields &#125; = <span class="xml"><span class="tag">&lt;<span class="name">ISqlResults</span>&gt;</span>await deleteRow(this.table, dbCondition);</span></span><br><span class="line">        return results ? &lt;IError&gt;&#123; err: false &#125; :</span><br><span class="line">            &lt;IError&gt;&#123;</span><br><span class="line">                err: true,</span><br><span class="line">                message: "you have err on delete from " + this.table</span><br><span class="line">            &#125;;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public async fetch (query: TypeRest | string): Promise&lt;Type&gt; &#123;</span><br><span class="line">        const dbQuery: IField = typeof query === "string" ? query :</span><br><span class="line">            Object.keys(query).reduce((acc, curKey) =&gt; &#123;</span><br><span class="line">                acc[this.fieldMap[curKey]] = query[curKey];</span><br><span class="line">                return acc;</span><br><span class="line">            &#125;, &#123;&#125;);</span><br><span class="line">        let &#123; results, fields &#125; = &lt;ISqlResults&gt;await tableQuery(this.table, dbQuery);</span><br><span class="line"></span><br><span class="line">        results.length || (results = [&#123;&#125;]);</span><br><span class="line">        Array.isArray(results) &amp;&amp; (results = results[0]);</span><br><span class="line">        return &lt;Type&gt;Object.keys(results).reduce((acc, curKey) =&gt; &#123;</span><br><span class="line">            acc[this.map[curKey]] = results[curKey];</span><br><span class="line">            return acc</span><br><span class="line">        &#125;, &#123;&#125;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public async fetchAll (condition?: TypeRest | string): Promise&lt;Array&lt;Type&gt;&gt; &#123;</span><br><span class="line"></span><br><span class="line">        const &#123; results, fields &#125; = &lt;ISqlResults&gt;await sqlQuery(&#123;</span><br><span class="line">            sql: !condition ? format("select * from ??", [this.table]) :</span><br><span class="line">                typeof condition === "string" ?</span><br><span class="line">                    format("select * from ?? where ??", [this.table, condition]) :</span><br><span class="line">                    format("select * from ?? where ?", [this.table, condition]),</span><br><span class="line">            timeout: 2000</span><br><span class="line">        &#125;);</span><br><span class="line"></span><br><span class="line">        return &lt;Array&lt;Type&gt;&gt;results.map(value =&gt; Object.keys(value).reduce((acc, curKey) =&gt; &#123;</span><br><span class="line">            acc[this.map[curKey]] = value[curKey];</span><br><span class="line">            return acc;</span><br><span class="line">        &#125;, &#123;&#125;));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public async insert (data: Type): Promise&lt;IError&gt; &#123;</span><br><span class="line">        const dbData: IField = Object.keys(data).reduce((acc, curKey) =&gt; &#123;</span><br><span class="line">            acc[this.fieldMap[curKey]] = data[curKey];</span><br><span class="line">            return acc;</span><br><span class="line">        &#125;, &#123;&#125;);</span><br><span class="line">        const &#123; results &#125; = &lt;ISqlResults&gt;await insertTable(this.table, dbData);</span><br><span class="line">        return results ? &lt;IError&gt;&#123; err: false &#125; : &lt;IError&gt;&#123; err: true, message: "you have some error in insert data" &#125;;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public async update (data: TypeRest, condition: TypeRest | string): Promise&lt;IError&gt; &#123;</span><br><span class="line">        const dbData: IField = Object.keys(data).reduce((acc, curKey) =&gt; &#123;</span><br><span class="line">            acc[this.fieldMap[curKey]] = data[curKey];</span><br><span class="line">            return acc;</span><br><span class="line">        &#125;, &#123;&#125;);</span><br><span class="line">        const dbCondition: IField | string = typeof condition === "string" ? condition : Object.keys(condition).reduce((acc, curKey) =&gt; &#123;</span><br><span class="line">            acc[this.fieldMap[curKey]] = condition[curKey];</span><br><span class="line">            return acc;</span><br><span class="line">        &#125;, &#123;&#125;);</span><br><span class="line">        console.log(dbData,dbCondition);</span><br><span class="line">        const &#123; results &#125; = &lt;ISqlResults&gt;await updateTable(this.table, dbData, dbCondition);</span><br><span class="line">        return results ? &lt;IError&gt;&#123; err: false &#125; : &#123; err: true, message: "you have message in update" &#125;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>测试：创建实体：User.ts</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">import</span> ORM <span class="keyword">from</span> <span class="string">"./MyOrm"</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> interface IUserType &#123;</span><br><span class="line">    readonly id: number;</span><br><span class="line">    readonly firstName: string;</span><br><span class="line">    readonly lastName: string;</span><br><span class="line">    readonly age: number;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> interface IUserTypeRest &#123;</span><br><span class="line">    readonly id?: number;</span><br><span class="line">    readonly firstName?: string;</span><br><span class="line">    readonly lastName?: string;</span><br><span class="line">    readonly age?: number;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 只需要继承ORM类即可</span></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="class"><span class="keyword">class</span> <span class="title">User</span> <span class="keyword">extends</span> <span class="title">ORM</span>&lt;<span class="title">IUserType</span>, <span class="title">IUserTypeRest</span>&gt; </span>&#123;</span><br><span class="line">    <span class="comment">// 类属性与数据库列字段的映射</span></span><br><span class="line">    public fieldMap = &#123;</span><br><span class="line">        id: <span class="string">"id"</span>,</span><br><span class="line">        firstName: <span class="string">"firstName"</span>,</span><br><span class="line">        lastName: <span class="string">"lastName"</span>,</span><br><span class="line">        age: <span class="string">"age"</span></span><br><span class="line">    &#125;;</span><br><span class="line">    <span class="comment">// 默认值</span></span><br><span class="line">    public defaultValue: IUserType = &#123;</span><br><span class="line">        id: <span class="number">0</span>,</span><br><span class="line">        firstName: <span class="string">""</span>,</span><br><span class="line">        lastName: <span class="string">""</span>,</span><br><span class="line">        age: <span class="number">0</span></span><br><span class="line">    &#125;;</span><br><span class="line">    public table: string = <span class="string">"user"</span>; <span class="comment">// 指定数据库表名</span></span><br><span class="line"></span><br><span class="line">    public map = <span class="built_in">Object</span>.keys(<span class="keyword">this</span>.fieldMap).reduce(<span class="function">(<span class="params">acc, curKey</span>) =&gt;</span> &#123;</span><br><span class="line">        acc[<span class="keyword">this</span>.fieldMap[curKey]] = curKey;</span><br><span class="line">        <span class="keyword">return</span> acc;</span><br><span class="line">    &#125;, &#123;&#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>测试方法：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> User, &#123;IUserType&#125; <span class="keyword">from</span> <span class="string">"./User"</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> user = <span class="keyword">new</span> User();</span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">function</span> <span class="title">main</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">const</span> user = <span class="keyword">new</span> User();</span><br><span class="line">    <span class="comment">/*await user.insert(&lt;IUserType&gt;&#123;</span></span><br><span class="line"><span class="comment">        id: 10,</span></span><br><span class="line"><span class="comment">        firstName: "hu",</span></span><br><span class="line"><span class="comment">        lastName: "hu",</span></span><br><span class="line"><span class="comment">        age: 20</span></span><br><span class="line"><span class="comment">    &#125;);*/</span></span><br><span class="line">    <span class="keyword">const</span> data = <span class="keyword">await</span> user.fetchAll();</span><br><span class="line">    <span class="built_in">console</span>.log(data)</span><br><span class="line">&#125;</span><br><span class="line">main();</span><br></pre></td></tr></table></figure>
+      
+    </div>
+     <!-- 相关文章推荐 -->
+    
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Node/" rel="tag"># Node</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/17/ECMAScript_6_async/" rel="next" title="ECMAScript 6 async">
+                <i class="fa fa-chevron-left"></i> ECMAScript 6 async
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/04/18/Lombok%E7%9A%84%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8/" rel="prev" title="Lombok的基本使用">
+                Lombok的基本使用 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+<span class="jiathis_txt">分享到：</span>
+<a class="jiathis_button_fav">收藏夹</a>
+<a class="jiathis_button_copy">复制网址</a>
+<a class="jiathis_button_email">邮件</a>
+<a class="jiathis_button_weixin">微信</a>
+<a class="jiathis_button_qzone">QQ空间</a>
+<a class="jiathis_button_tqq">腾讯微博</a>
+<a class="jiathis_button_douban">豆瓣</a>
+<a class="jiathis_button_share">一键分享</a>
+
+<a href="http://www.jiathis.com/share?uid=2140465" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+<a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+var jiathis_config={
+  data_track_clickback:true,
+  summary:"",
+  shortUrl:false,
+  hideMore:false
+}
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://img.huyunshun.com/img/20200522182348.png"
+                alt="初晨" />
+            
+              <p class="site-author-name" itemprop="name">初晨</p>
+              <p class="site-description motion-element" itemprop="description">永远不要说你知道本质，更别说真相了。</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">249</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">46</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+<!--近期文章版块-->
+            
+                <div class="links-of-blogroll motion-element links-of-blogroll-block">
+                  <div class="links-of-blogroll-title">
+                    <!-- modify icon to fire by szw -->
+                    <i class="fa fa-history fa-" aria-hidden="true"></i>
+                    近期文章
+                  </div>
+                  <ul class="links-of-blogroll-list">
+                    
+                    
+                      <li>
+                        <a href="/2020/05/22/WebSocket%E3%80%81Socket%E3%80%81TCP%E3%80%81HTTP%E5%8C%BA%E5%88%AB/" title="WebSocket、Socket、TCP、HTTP区别" target="_blank">WebSocket、Socket、TCP、HTTP区别</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/19/Springboot%E9%A1%B9%E7%9B%AE%E7%9A%84%E6%8E%A5%E5%8F%A3%E9%98%B2%E5%88%B7/" title="Springboot项目的接口防刷" target="_blank">Springboot项目的接口防刷</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/03/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Volatile%E5%85%B3%E9%94%AE%E5%AD%97%E5%8F%8A%E5%85%B6%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/" title="深入理解Volatile关键字及其实现原理" target="_blank">深入理解Volatile关键字及其实现原理</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/04/20/%E4%BD%BF%E7%94%A8vscode%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0%E7%8E%AF%E5%A2%83/" title="使用vscode搭建个人笔记环境" target="_blank">使用vscode搭建个人笔记环境</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/01/20/HBase%E4%BB%8B%E7%BB%8D%E5%AE%89%E8%A3%85%E4%B8%8E%E6%93%8D%E4%BD%9C/" title="HBase介绍安装与操作" target="_blank">HBase介绍安装与操作</a>
+                      </li>
+                    
+                  </ul>
+                </div>
+            
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-5"><a class="nav-link" href="#简单封装"><span class="nav-number">1.</span> <span class="nav-text">简单封装</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#完整封装"><span class="nav-number">2.</span> <span class="nav-text">完整封装</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Copyright</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

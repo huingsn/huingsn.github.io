@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="rest," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="网络应用程序，分为前端和后端两个部分。当前的发展趋势，就是前端设备层出不穷（手机、平板、桌面电脑、其他专用设备……）。 REST 用来规范应用如何在 HTTP 层与 API 提供方进行数据交互 。REST 是面向资源的，这个概念非常重要，而资源是通过 URI 进行暴露。 一、传统下的API接口删除一个数据，以往的做法通常是 delete&#x2F;{id}　 更新一个数据，可能是Post数据放Body，然后">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Rest和Restful风格">
+<meta property="og:url" content="https://huyunshun.com/2018/05/14/Rest%E5%92%8CRestful%E9%A3%8E%E6%A0%BC/index.html">
+<meta property="og:site_name" content="简">
+<meta property="og:description" content="网络应用程序，分为前端和后端两个部分。当前的发展趋势，就是前端设备层出不穷（手机、平板、桌面电脑、其他专用设备……）。 REST 用来规范应用如何在 HTTP 层与 API 提供方进行数据交互 。REST 是面向资源的，这个概念非常重要，而资源是通过 URI 进行暴露。 一、传统下的API接口删除一个数据，以往的做法通常是 delete&#x2F;{id}　 更新一个数据，可能是Post数据放Body，然后">
+<meta property="article:published_time" content="2018-05-13T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-05-20T10:04:24.677Z">
+<meta property="article:author" content="初晨">
+<meta property="article:tag" content="rest">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://huyunshun.com/2018/05/14/Rest和Restful风格/"/>
+
+
+
+
+
+  <title>Rest和Restful风格 | 简</title>
+  
+
+
+
+
+
+
+
+
+  <script type="text/javascript" src="/js/src/love.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
+
+  <!-- 看板娘 -->
+    
+        <script async src="/live2d-widget/autoload.js"></script>
+    
+ <!-- 飘动的彩带） -->
+  <script src="/js/src/piao.js" type="text/javascript"></script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">简</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">人生短暂，学海无边，而大道至简。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://huyunshun.com/2018/05/14/Rest%E5%92%8CRestful%E9%A3%8E%E6%A0%BC/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="初晨">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://img.huyunshun.com/img/20200522182348.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="简">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Rest和Restful风格</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-14T00:00:00+08:00">
+                2018-05-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/rest/" itemprop="url" rel="index">
+                    <span itemprop="name">rest</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>网络应用程序，分为前端和后端两个部分。当前的发展趋势，就是前端设备层出不穷（手机、平板、桌面电脑、其他专用设备……）。</p>
+<p>REST 用来规范应用如何在 HTTP 层与 API 提供方进行数据交互 。REST 是面向资源的，这个概念非常重要，而资源是通过 URI 进行暴露。</p>
+<h2 id="一、传统下的API接口"><a href="#一、传统下的API接口" class="headerlink" title="一、传统下的API接口"></a>一、传统下的API接口</h2><pre><code>删除一个数据，以往的做法通常是 delete/{id}　
+更新一个数据，可能是Post数据放Body，然后方法是 update/{id}， 或者是artichle/{id}?method=update　</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;api&#x2F;getUser</span><br><span class="line">&#x2F;api&#x2F;createApp</span><br><span class="line">&#x2F;api&#x2F;searchResult</span><br><span class="line">&#x2F;api&#x2F;deleteAllUsers</span><br><span class="line">&#x2F;api&#x2F;getUser （用来获取某个用户的信息，还需要以参数方式传入用户 id 信息）</span><br><span class="line">&#x2F;api&#x2F;updateUser （用来更新用户信息）</span><br><span class="line">&#x2F;api&#x2F;deleteUser&#x2F;id （用来删除单个用户）</span><br><span class="line">&#x2F;api&#x2F;resetUser （重置用户的信息）</span><br></pre></td></tr></table></figure>
+<p>这样的弊端在于：首先加上了动词，肯定是使 URL 更长了；其次对一个资源实体进行不同的操作就是一个不同的 URL，造成 URL 过多难以管理。</p>
+<h2 id="二、REST-架构的链接"><a href="#二、REST-架构的链接" class="headerlink" title="二、REST 架构的链接"></a>二、REST 架构的链接</h2><pre><code>1. URL 中不应该出现任何表示操作的动词，链接只用于对应资源；
+2. URL 中应该单复数区分，推荐的实践是永远只用复数；比如 GET /api/users 表示获取用户的列表；如果获取单个资源，传入 ID，比如 /api/users/123 表示获取单个用户的信息；
+3. 按照资源的逻辑层级，对 URL 进行嵌套，比如一个用户属于某个团队，而这个团队也是众多团队之一；那么获取这个用户的接口可能是这样：</code></pre><p>GET /api/teams/123/members/234 表示获取 id 为 123 的小组下，id 为234 的成员信息</p>
+<p>rest原则：</p>
+<p>  &lt;1&gt;网络上的所有事物都被抽象为资源<br>  &lt;2&gt; 每个资源都有一个唯一的资源标识符<br>  &lt;3&gt; 同一个资源具有多种表现形式(xml,json等)<br>  &lt;4&gt;  对资源的各种操作不会改变资源标识符<br>   &lt;5&gt; 所有的操作都是无状态的</p>
+<p>REST是一个标准，一种规范，遵循REST风格可以使开发的接口通用，便于调用者理解接口的作用。</p>
+<h2 id="关于restful"><a href="#关于restful" class="headerlink" title="关于restful"></a>关于restful</h2><p>基于REST构建的API就是Restful风格。</p>
+<p>RESTful架构风格规定，数据的元操作，即CRUD(create, read, update和delete,即数据的增删查改)操作，分别对应于HTTP方法：GET用来获取资源，POST用来新建资源（也可以用于更新资源），PUT用来更新资源，DELETE用来删除资源，这样就统一了数据操作的接口，仅通过HTTP方法，就可以完成对数据的所有增删查改工作。</p>
+<pre><code>GET（SELECT）：从服务器取出资源（一项或多项）。
+POST（CREATE）：在服务器新建一个资源。
+PUT（UPDATE）：在服务器更新资源（客户端提供完整资源数据）。
+PATCH（UPDATE）：在服务器更新资源（客户端提供需要修改的资源数据）。
+DELETE（DELETE）：从服务器删除资源。</code></pre><p>restful用法：</p>
+<p>在Restful之前的操作：</p>
+<pre><code>http://127.0.0.1/user/query/1 GET  根据用户id查询用户数据
+http://127.0.0.1/user/save POST 新增用户
+http://127.0.0.1/user/update POST 修改用户信息
+http://127.0.0.1/user/delete GET/POST 删除用户信息</code></pre><p>RESTful用法：</p>
+<pre><code>http://127.0.0.1/user/1 GET  根据用户id查询用户数据
+http://127.0.0.1/user 新增用户
+http://127.0.0.1/user 修改用户信息
+http://127.0.0.1/user 删除用户信息</code></pre><p>在RESTful架构中，每个网址代表一种资源（resource），所以网址中不能有动词，只能有名词，而且所用的名词往往与数据库的表名对应，一般来说，数据库中的表都是同种记录的”集合”（collection），所以API中的名词也应该使用复数。</p>
+<h2 id="使用标准的状态码"><a href="#使用标准的状态码" class="headerlink" title="使用标准的状态码"></a>使用标准的状态码</h2><h3 id="GET"><a href="#GET" class="headerlink" title="GET"></a>GET</h3><p>安全且幂等 获取表示 变更时获取表示（缓存）</p>
+<pre><code>200（OK） - 表示已在响应中发出
+204（无内容） - 资源有空表示
+301（Moved Permanently） - 资源的URI已被更新
+303（See Other） - 其他（如，负载均衡）
+304（not modified）- 资源未更改（缓存）
+400 （bad request）- 指代坏请求（如，参数错误）
+404 （not found）- 资源不存在
+406 （not acceptable）- 服务端不支持所需表示
+500 （internal server error）- 通用错误响应
+503 （Service Unavailable）- 服务端当前无法处理请求</code></pre><h3 id="POST"><a href="#POST" class="headerlink" title="POST"></a>POST</h3><p>不安全且不幂等 使用服务端管理的（自动产生）的实例号创建资源</p>
+<p>创建子资源  部分更新资源</p>
+<p>如果没有被修改，则不过更新资源（乐观锁）</p>
+<pre><code>200（OK）- 如果现有资源已被更改
+201（created）- 如果新资源被创建
+202（accepted）- 已接受处理请求但尚未完成（异步处理）
+301（Moved Permanently）- 资源的URI被更新
+303（See Other）- 其他（如，负载均衡）
+400（bad request）- 指代坏请求
+404 （not found）- 资源不存在
+406 （not acceptable）- 服务端不支持所需表示
+409 （conflict）- 通用冲突
+412 （Precondition Failed）- 前置条件失败（如执行条件更新时的冲突）
+415 （unsupported media type）- 接受到的表示不受支持
+500 （internal server error）- 通用错误响应
+503 （Service Unavailable）- 服务当前无法处理请求</code></pre><h3 id="PUT"><a href="#PUT" class="headerlink" title="PUT"></a>PUT</h3><p>不安全但幂等，用客户端管理的实例号创建一个资源，通过替换的方式更新资源，如果未被修改，则更新资源（乐观锁）</p>
+<pre><code>200 （OK）- 如果已存在资源被更改
+201 （created）- 如果新资源被创建
+301（Moved Permanently）- 资源的URI已更改
+303 （See Other）- 其他（如，负载均衡）
+400 （bad request）- 指代坏请求
+404 （not found）- 资源不存在
+406 （not acceptable）- 服务端不支持所需表示
+409 （conflict）- 通用冲突
+412 （Precondition Failed）- 前置条件失败（如执行条件更新时的冲突）
+415 （unsupported media type）- 接受到的表示不受支持
+500 （internal server error）- 通用错误响应
+503 （Service Unavailable）- 服务当前无法处理请求</code></pre><h3 id="DELETE"><a href="#DELETE" class="headerlink" title="DELETE"></a>DELETE</h3><p>不安全但幂等，删除资源。</p>
+<pre><code>200 （OK）- 资源已被删除
+301 （Moved Permanently）- 资源的URI已更改
+303 （See Other）- 其他，如负载均衡
+400 （bad request）- 指代坏请求
+404 （not found）- 资源不存在
+409 （conflict）- 通用冲突
+500 （internal server error）- 通用错误响应
+503 （Service Unavailable）- 服务端当前无法处理请求</code></pre><p>表示结构</p>
+<p>json   xml</p>
+
+      
+    </div>
+     <!-- 相关文章推荐 -->
+    
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/rest/" rel="tag"># rest</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/05/10/JVM%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D%E5%92%8C%E5%8F%82%E6%95%B0/" rel="next" title="JVM内存分配和参数">
+                <i class="fa fa-chevron-left"></i> JVM内存分配和参数
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/06/14/Springboot%E4%B8%AD%E4%BD%BF%E7%94%A8AOP%E7%BB%9F%E4%B8%80%E5%A4%84%E7%90%86Web%E8%AF%B7%E6%B1%82%E6%97%A5%E5%BF%97/" rel="prev" title="Springboot中使用AOP统一处理Web请求日志异常">
+                Springboot中使用AOP统一处理Web请求日志异常 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+<span class="jiathis_txt">分享到：</span>
+<a class="jiathis_button_fav">收藏夹</a>
+<a class="jiathis_button_copy">复制网址</a>
+<a class="jiathis_button_email">邮件</a>
+<a class="jiathis_button_weixin">微信</a>
+<a class="jiathis_button_qzone">QQ空间</a>
+<a class="jiathis_button_tqq">腾讯微博</a>
+<a class="jiathis_button_douban">豆瓣</a>
+<a class="jiathis_button_share">一键分享</a>
+
+<a href="http://www.jiathis.com/share?uid=2140465" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+<a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+var jiathis_config={
+  data_track_clickback:true,
+  summary:"",
+  shortUrl:false,
+  hideMore:false
+}
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://img.huyunshun.com/img/20200522182348.png"
+                alt="初晨" />
+            
+              <p class="site-author-name" itemprop="name">初晨</p>
+              <p class="site-description motion-element" itemprop="description">永远不要说你知道本质，更别说真相了。</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">249</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">46</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+<!--近期文章版块-->
+            
+                <div class="links-of-blogroll motion-element links-of-blogroll-block">
+                  <div class="links-of-blogroll-title">
+                    <!-- modify icon to fire by szw -->
+                    <i class="fa fa-history fa-" aria-hidden="true"></i>
+                    近期文章
+                  </div>
+                  <ul class="links-of-blogroll-list">
+                    
+                    
+                      <li>
+                        <a href="/2020/05/22/WebSocket%E3%80%81Socket%E3%80%81TCP%E3%80%81HTTP%E5%8C%BA%E5%88%AB/" title="WebSocket、Socket、TCP、HTTP区别" target="_blank">WebSocket、Socket、TCP、HTTP区别</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/19/Springboot%E9%A1%B9%E7%9B%AE%E7%9A%84%E6%8E%A5%E5%8F%A3%E9%98%B2%E5%88%B7/" title="Springboot项目的接口防刷" target="_blank">Springboot项目的接口防刷</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/03/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Volatile%E5%85%B3%E9%94%AE%E5%AD%97%E5%8F%8A%E5%85%B6%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/" title="深入理解Volatile关键字及其实现原理" target="_blank">深入理解Volatile关键字及其实现原理</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/04/20/%E4%BD%BF%E7%94%A8vscode%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0%E7%8E%AF%E5%A2%83/" title="使用vscode搭建个人笔记环境" target="_blank">使用vscode搭建个人笔记环境</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/01/20/HBase%E4%BB%8B%E7%BB%8D%E5%AE%89%E8%A3%85%E4%B8%8E%E6%93%8D%E4%BD%9C/" title="HBase介绍安装与操作" target="_blank">HBase介绍安装与操作</a>
+                      </li>
+                    
+                  </ul>
+                </div>
+            
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、传统下的API接口"><span class="nav-number">1.</span> <span class="nav-text">一、传统下的API接口</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、REST-架构的链接"><span class="nav-number">2.</span> <span class="nav-text">二、REST 架构的链接</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#关于restful"><span class="nav-number">3.</span> <span class="nav-text">关于restful</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用标准的状态码"><span class="nav-number">4.</span> <span class="nav-text">使用标准的状态码</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#GET"><span class="nav-number">4.1.</span> <span class="nav-text">GET</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#POST"><span class="nav-number">4.2.</span> <span class="nav-text">POST</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#PUT"><span class="nav-number">4.3.</span> <span class="nav-text">PUT</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DELETE"><span class="nav-number">4.4.</span> <span class="nav-text">DELETE</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Copyright</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

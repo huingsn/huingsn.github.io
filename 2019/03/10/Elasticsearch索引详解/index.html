@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Elasticsearch," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="在ES中创建一个mapping映射类似于在数据库中定义表结构，即表里面有哪些字段、字段是什么类型、字段的默认值，分词器等；也类似于solr里面的模式schema的定义。 获取映射关系 12345678910111213141516171819202122232425262728293031323334GET &#x2F;mydemo_01&#x2F;_mapping结果：&amp;#123;  &amp;quot">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Elasticsearch索引详解">
+<meta property="og:url" content="https://huyunshun.com/2019/03/10/Elasticsearch%E7%B4%A2%E5%BC%95%E8%AF%A6%E8%A7%A3/index.html">
+<meta property="og:site_name" content="简">
+<meta property="og:description" content="在ES中创建一个mapping映射类似于在数据库中定义表结构，即表里面有哪些字段、字段是什么类型、字段的默认值，分词器等；也类似于solr里面的模式schema的定义。 获取映射关系 12345678910111213141516171819202122232425262728293031323334GET &#x2F;mydemo_01&#x2F;_mapping结果：&amp;#123;  &amp;quot">
+<meta property="og:image" content="https://img.huyunshun.com/img1/Elasticsearch/imgsddasdasdfdfvrtyhclip.png">
+<meta property="article:published_time" content="2019-03-09T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-05-20T10:04:24.697Z">
+<meta property="article:author" content="初晨">
+<meta property="article:tag" content="Elasticsearch">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img.huyunshun.com/img1/Elasticsearch/imgsddasdasdfdfvrtyhclip.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://huyunshun.com/2019/03/10/Elasticsearch索引详解/"/>
+
+
+
+
+
+  <title>Elasticsearch索引详解 | 简</title>
+  
+
+
+
+
+
+
+
+
+  <script type="text/javascript" src="/js/src/love.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
+
+  <!-- 看板娘 -->
+    
+        <script async src="/live2d-widget/autoload.js"></script>
+    
+ <!-- 飘动的彩带） -->
+  <script src="/js/src/piao.js" type="text/javascript"></script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">简</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">人生短暂，学海无边，而大道至简。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://huyunshun.com/2019/03/10/Elasticsearch%E7%B4%A2%E5%BC%95%E8%AF%A6%E8%A7%A3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="初晨">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://img.huyunshun.com/img/20200522182348.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="简">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Elasticsearch索引详解</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-03-10T00:00:00+08:00">
+                2019-03-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Elasticsearch/" itemprop="url" rel="index">
+                    <span itemprop="name">Elasticsearch</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>在ES中创建一个mapping映射类似于在数据库中定义表结构，即表里面有哪些字段、字段是什么类型、字段的默认值，分词器等；也类似于solr里面的模式schema的定义。</p>
+<p>获取映射关系</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">GET &#x2F;mydemo_01&#x2F;_mapping</span><br><span class="line"></span><br><span class="line">结果：</span><br><span class="line">&#123;</span><br><span class="line">  &quot;mydemo_01&quot; : &#123;</span><br><span class="line">    &quot;mappings&quot; : &#123;</span><br><span class="line">      &quot;user&quot; : &#123;</span><br><span class="line">        &quot;properties&quot; : &#123;</span><br><span class="line">          &quot;age&quot; : &#123;</span><br><span class="line">            &quot;type&quot; : &quot;long&quot;</span><br><span class="line">          &#125;,</span><br><span class="line">          &quot;idcard&quot; : &#123;</span><br><span class="line">            &quot;type&quot; : &quot;text&quot;,</span><br><span class="line">            &quot;fields&quot; : &#123;</span><br><span class="line">              &quot;keyword&quot; : &#123;</span><br><span class="line">                &quot;type&quot; : &quot;keyword&quot;,</span><br><span class="line">                &quot;ignore_above&quot; : 256</span><br><span class="line">              &#125;</span><br><span class="line">            &#125;</span><br><span class="line">          &#125;,</span><br><span class="line">          &quot;name&quot; : &#123;</span><br><span class="line">            &quot;type&quot; : &quot;text&quot;,</span><br><span class="line">            &quot;fields&quot; : &#123;</span><br><span class="line">              &quot;keyword&quot; : &#123;</span><br><span class="line">                &quot;type&quot; : &quot;keyword&quot;,</span><br><span class="line">                &quot;ignore_above&quot; : 256</span><br><span class="line">              &#125;</span><br><span class="line">            &#125;</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="索引"><a href="#索引" class="headerlink" title="索引"></a>索引</h1><h2 id="1、创建索引"><a href="#1、创建索引" class="headerlink" title="1、创建索引"></a>1、创建索引</h2><p>在ES中创建一个索引类似于在数据库中建立一个数据库(ES6.0之后类似于创建一个表)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">PUT demo_index</span><br><span class="line">&#123;</span><br><span class="line">    &quot;settings&quot; : &#123;</span><br><span class="line">        &quot;index&quot; : &#123; #可以省略</span><br><span class="line">            &quot;number_of_shards&quot; : 3, </span><br><span class="line">            &quot;number_of_replicas&quot; : 2 </span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>创建索引时加入别名定义</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">PUT twitter</span><br><span class="line">&#123;</span><br><span class="line">    &quot;aliases&quot; : &#123;</span><br><span class="line">        &quot;alias_1&quot; : &#123;&#125;,</span><br><span class="line">        &quot;alias_2&quot; : &#123;</span><br><span class="line">            &quot;filter&quot; : &#123;</span><br><span class="line">                &quot;term&quot; : &#123;&quot;user&quot; : &quot;hu&quot; &#125;</span><br><span class="line">            &#125;,</span><br><span class="line">            &quot;routing&quot; : &quot;hu&quot;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="2、创建mapping映射"><a href="#2、创建mapping映射" class="headerlink" title="2、创建mapping映射"></a>2、创建mapping映射</h2><p>mapping映射类似于在数据库中定义表结构，即表里面有哪些字段、字段是什么类型、字段的默认值等</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">PUT demo_index</span><br><span class="line">&#123;</span><br><span class="line">    &quot;settings&quot; : &#123;</span><br><span class="line">        &quot;index&quot; : &#123;</span><br><span class="line">            &quot;number_of_shards&quot; : 3, </span><br><span class="line">            &quot;number_of_replicas&quot; : 2 </span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">#映射</span><br><span class="line">   &quot;mappings&quot; : &#123;</span><br><span class="line">        &quot;type1&quot; : &#123;</span><br><span class="line">            &quot;properties&quot; : &#123;</span><br><span class="line">                &quot;field1&quot; : &#123; &quot;type&quot; : &quot;text&quot; &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>返回说明</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  &quot;acknowledged&quot; : true, #索引创建成功</span><br><span class="line">  &quot;shards_acknowledged&quot; : true, #所需数量的分片和副本创建成功</span><br><span class="line">  &quot;index&quot; : &quot;demo_index&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="3、删除索引"><a href="#3、删除索引" class="headerlink" title="3、删除索引"></a>3、删除索引</h2><p>DELETE /twitter   可以一次删除多个索引（以逗号间隔） 删除所有索引 _all 或 通配符 *</p>
+<h2 id="4、判断索引是否存在"><a href="#4、判断索引是否存在" class="headerlink" title="4、判断索引是否存在"></a>4、判断索引是否存在</h2><p>HEAD twitter  #HTTP status code 表示结果 404 不存在 ， 200 存在</p>
+<h2 id="5、修改索引的settings信息"><a href="#5、修改索引的settings信息" class="headerlink" title="5、修改索引的settings信息"></a>5、修改索引的settings信息</h2><p>索引的设置信息分为静态信息和动态信息两部分。静态信息不可更改，如索引的分片数。动态信息可以修改。</p>
+<p>/_settings 更新所有索引的。</p>
+<p>{index}/_settings 更新一个或多个索引的settings。</p>
+<h2 id="6、修改备份数"><a href="#6、修改备份数" class="headerlink" title="6、修改备份数"></a>6、修改备份数</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">PUT &#x2F;demo_index&#x2F;_settings</span><br><span class="line">&#123;</span><br><span class="line">    &quot;index&quot; : &#123;</span><br><span class="line">        &quot;number_of_replicas&quot; : 2</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="7、设置其他"><a href="#7、设置其他" class="headerlink" title="7、设置其他"></a>7、设置其他</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">PUT &#x2F;demo_index&#x2F;_settings</span><br><span class="line">&#123;</span><br><span class="line">    &quot;index&quot; : &#123;</span><br><span class="line">        &quot;refresh_interval&quot; : null  #设置默认值</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">索引的读写</span><br><span class="line">index.blocks.read_only：设为true,则索引以及索引的元数据只可读</span><br><span class="line">index.blocks.read_only_allow_delete：设为true，只读时允许删除。</span><br><span class="line">index.blocks.read：设为true，则不可读。</span><br><span class="line">index.blocks.write：设为true，则不可写。</span><br><span class="line">index.blocks.metadata：设为true，则索引元数据不可读写。</span><br></pre></td></tr></table></figure>
+
+<h2 id="8、索引模板"><a href="#8、索引模板" class="headerlink" title="8、索引模板"></a>8、索引模板</h2><p>模板中定义好settings、mapping、以及一个模式定义来匹配创建的索引。</p>
+<p>注意：模板只在索引创建时被参考，修改模板不会影响已创建的索引</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">#新增&#x2F;修改名为tempae_1的模板，匹配名称为te* 或 demo*的索引创建</span><br><span class="line">PUT _template&#x2F;template_1</span><br><span class="line">&#123;</span><br><span class="line">  &quot;index_patterns&quot;: [&quot;te*&quot;, &quot;demo*&quot;],</span><br><span class="line">  &quot;settings&quot;: &#123;</span><br><span class="line">    &quot;number_of_shards&quot;: 1</span><br><span class="line">  &#125;,</span><br><span class="line">  &quot;mappings&quot;: &#123;</span><br><span class="line">    &quot;type1&quot;: &#123;</span><br><span class="line">      &quot;_source&quot;: &#123;</span><br><span class="line">        &quot;enabled&quot;: false</span><br><span class="line">      &#125;,</span><br><span class="line">      &quot;properties&quot;: &#123;</span><br><span class="line">        &quot;host_name&quot;: &#123;</span><br><span class="line">          &quot;type&quot;: &quot;keyword&quot;</span><br><span class="line">        &#125;,</span><br><span class="line">        &quot;created_at&quot;: &#123;</span><br><span class="line">          &quot;type&quot;: &quot;date&quot;,</span><br><span class="line">          &quot;format&quot;: &quot;EEE MMM dd HH:mm:ss Z YYYY&quot;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>查看索引模板</p>
+<p>GET /_template/template_1</p>
+<p>GET /_template/temp*</p>
+<p>GET /_template/template_1,template_2</p>
+<p>GET /_template</p>
+<p>删除模板</p>
+<p>DELETE /_template/template_1</p>
+<h2 id="9、-打开-关闭索引"><a href="#9、-打开-关闭索引" class="headerlink" title="9、 打开/关闭索引"></a>9、 打开/关闭索引</h2><p>POST /demo_index/_close</p>
+<p>POST /demo_index/_open</p>
+<h2 id="10、Shrink-Index-收缩索引"><a href="#10、Shrink-Index-收缩索引" class="headerlink" title="10、Shrink Index 收缩索引"></a>10、Shrink Index 收缩索引</h2><p>索引的分片数是不可更改的，如要减少分片数可以通过收缩方式收缩为一个新的索引。新索引的分片数必须是原分片数的因子值，如原分片数是8，则新索引的分片数可以为4、2、1 。</p>
+<p>收缩的流程：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">先把所有主分片都转移到一台主机上；</span><br><span class="line">在这台主机上创建一个新索引，分片数较小，其他设置和原索引一致；</span><br><span class="line">把原索引的所有分片，复制（或硬链接）到新索引的目录下；</span><br><span class="line">对新索引进行打开操作恢复分片数据；</span><br><span class="line">(可选)重新把新索引的分片均衡到其他节点上。</span><br></pre></td></tr></table></figure>
+<p>将原索引设置为只读；</p>
+<p>将原索引各分片的一个副本重分配到同一个节点上，并且要是健康绿色状态。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">PUT &#x2F;my_source_index&#x2F;_settings</span><br><span class="line">&#123;</span><br><span class="line">  &quot;settings&quot;: &#123;</span><br><span class="line">    &lt;!-- 指定进行收缩的节点的名称 --&gt;</span><br><span class="line">    &quot;index.routing.allocation.require._name&quot;: &quot;shrink_node_name&quot;, </span><br><span class="line">    &lt;!-- 阻止写，只读 --&gt;</span><br><span class="line">     &quot;index.blocks.write&quot;: true </span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>进行收缩：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">POST my_source_index&#x2F;_shrink&#x2F;my_target_index</span><br><span class="line">&#123;</span><br><span class="line">  &quot;settings&quot;: &#123;</span><br><span class="line">    &quot;index.number_of_replicas&quot;: 1,</span><br><span class="line">    &quot;index.number_of_shards&quot;: 1, </span><br><span class="line">    &quot;index.codec&quot;: &quot;best_compression&quot; </span><br><span class="line">  &#125;&#125;</span><br></pre></td></tr></table></figure>
+<p>监控收缩过程：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">GET _cat&#x2F;recovery?v</span><br><span class="line">GET _cluster&#x2F;health</span><br></pre></td></tr></table></figure>
+
+<h2 id="11、Split-Index-拆分索引"><a href="#11、Split-Index-拆分索引" class="headerlink" title="11、Split Index 拆分索引"></a>11、Split Index 拆分索引</h2><p>当索引的分片容量过大时，可以通过拆分操作将索引拆分为一个倍数分片数的新索引。能拆分为几倍由创建索引时指定的index.number_of_routing_shards 路由分片数决定。这个路由分片数决定了根据一致性hash路由文档到分片的散列空间。</p>
+<p>如index.number_of_routing_shards = 30 ，指定的分片数是5，则可按如下倍数方式进行拆分：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">5 → 10 → 30 (split by 2, then by 3)</span><br><span class="line">5 → 15 → 30 (split by 3, then by 2)</span><br><span class="line">5 → 30 (split by 6)</span><br></pre></td></tr></table></figure>
+<p>压缩索引相反</p>
+<p>但是只有在创建时指定了index.number_of_routing_shards 的索引才可以进行拆分，ES7开始将不再有这个限制。</p>
+<p>和solr的区别是，solr是对一个分片进行拆分，es中是整个索引进行拆分。</p>
+<p>拆分步骤：</p>
+<p>准备一个索引来做拆分：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">PUT my_source_index</span><br><span class="line">&#123;</span><br><span class="line">    &quot;settings&quot;: &#123;</span><br><span class="line">        &quot;index.number_of_shards&quot; : 1,</span><br><span class="line">        &lt;!-- 创建时需要指定路由分片数 --&gt;</span><br><span class="line">        &quot;index.number_of_routing_shards&quot; : 2 </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>先设置索引只读：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">PUT &#x2F;my_source_index&#x2F;_settings</span><br><span class="line">&#123;</span><br><span class="line">  &quot;settings&quot;: &#123;</span><br><span class="line">    &quot;index.blocks.write&quot;: true </span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>做拆分：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">POST my_source_index&#x2F;_split&#x2F;my_target_index</span><br><span class="line">&#123;</span><br><span class="line">  &quot;settings&quot;: &#123;</span><br><span class="line">    &lt;!--新索引的分片数需符合拆分规则--&gt;</span><br><span class="line">    &quot;index.number_of_shards&quot;: 2</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>监控拆分过程：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">GET _cat&#x2F;recovery?v</span><br><span class="line">GET _cluster&#x2F;health</span><br></pre></td></tr></table></figure>
+<h2 id="12、Rollover-Index-别名滚动指向新创建的索引"><a href="#12、Rollover-Index-别名滚动指向新创建的索引" class="headerlink" title="12、Rollover Index 别名滚动指向新创建的索引"></a>12、Rollover Index 别名滚动指向新创建的索引</h2><p>ES的rollover index API 让我们可以根据满足指定的条件（时间、文档数量、索引大小）创建新的索引，并把别名滚动指向新的索引。</p>
+<p>创建一个名字为logs-0000001 、别名为logs_write 的索引：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">PUT &#x2F;logs-000001 </span><br><span class="line">&#123;</span><br><span class="line">  &quot;aliases&quot;: &#123;</span><br><span class="line">    &quot;logs_write&quot;: &#123;&#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>添加1000个文档到索引logs-000001，然后设置别名滚动的条件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">POST &#x2F;logs_write&#x2F;_rollover </span><br><span class="line">&#123;</span><br><span class="line">  &quot;conditions&quot;: &#123;</span><br><span class="line">    &quot;max_age&quot;:   &quot;7d&quot;,</span><br><span class="line">    &quot;max_docs&quot;:  1000,</span><br><span class="line">    &quot;max_size&quot;:  &quot;5gb&quot;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>说明：如果别名logs_write指向的索引是7天前（含）创建的或索引的文档数&gt;=1000或索引的大小&gt;= 5gb，则会创建一个新索引 logs-000002，并把别名logs_writer指向新创建的logs-000002索引</p>
+<p>** Rollover Index 新建索引的命名规则：**</p>
+<p>如果索引的名称是-数字结尾，如logs-000001，则新建索引的名称也会是这个模式，数值增1。</p>
+<p>如果索引的名称不是-数值结尾，则在请求rollover api时需指定新索引的名称</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">POST &#x2F;my_alias&#x2F;_rollover&#x2F;my_new_index_name</span><br><span class="line">&#123;</span><br><span class="line">  &quot;conditions&quot;: &#123;</span><br><span class="line">    &quot;max_age&quot;:   &quot;7d&quot;,</span><br><span class="line">    &quot;max_docs&quot;:  1000,</span><br><span class="line">    &quot;max_size&quot;: &quot;5gb&quot;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>** 在名称中使用Date math（时间表达式）**</p>
+<p>如果你希望生成的索引名称中带有日期，如logstash-2016.02.03-1 ，则可以在创建索引时采用时间表达式来命名：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"># PUT &#x2F;&lt;logs-&#123;now&#x2F;d&#125;-1&gt; with URI encoding:</span><br><span class="line">PUT &#x2F;%3Clogs-%7Bnow%2Fd%7D-1%3E </span><br><span class="line">&#123;</span><br><span class="line">  &quot;aliases&quot;: &#123;</span><br><span class="line">    &quot;logs_write&quot;: &#123;&#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">PUT logs_write&#x2F;_doc&#x2F;1</span><br><span class="line">&#123;</span><br><span class="line">  &quot;message&quot;: &quot;a dummy log&quot;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">POST logs_write&#x2F;_refresh</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">POST &#x2F;logs_write&#x2F;_rollover </span><br><span class="line">&#123;</span><br><span class="line">  &quot;conditions&quot;: &#123;</span><br><span class="line">    &quot;max_docs&quot;:   &quot;1&quot;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>** Rollover时可对新的索引作定义 **</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">PUT &#x2F;logs-000001</span><br><span class="line">&#123;</span><br><span class="line">  &quot;aliases&quot;: &#123;</span><br><span class="line">    &quot;logs_write&quot;: &#123;&#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">POST &#x2F;logs_write&#x2F;_rollover</span><br><span class="line">&#123;</span><br><span class="line">  &quot;conditions&quot; : &#123;</span><br><span class="line">    &quot;max_age&quot;: &quot;7d&quot;,</span><br><span class="line">    &quot;max_docs&quot;: 1000,</span><br><span class="line">    &quot;max_size&quot;: &quot;5gb&quot;</span><br><span class="line">  &#125;,</span><br><span class="line">  &quot;settings&quot;: &#123;</span><br><span class="line">    &quot;index.number_of_shards&quot;: 2</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Dry run  实际操作前先测试是否达到条件：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">POST &#x2F;logs_write&#x2F;_rollover?dry_run</span><br><span class="line">&#123;</span><br><span class="line">  &quot;conditions&quot; : &#123;</span><br><span class="line">    &quot;max_age&quot;: &quot;7d&quot;,</span><br><span class="line">    &quot;max_docs&quot;: 1000,</span><br><span class="line">    &quot;max_size&quot;: &quot;5gb&quot;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>说明：</p>
+<p>rollover是你请求它才会进行操作，并不是自动在后台进行的。你可以周期性地去请求它。</p>
+<h1 id="索引监控"><a href="#索引监控" class="headerlink" title="索引监控"></a>索引监控</h1><h2 id="查看索引状态信息"><a href="#查看索引状态信息" class="headerlink" title="查看索引状态信息"></a>查看索引状态信息</h2><p>查看所有的索引状态：</p>
+<p>GET /_stats</p>
+<p>查看指定索引的状态信息：</p>
+<p>GET /index1,index2/_stats</p>
+<h2 id="查看索引段信息"><a href="#查看索引段信息" class="headerlink" title="查看索引段信息"></a>查看索引段信息</h2><p><a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-segments.html" target="_blank" rel="noopener">https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-segments.html</a></p>
+<p> GET /test/_segments</p>
+<p>GET /index1,index2/_segments</p>
+<p>GET /_segments</p>
+<h2 id="查看索引恢复信息"><a href="#查看索引恢复信息" class="headerlink" title="查看索引恢复信息"></a>查看索引恢复信息</h2><p>GET index1,index2/_recovery?human</p>
+<p>GET /_recovery?human</p>
+<h2 id="查看索引分片的存储信息"><a href="#查看索引分片的存储信息" class="headerlink" title="查看索引分片的存储信息"></a>查看索引分片的存储信息</h2><p>GET /test/_shard_stores</p>
+<p>GET /test1,test2/_shard_stores</p>
+<p>GET /_shard_stores</p>
+<h2 id="索引状态管理"><a href="#索引状态管理" class="headerlink" title="索引状态管理"></a>索引状态管理</h2><p>** Clear Cache 清理缓存** </p>
+<p>POST /demo_index/_cache/clear</p>
+<p>默认会清理所有缓存，可指定清理query, fielddata or request 缓存</p>
+<p>POST /_cache/clear</p>
+<p>**  Refresh，重新打开读取索引** </p>
+<p>POST /demo_index/_refresh</p>
+<p>POST /_refresh</p>
+<p>** Flush，将缓存在内存中的索引数据刷新到持久存储中 ** </p>
+<p>POST demo_index/_flush</p>
+<p>**  Force merge 强制段合并 ** </p>
+<p>POST /demo_index/_forcemerge?only_expunge_deletes=false&amp;max_num_segments=100&amp;flush=true<br>可选参数说明：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">max_num_segments 合并为几个段，默认1</span><br><span class="line">only_expunge_deletes 是否只合并含有删除文档的段，默认false</span><br><span class="line">flush 合并后是否刷新，默认true</span><br><span class="line"></span><br><span class="line">POST &#x2F;demo_index,elasticsearch&#x2F;_forcemerge</span><br><span class="line">POST &#x2F;_forcemerge</span><br></pre></td></tr></table></figure>
+<h1 id="映射Mapping"><a href="#映射Mapping" class="headerlink" title="映射Mapping"></a>映射Mapping</h1><p>静态映射</p>
+<p>在ElasticSearch中也可以事先定义好映射，包含文档的各个字段及其类型等，这种方式称之为静态映射。</p>
+<p>动态映射</p>
+<p>ElasticSearch中不需要事先定义映射（Mapping），文档写入ElasticSearch时，会根据文档字段自动识别类型，这种机制称之为动态映射。</p>
+<p>索引创建mapping</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">PUT demo_index</span><br><span class="line">&#123;</span><br><span class="line">&lt;!--映射定义 --&gt;</span><br><span class="line">&quot;mappings&quot; : &#123;</span><br><span class="line">&lt;!--名为type1的映射类别 mapping type--&gt;</span><br><span class="line">        &quot;type1&quot; : &#123;</span><br><span class="line">        &lt;!-- 字段定义 --&gt;</span><br><span class="line">            &quot;properties&quot; : &#123;</span><br><span class="line">            &lt;!-- 名为field1的字段，它的field datatype 为 text --&gt;</span><br><span class="line">                &quot;field1&quot; : &#123; &quot;type&quot; : &quot;text&quot; &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="映射类别-Mapping-type"><a href="#映射类别-Mapping-type" class="headerlink" title="映射类别 Mapping type"></a>映射类别 Mapping type</h2><p>从6.0.0开始限定仅包含一个映射类别定义（ “index.mapping.single_type”: true ），兼容5.x中的多映射类别。从7.0开始将移除映射类别。为了与未来的规划匹配，请现在将这个唯一的映射类别名定义为“_doc”,因为索引的请求地址将规范为：PUT {index}/_doc/{id} and POST {index}/_doc</p>
+<h2 id="字段类型-datatypes"><a href="#字段类型-datatypes" class="headerlink" title="字段类型 datatypes"></a>字段类型 datatypes</h2><p>Core Datatypes     核心类型</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">string</span><br><span class="line">    text and keyword </span><br><span class="line">Numeric datatypes</span><br><span class="line">    long, integer, short, byte, double, float, half_float, scaled_float </span><br><span class="line">Date datatype</span><br><span class="line">    date </span><br><span class="line">Boolean datatype</span><br><span class="line">    boolean </span><br><span class="line">Binary datatype</span><br><span class="line">    binary </span><br><span class="line">Range datatypes     范围</span><br><span class="line">    integer_range, float_range, long_range, double_range, date_range</span><br></pre></td></tr></table></figure>
+<p>Complex datatypes 复合类型</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Array datatype</span><br><span class="line">    数组就是多值，不需要专门的类型</span><br><span class="line">Object datatype</span><br><span class="line">    object ：表示值为一个JSON 对象 </span><br><span class="line">Nested datatype</span><br><span class="line">    nested：for arrays of JSON objects（表示值为JSON对象数组 ）</span><br></pre></td></tr></table></figure>
+<p>Geo datatypes  地理数据类型</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Geo-point datatype</span><br><span class="line">    geo_point： for lat&#x2F;lon points  （经纬坐标点）</span><br><span class="line">Geo-Shape datatype</span><br><span class="line">    geo_shape： for complex shapes like polygons （形状表示）</span><br></pre></td></tr></table></figure>
+<p>Specialised datatypes 特别的类型</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">IP datatype</span><br><span class="line">    ip： for IPv4 and IPv6 addresses </span><br><span class="line">Completion datatype</span><br><span class="line">    completion： to provide auto-complete suggestions </span><br><span class="line">Token count datatype</span><br><span class="line">    token_count： to count the number of tokens in a string </span><br><span class="line">mapper-murmur3</span><br><span class="line">    murmur3： to compute hashes of values at index-time and store them in the index </span><br><span class="line">Percolator type</span><br><span class="line">    Accepts queries from the query-dsl </span><br><span class="line">join datatype</span><br><span class="line">    Defines parent&#x2F;child relation for documents within the same index</span><br></pre></td></tr></table></figure>
+<h2 id="字段定义属性介绍"><a href="#字段定义属性介绍" class="headerlink" title="字段定义属性介绍"></a>字段定义属性介绍</h2><p>字段的type (Datatype)定义了如何索引存储字段值，还有一些属性可以让我们根据需要来覆盖默认的值或进行特别定义。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">analyzer   指定分词器</span><br><span class="line">normalizer   指定标准化器</span><br><span class="line">boost        指定权重值</span><br><span class="line">coerce      强制类型转换</span><br><span class="line">copy_to    值复制给另一字段</span><br><span class="line">doc_values  是否存储docValues</span><br><span class="line">dynamic</span><br><span class="line">enabled    字段是否可用</span><br><span class="line">fielddata</span><br><span class="line">eager_global_ordinals</span><br><span class="line">format    指定时间值的格式</span><br><span class="line">ignore_above</span><br><span class="line">ignore_malformed</span><br><span class="line">index_options</span><br><span class="line">index</span><br><span class="line">fields</span><br><span class="line">norms</span><br><span class="line">null_value</span><br><span class="line">position_increment_gap</span><br><span class="line">properties</span><br><span class="line">search_analyzer</span><br><span class="line">similarity</span><br><span class="line">store</span><br><span class="line">term_vector</span><br></pre></td></tr></table></figure>
+<p>如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">PUT my_index</span><br><span class="line">&#123;</span><br><span class="line">  &quot;mappings&quot;: &#123;</span><br><span class="line">    &quot;_doc&quot;: &#123;</span><br><span class="line">      &quot;properties&quot;: &#123;</span><br><span class="line">        &quot;date&quot;: &#123;</span><br><span class="line">          &quot;type&quot;:   &quot;date&quot;,</span><br><span class="line">           &lt;!--格式化日期 --&gt;</span><br><span class="line">          &quot;format&quot;: &quot;yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis&quot;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Multi-Field-多重字段"><a href="#Multi-Field-多重字段" class="headerlink" title="Multi Field 多重字段"></a>Multi Field 多重字段</h2><p>当我们需要对一个字段进行多种不同方式的索引时，可以使用fields多重字段定义。如一个字符串字段即需要进行text分词索引，也需要进行keyword 关键字索引来支持排序、聚合；或需要用不同的分词器进行分词索引。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">PUT my_index</span><br><span class="line">&#123;</span><br><span class="line">  &quot;mappings&quot;: &#123;</span><br><span class="line">    &quot;_doc&quot;: &#123;</span><br><span class="line">      &quot;properties&quot;: &#123;</span><br><span class="line">        &quot;city&quot;: &#123;</span><br><span class="line">          &quot;type&quot;: &quot;text&quot;,</span><br><span class="line">          &quot;fields&quot;: &#123;</span><br><span class="line">            &quot;raw&quot;: &#123; </span><br><span class="line">              &quot;type&quot;:  &quot;keyword&quot;</span><br><span class="line">            &#125;</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>往多重字段里面添加文档</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">PUT my_index&#x2F;_doc&#x2F;1</span><br><span class="line">&#123;</span><br><span class="line">  &quot;city&quot;: &quot;New York&quot;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">PUT my_index&#x2F;_doc&#x2F;2</span><br><span class="line">&#123;</span><br><span class="line">  &quot;city&quot;: &quot;York&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>获取多重字段的值：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">GET my_index&#x2F;_search</span><br><span class="line">&#123;</span><br><span class="line">  &quot;query&quot;: &#123;</span><br><span class="line">    &quot;match&quot;: &#123;</span><br><span class="line">      &quot;city&quot;: &quot;york&quot; </span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  &quot;sort&quot;: &#123;</span><br><span class="line">    &quot;city.raw&quot;: &quot;asc&quot; </span><br><span class="line">  &#125;,</span><br><span class="line">  &quot;aggs&quot;: &#123;</span><br><span class="line">    &quot;Cities&quot;: &#123;</span><br><span class="line">      &quot;terms&quot;: &#123;</span><br><span class="line">        &quot;field&quot;: &quot;city.raw&quot; </span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="元字段"><a href="#元字段" class="headerlink" title="元字段"></a>元字段</h2><p>元字段是ES中定义的文档字段，有这几种：_index，_uid，_type，_id。</p>
+<h2 id="动态映射"><a href="#动态映射" class="headerlink" title="动态映射"></a>动态映射</h2><p>动态映射：ES中提供的重要特性，让我们可以快速使用ES，而不需要先创建索引、定义映射。 如我们直接向ES提交文档进行索引：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">PUT data&#x2F;_doc&#x2F;1 </span><br><span class="line">&#123; &quot;count&quot;: 5 &#125;</span><br></pre></td></tr></table></figure>
+<p>ES将自动为我们创建data索引、_doc 映射、类型为 long 的字段 count</p>
+<p>索引文档时，当有新字段时， ES将根据我们字段的json的数据类型为我们自动加人字段定义到mapping中。</p>
+<p>字段动态映射规则</p>
+<p><img src="https://img.huyunshun.com/img1/Elasticsearch/imgsddasdasdfdfvrtyhclip.png" alt=""></p>
+<p>Date detection 时间侦测：指我们往ES里面插入数据的时候会去自动检测我们的数据是不是日期格式的，是的话就会给我们自动转为设置的格式</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">date_detection 默认是开启的，默认的格式dynamic_date_formats为：</span><br><span class="line"></span><br><span class="line">[ &quot;strict_date_optional_time&quot;,&quot;yyyy&#x2F;MM&#x2F;dd HH:mm:ss Z||yyyy&#x2F;MM&#x2F;dd Z&quot;]</span><br><span class="line">PUT my_index&#x2F;_doc&#x2F;1</span><br><span class="line">&#123;</span><br><span class="line">  &quot;create_date&quot;: &quot;2015&#x2F;09&#x2F;02&quot;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">GET my_index&#x2F;_mapping</span><br><span class="line"></span><br><span class="line"> 自定义时间格式：</span><br><span class="line"></span><br><span class="line">PUT my_index</span><br><span class="line">&#123;</span><br><span class="line">  &quot;mappings&quot;: &#123;</span><br><span class="line">    &quot;_doc&quot;: &#123;</span><br><span class="line">      &quot;dynamic_date_formats&quot;: [&quot;MM&#x2F;dd&#x2F;yyyy&quot;]</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">禁用时间侦测：</span><br><span class="line"></span><br><span class="line">PUT my_index</span><br><span class="line">&#123;</span><br><span class="line">  &quot;mappings&quot;: &#123;</span><br><span class="line">    &quot;_doc&quot;: &#123;</span><br><span class="line">      &quot;date_detection&quot;: false</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Numeric detection  数值侦测</p>
+<p>开启数值侦测（默认是禁用的）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">PUT my_index</span><br><span class="line">&#123;</span><br><span class="line">  &quot;mappings&quot;: &#123;</span><br><span class="line">    &quot;_doc&quot;: &#123;</span><br><span class="line">      &quot;numeric_detection&quot;: true</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="索引别名"><a href="#索引别名" class="headerlink" title="索引别名"></a>索引别名</h1><ol>
+<li>别名的用途<br>如果希望一次查询可查询多个索引。<br>如果希望通过索引的视图来操作索引，就像数据库库中的视图一样。</li>
+</ol>
+<p>索引的别名机制，就是让我们可以以视图的方式来操作集群中的索引，这个视图可是多个索引，也可是一个索引或索引的一部分。</p>
+<ol start="2">
+<li><p>新建索引时定义别名</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">PUT &#x2F;logs_20162801</span><br><span class="line">&#123;</span><br><span class="line">    &quot;mappings&quot; : &#123;</span><br><span class="line">        &quot;type&quot; : &#123;</span><br><span class="line">            &quot;properties&quot; : &#123;</span><br><span class="line">                &quot;year&quot; : &#123;&quot;type&quot; : &quot;integer&quot;&#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    &lt;!-- 定义了两个别名 --&gt;</span><br><span class="line">    &quot;aliases&quot; : &#123;</span><br><span class="line">        &quot;current_day&quot; : &#123;&#125;,</span><br><span class="line">        &quot;2016&quot; : &#123;</span><br><span class="line">            &quot;filter&quot; : &#123;</span><br><span class="line">                &quot;term&quot; : &#123;&quot;year&quot; : 2016 &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>创建别名     /_aliases</p>
+</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">POST &#x2F;_aliases</span><br><span class="line">&#123;</span><br><span class="line">    &quot;actions&quot; : [</span><br><span class="line">        &#123; &quot;add&quot; : &#123; &quot;index&quot; : &quot;test1&quot;, &quot;alias&quot; : &quot;alias1&quot; &#125; &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="4">
+<li><p>删除别名</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">POST &#x2F;_aliases</span><br><span class="line">&#123;</span><br><span class="line">    &quot;actions&quot; : [</span><br><span class="line">        &#123; &quot;remove&quot; : &#123; &quot;index&quot; : &quot;test1&quot;, &quot;alias&quot; : &quot;alias1&quot; &#125; &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br><span class="line"> 还可以这样写</span><br><span class="line"></span><br><span class="line">DELETE &#x2F;&#123;index&#125;&#x2F;_alias&#x2F;&#123;name&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>批量操作别名</p>
+<p>删除索引test1的别名alias1，同时为索引test2添加别名alias1</p>
+</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">POST &#x2F;_aliases</span><br><span class="line">&#123;</span><br><span class="line">    &quot;actions&quot; : [</span><br><span class="line">        &#123; &quot;remove&quot; : &#123; &quot;index&quot; : &quot;test1&quot;, &quot;alias&quot; : &quot;alias1&quot; &#125; &#125;,</span><br><span class="line">        &#123; &quot;add&quot; : &#123; &quot;index&quot; : &quot;test2&quot;, &quot;alias&quot; : &quot;alias1&quot; &#125; &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="6">
+<li>为多个索引定义一样的别名</li>
+</ol>
+<p>方式1：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">POST &#x2F;_aliases</span><br><span class="line">&#123;</span><br><span class="line">    &quot;actions&quot; : [</span><br><span class="line">        &#123; &quot;add&quot; : &#123; &quot;index&quot; : &quot;test1&quot;, &quot;alias&quot; : &quot;alias1&quot; &#125; &#125;,</span><br><span class="line">        &#123; &quot;add&quot; : &#123; &quot;index&quot; : &quot;test2&quot;, &quot;alias&quot; : &quot;alias1&quot; &#125; &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>方式2：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">POST &#x2F;_aliases</span><br><span class="line">&#123;</span><br><span class="line">    &quot;actions&quot; : [</span><br><span class="line">        &#123; &quot;add&quot; : &#123; &quot;indices&quot; : [&quot;test1&quot;, &quot;test2&quot;], &quot;alias&quot; : &quot;alias1&quot; &#125; &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>注意：只可通过多索引别名进行搜索，不可进行文档索引和根据id获取文档。</p>
+<p>方式3：通过统配符*模式来指定要别名的索引</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">POST &#x2F;_aliases</span><br><span class="line">&#123;</span><br><span class="line">    &quot;actions&quot; : [</span><br><span class="line">        &#123; &quot;add&quot; : &#123; &quot;index&quot; : &quot;test*&quot;, &quot;alias&quot; : &quot;all_test_indices&quot; &#125; &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br><span class="line">注意：在这种情况下，别名是一个点时间别名，它将对所有匹配的当前索引进行别名，当添加&#x2F;删除与此模式匹配的新索引时，它不会自动更新。</span><br></pre></td></tr></table></figure>
+<ol start="7">
+<li>带过滤器的别名</li>
+</ol>
+<p>索引中需要有字段</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">PUT &#x2F;test1</span><br><span class="line">&#123;</span><br><span class="line">  &quot;mappings&quot;: &#123;</span><br><span class="line">    &quot;type1&quot;: &#123;</span><br><span class="line">      &quot;properties&quot;: &#123;</span><br><span class="line">        &quot;user&quot; : &#123;</span><br><span class="line">          &quot;type&quot;: &quot;keyword&quot;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>过滤器通过Query DSL来定义，将作用于通过该别名来进行的所有Search, Count, Delete By Query and More Like This 操作。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">POST &#x2F;_aliases</span><br><span class="line">&#123;</span><br><span class="line">    &quot;actions&quot; : [</span><br><span class="line">        &#123;</span><br><span class="line">            &quot;add&quot; : &#123;</span><br><span class="line">                 &quot;index&quot; : &quot;test1&quot;,</span><br><span class="line">                 &quot;alias&quot; : &quot;alias2&quot;,</span><br><span class="line">                 &quot;filter&quot; : &#123; &quot;term&quot; : &#123; &quot;user&quot; : &quot;kimchy&quot; &#125; &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ol start="8">
+<li>带routing的别名</li>
+</ol>
+<p>可在别名定义中指定路由值，可和filter一起使用，用来限定操作的分片，避免不需要的其他分片操作。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">POST &#x2F;_aliases</span><br><span class="line">&#123;</span><br><span class="line">    &quot;actions&quot; : [</span><br><span class="line">        &#123;</span><br><span class="line">            &quot;add&quot; : &#123;</span><br><span class="line">                 &quot;index&quot; : &quot;test&quot;,</span><br><span class="line">                 &quot;alias&quot; : &quot;alias1&quot;,</span><br><span class="line">                 &quot;routing&quot; : &quot;1&quot;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>为搜索、索引指定不同的路由值</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">POST &#x2F;_aliases</span><br><span class="line">&#123;</span><br><span class="line">    &quot;actions&quot; : [</span><br><span class="line">        &#123;</span><br><span class="line">            &quot;add&quot; : &#123;</span><br><span class="line">                 &quot;index&quot; : &quot;test&quot;,</span><br><span class="line">                 &quot;alias&quot; : &quot;alias2&quot;,</span><br><span class="line">                 &quot;search_routing&quot; : &quot;1,2&quot;,</span><br><span class="line">                 &quot;index_routing&quot; : &quot;2&quot;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="9">
+<li>以PUT方式来定义一个别名<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">PUT &#x2F;&#123;index&#125;&#x2F;_alias&#x2F;&#123;name&#125;</span><br><span class="line">PUT &#x2F;logs_201305&#x2F;_alias&#x2F;2013</span><br></pre></td></tr></table></figure>
+带filter 和 routing   <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">PUT &#x2F;users</span><br><span class="line">&#123;</span><br><span class="line">    &quot;mappings&quot; : &#123;</span><br><span class="line">        &quot;user&quot; : &#123;</span><br><span class="line">            &quot;properties&quot; : &#123;</span><br><span class="line">                &quot;user_id&quot; : &#123;&quot;type&quot; : &quot;integer&quot;&#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">PUT &#x2F;users&#x2F;_alias&#x2F;user_12</span><br><span class="line">&#123;</span><br><span class="line">    &quot;routing&quot; : &quot;12&quot;,</span><br><span class="line">    &quot;filter&quot; : &#123;</span><br><span class="line">        &quot;term&quot; : &#123;</span><br><span class="line">            &quot;user_id&quot; : 12</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="10">
+<li>查看别名定义信息<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">GET &#x2F;&#123;index&#125;&#x2F;_alias&#x2F;&#123;alias&#125;</span><br><span class="line">GET &#x2F;logs_20162801&#x2F;_alias&#x2F;*</span><br><span class="line">GET &#x2F;_alias&#x2F;2016</span><br><span class="line">GET &#x2F;_alias&#x2F;20*</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+
+      
+    </div>
+     <!-- 相关文章推荐 -->
+    
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Elasticsearch/" rel="tag"># Elasticsearch</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/03/09/Elasticsearch%E4%BB%8B%E7%BB%8D%E5%92%8C%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8/" rel="next" title="Elasticsearch介绍和基本使用">
+                <i class="fa fa-chevron-left"></i> Elasticsearch介绍和基本使用
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/03/11/Elasticsearch%E6%96%87%E6%A1%A3%E6%93%8D%E4%BD%9C/" rel="prev" title="Elasticsearch文档操作">
+                Elasticsearch文档操作 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+<span class="jiathis_txt">分享到：</span>
+<a class="jiathis_button_fav">收藏夹</a>
+<a class="jiathis_button_copy">复制网址</a>
+<a class="jiathis_button_email">邮件</a>
+<a class="jiathis_button_weixin">微信</a>
+<a class="jiathis_button_qzone">QQ空间</a>
+<a class="jiathis_button_tqq">腾讯微博</a>
+<a class="jiathis_button_douban">豆瓣</a>
+<a class="jiathis_button_share">一键分享</a>
+
+<a href="http://www.jiathis.com/share?uid=2140465" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+<a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+var jiathis_config={
+  data_track_clickback:true,
+  summary:"",
+  shortUrl:false,
+  hideMore:false
+}
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://img.huyunshun.com/img/20200522182348.png"
+                alt="初晨" />
+            
+              <p class="site-author-name" itemprop="name">初晨</p>
+              <p class="site-description motion-element" itemprop="description">永远不要说你知道本质，更别说真相了。</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">249</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">46</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+<!--近期文章版块-->
+            
+                <div class="links-of-blogroll motion-element links-of-blogroll-block">
+                  <div class="links-of-blogroll-title">
+                    <!-- modify icon to fire by szw -->
+                    <i class="fa fa-history fa-" aria-hidden="true"></i>
+                    近期文章
+                  </div>
+                  <ul class="links-of-blogroll-list">
+                    
+                    
+                      <li>
+                        <a href="/2020/05/22/WebSocket%E3%80%81Socket%E3%80%81TCP%E3%80%81HTTP%E5%8C%BA%E5%88%AB/" title="WebSocket、Socket、TCP、HTTP区别" target="_blank">WebSocket、Socket、TCP、HTTP区别</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/19/Springboot%E9%A1%B9%E7%9B%AE%E7%9A%84%E6%8E%A5%E5%8F%A3%E9%98%B2%E5%88%B7/" title="Springboot项目的接口防刷" target="_blank">Springboot项目的接口防刷</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/03/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Volatile%E5%85%B3%E9%94%AE%E5%AD%97%E5%8F%8A%E5%85%B6%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/" title="深入理解Volatile关键字及其实现原理" target="_blank">深入理解Volatile关键字及其实现原理</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/04/20/%E4%BD%BF%E7%94%A8vscode%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0%E7%8E%AF%E5%A2%83/" title="使用vscode搭建个人笔记环境" target="_blank">使用vscode搭建个人笔记环境</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/01/20/HBase%E4%BB%8B%E7%BB%8D%E5%AE%89%E8%A3%85%E4%B8%8E%E6%93%8D%E4%BD%9C/" title="HBase介绍安装与操作" target="_blank">HBase介绍安装与操作</a>
+                      </li>
+                    
+                  </ul>
+                </div>
+            
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#索引"><span class="nav-number">1.</span> <span class="nav-text">索引</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1、创建索引"><span class="nav-number">1.1.</span> <span class="nav-text">1、创建索引</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2、创建mapping映射"><span class="nav-number">1.2.</span> <span class="nav-text">2、创建mapping映射</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3、删除索引"><span class="nav-number">1.3.</span> <span class="nav-text">3、删除索引</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4、判断索引是否存在"><span class="nav-number">1.4.</span> <span class="nav-text">4、判断索引是否存在</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5、修改索引的settings信息"><span class="nav-number">1.5.</span> <span class="nav-text">5、修改索引的settings信息</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6、修改备份数"><span class="nav-number">1.6.</span> <span class="nav-text">6、修改备份数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7、设置其他"><span class="nav-number">1.7.</span> <span class="nav-text">7、设置其他</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8、索引模板"><span class="nav-number">1.8.</span> <span class="nav-text">8、索引模板</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#9、-打开-关闭索引"><span class="nav-number">1.9.</span> <span class="nav-text">9、 打开&#x2F;关闭索引</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#10、Shrink-Index-收缩索引"><span class="nav-number">1.10.</span> <span class="nav-text">10、Shrink Index 收缩索引</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#11、Split-Index-拆分索引"><span class="nav-number">1.11.</span> <span class="nav-text">11、Split Index 拆分索引</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#12、Rollover-Index-别名滚动指向新创建的索引"><span class="nav-number">1.12.</span> <span class="nav-text">12、Rollover Index 别名滚动指向新创建的索引</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#索引监控"><span class="nav-number">2.</span> <span class="nav-text">索引监控</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#查看索引状态信息"><span class="nav-number">2.1.</span> <span class="nav-text">查看索引状态信息</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#查看索引段信息"><span class="nav-number">2.2.</span> <span class="nav-text">查看索引段信息</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#查看索引恢复信息"><span class="nav-number">2.3.</span> <span class="nav-text">查看索引恢复信息</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#查看索引分片的存储信息"><span class="nav-number">2.4.</span> <span class="nav-text">查看索引分片的存储信息</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#索引状态管理"><span class="nav-number">2.5.</span> <span class="nav-text">索引状态管理</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#映射Mapping"><span class="nav-number">3.</span> <span class="nav-text">映射Mapping</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#映射类别-Mapping-type"><span class="nav-number">3.1.</span> <span class="nav-text">映射类别 Mapping type</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#字段类型-datatypes"><span class="nav-number">3.2.</span> <span class="nav-text">字段类型 datatypes</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#字段定义属性介绍"><span class="nav-number">3.3.</span> <span class="nav-text">字段定义属性介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Multi-Field-多重字段"><span class="nav-number">3.4.</span> <span class="nav-text">Multi Field 多重字段</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#元字段"><span class="nav-number">3.5.</span> <span class="nav-text">元字段</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#动态映射"><span class="nav-number">3.6.</span> <span class="nav-text">动态映射</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#索引别名"><span class="nav-number">4.</span> <span class="nav-text">索引别名</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Copyright</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Jenkins," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="一、什么是持续集成？（1）Continuous integration（CI）持续集成是一种软件开发实践，即团队开发成员经常集成他们的工作，通常每个成员至少集成一次，也就意味着每天可能会发生多次集成。每次集成都通过自动化的构建（包括编译，发布，自动化测试）来验证，从而尽快地发现集成错误。许多团队发现这个过程可以大大减少集成的问题，让团队能够更快的开发内聚的软件。 （2）没有持续集成项目做模块集成的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Jenkins介绍和安装使用">
+<meta property="og:url" content="https://huyunshun.com/2019/04/13/jenkins%E4%BB%8B%E7%BB%8D%E5%92%8C%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8/index.html">
+<meta property="og:site_name" content="简">
+<meta property="og:description" content="一、什么是持续集成？（1）Continuous integration（CI）持续集成是一种软件开发实践，即团队开发成员经常集成他们的工作，通常每个成员至少集成一次，也就意味着每天可能会发生多次集成。每次集成都通过自动化的构建（包括编译，发布，自动化测试）来验证，从而尽快地发现集成错误。许多团队发现这个过程可以大大减少集成的问题，让团队能够更快的开发内聚的软件。 （2）没有持续集成项目做模块集成的">
+<meta property="og:image" content="https://img.huyunshun.com/img/20200413162014.png">
+<meta property="og:image" content="https://img.huyunshun.com/img/20200413161952.png">
+<meta property="og:image" content="https://img.huyunshun.com/img/20200413162214.png">
+<meta property="og:image" content="https://img.huyunshun.com/img/20200413162306.png">
+<meta property="og:image" content="https://img.huyunshun.com/img/20200413162444.png">
+<meta property="og:image" content="https://img.huyunshun.com/img/20200413162513.png">
+<meta property="og:image" content="https://img.huyunshun.com/img/20200413162537.png">
+<meta property="article:published_time" content="2019-04-12T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-05-20T10:04:24.698Z">
+<meta property="article:author" content="初晨">
+<meta property="article:tag" content="Jenkins">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img.huyunshun.com/img/20200413162014.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://huyunshun.com/2019/04/13/jenkins介绍和安装使用/"/>
+
+
+
+
+
+  <title>Jenkins介绍和安装使用 | 简</title>
+  
+
+
+
+
+
+
+
+
+  <script type="text/javascript" src="/js/src/love.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
+
+  <!-- 看板娘 -->
+    
+        <script async src="/live2d-widget/autoload.js"></script>
+    
+ <!-- 飘动的彩带） -->
+  <script src="/js/src/piao.js" type="text/javascript"></script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">简</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">人生短暂，学海无边，而大道至简。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://huyunshun.com/2019/04/13/jenkins%E4%BB%8B%E7%BB%8D%E5%92%8C%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="初晨">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://img.huyunshun.com/img/20200522182348.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="简">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Jenkins介绍和安装使用</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-13T00:00:00+08:00">
+                2019-04-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Jenkins/" itemprop="url" rel="index">
+                    <span itemprop="name">Jenkins</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="一、什么是持续集成？"><a href="#一、什么是持续集成？" class="headerlink" title="一、什么是持续集成？"></a>一、什么是持续集成？</h2><h3 id="（1）Continuous-integration（CI）"><a href="#（1）Continuous-integration（CI）" class="headerlink" title="（1）Continuous integration（CI）"></a>（1）Continuous integration（CI）</h3><p>持续集成是一种软件开发实践，即团队开发成员经常集成他们的工作，通常每个成员至少集成一次，也就意味着每天可能会发生多次集成。每次集成都通过自动化的构建（包括编译，发布，自动化测试）来验证，从而尽快地发现集成错误。许多团队发现这个过程可以大大减少集成的问题，让团队能够更快的开发内聚的软件。</p>
+<h3 id="（2）没有持续集成"><a href="#（2）没有持续集成" class="headerlink" title="（2）没有持续集成"></a>（2）没有持续集成</h3><pre><code>项目做模块集成的时候，发现很多借口都不通==&gt;浪费大量时间
+需要手动去编译打包最新的代码==&gt;构建过程不透明
+发布代码，上线，基本靠手工==&gt;脚本乱飞</code></pre><h3 id="（3）持续集成最佳实践："><a href="#（3）持续集成最佳实践：" class="headerlink" title="（3）持续集成最佳实践："></a>（3）持续集成最佳实践：</h3><pre><code>维护一个单一的代码库
+使构建自动化
+执行测试是构建的一部分
+集成日志及历史记录
+使用统一的依赖包管理库
+每天至少集成一次</code></pre><h3 id="（4）jenkins介绍"><a href="#（4）jenkins介绍" class="headerlink" title="（4）jenkins介绍"></a>（4）jenkins介绍</h3><pre><code>Jenkins只是一个平台，真正运作的都是插件。这就是jenkins流行的原因，因为jenkins什么插件都有
+Hudson是Jenkins的前身，是基于Java开发的一种持续集成工具，用于监控程序重复的工作，Hudson后来被收购，成为商业版。后来创始人又写了一个jenkins，jenkins在功能上远远超过hudson
+Jenkins官网：https://jenkins.io/
+Jenkins下载：http://updates.jenkins-ci.org/
+jenkins的全部镜像：http://mirrors.jenkins-ci.org/status.html</code></pre><h3 id="（5）部署代码上线流程："><a href="#（5）部署代码上线流程：" class="headerlink" title="（5）部署代码上线流程："></a>（5）部署代码上线流程：</h3><pre><code>1.代码获取（直接了拉取）
+2.编译      （可选）
+3.配置文件放进去
+4.打包
+5.scp到目标服务器
+6.将目标服务器移除集群
+7.解压并放置到Webroot
+8.Scp 差异文件
+9.重启      （可选）
+10.测试
+11.加入集群</code></pre><h2 id="二、安装使用"><a href="#二、安装使用" class="headerlink" title="二、安装使用"></a>二、安装使用</h2><p>yum的repo中默认没有Jenkins，需要先将Jenkins存储库添加到yum repos，执行下面的命令：<br>wget -O /etc/yum.repos.d/jenkins.repo <a href="https://pkg.jenkins.io/redhat-stable/jenkins.repo" target="_blank" rel="noopener">https://pkg.jenkins.io/redhat-stable/jenkins.repo</a></p>
+<p>然后执行下面的命令：</p>
+<p>rpm –import <a href="https://pkg.jenkins.io/redhat-stable/jenkins.io.key" target="_blank" rel="noopener">https://pkg.jenkins.io/redhat-stable/jenkins.io.key</a></p>
+<p>然后 安装Jenkins</p>
+<p>yum install -y jenkins 默认安装最新的</p>
+<p>或者<br>直接下载到本地：wget <a href="https://pkg.jenkins.io/redhat/jenkins-2.160-1.1.noarch.rpm" target="_blank" rel="noopener">https://pkg.jenkins.io/redhat/jenkins-2.160-1.1.noarch.rpm</a><br>然后通过命令安装成功：rpm -ih jenkins-2.160-1.1.noarch.rpm</p>
+<p>jenkins安装成功后，默认的用户是jenkins，端口是8080，为了防止冲突，并且给用户赋权限，我们修改用户名和端口。</p>
+<p>输入命令，进入jenkins配置文件： vi /etc/sysconfig/jenkins</p>
+<p>修改用户名root，端口，然后保存，退出</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">安装jenkins有两种方式，tomcat方式部署和java部署启动。</span><br><span class="line"></span><br><span class="line">tomcat方式部署：</span><br><span class="line">       1、首先安装tomcat和JAVA；</span><br><span class="line">       2、官网下载下来的jenkins.war文件放入tomcat下的webapps目录下，进入tomcat的&#x2F;bin目录下，启动tomcat即启动jenkins。</span><br><span class="line">       3、启动jenkins时，会自动在webapps目录下建立jenkins目录，访问地址为：http:&#x2F;&#x2F;localhost:8080&#x2F;jenkins</span><br><span class="line">       4、如果启动时报错：Caused by:java.awt.AWTError: Can&#39;t connect to X11 window server using &#39;:0&#39; as the value of the DISPLAY varible...</span><br><span class="line">               解决：[jenkins@osb30 bin]$ vim apache-tomcat-8.0.30&#x2F;bin&#x2F;catalina.sh，修改为：JAVA_OPTS&#x3D;&quot;-Xms1024m -Xmx1024m -Djava.awt.headless&#x3D;true&quot;</span><br><span class="line"></span><br><span class="line">java部署启动jenkins：</span><br><span class="line">       1、切换到jenkins.war存放的目录，输入如下命令：java -jar jenkins.war，可以修改启动端口java -jar jenkins.war --httpPort&#x3D;8000</span><br><span class="line">       2、然后在浏览器http:&#x2F;&#x2F;localhost:8080即可访问</span><br></pre></td></tr></table></figure>
+
+<h3 id="启动jenkins"><a href="#启动jenkins" class="headerlink" title="启动jenkins"></a>启动jenkins</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">service jenkins start</span><br><span class="line">启动报Starting Jenkins bash: &#x2F;usr&#x2F;bin&#x2F;java: No such file or directory</span><br><span class="line">修改Jenkins启动配置文件，指定java安装路径。</span><br><span class="line">vim &#x2F;etc&#x2F;init.d&#x2F;jenkins</span><br><span class="line">在candidates中第一行添加java路径，如下：</span><br><span class="line">candidates&#x3D;&quot;</span><br><span class="line">&#x2F;usr&#x2F;local&#x2F;jdk8&#x2F;bin&#x2F;java</span><br><span class="line">启动成功，浏览器访问http:&#x2F;&#x2F;192.168.1.110:8088</span><br><span class="line"></span><br><span class="line">初始密码在：&#x2F;var&#x2F;lib&#x2F;jenkins&#x2F;secrets&#x2F;initialAdminPassword</span><br></pre></td></tr></table></figure>
+<p>登录成功后显示</p>
+<p><img src="https://img.huyunshun.com/img/20200413162014.png" alt="20200413162014"></p>
+<p>选择”Install suggested plugins”安装默认的插件，下面Jenkins就会自己去下载相关的插件进行安装。安装完成后配置账号，配置好账号之后hu/123456，进入Jenkins。</p>
+<p>接下来在jenkins中配置jdk、svn、maven、git，并且构建web项目和spring boot项目。</p>
+<h2 id="三、安装Maven"><a href="#三、安装Maven" class="headerlink" title="三、安装Maven"></a>三、安装Maven</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">官网下载安装包apache-maven-3.6.0-bin.tar.gz到Linux上</span><br><span class="line">解压[root@localhost local]# tar -zxvf apache-maven-3.6.0-bin.tar.gz</span><br><span class="line">&#x2F;&#x2F; 配置环境变量到&#x2F;etc&#x2F;profile</span><br><span class="line">export PATH&#x3D;$PATH:cbin</span><br><span class="line">&#x2F;&#x2F;查看版本</span><br><span class="line">[root@localhost local]# mvn --version</span><br><span class="line">Apache Maven 3.6.0 (97c98ec64a1fdfee7767ce5ffb20918da4f719f3; 2018-10-25T02:41:47+08:00)</span><br><span class="line">Maven home: &#x2F;usr&#x2F;local&#x2F;apache-maven-3.6.0</span><br><span class="line">Java version: 1.8.0_191, vendor: Oracle Corporation, runtime: &#x2F;usr&#x2F;local&#x2F;jdk8&#x2F;jre</span><br><span class="line">Default locale: en_US, platform encoding: UTF-8</span><br><span class="line">OS name: &quot;linux&quot;, version: &quot;2.6.32-431.el6.x86_64&quot;, arch: &quot;amd64&quot;, family: &quot;unix&quot;</span><br><span class="line">修改一下源：</span><br></pre></td></tr></table></figure>
+<h2 id="四、安装git"><a href="#四、安装git" class="headerlink" title="四、安装git"></a>四、安装git</h2><p>安装过程 略</p>
+<p>有的插件安装失败，通过换源来解决或者手动下载：jenkins-&gt;系统管理-&gt;管理插件-&gt;高级，如<br> <a href="https://mirrors.tuna.tsinghua.edu.cn/jenkins/updates/update-center.jsonss" target="_blank" rel="noopener">https://mirrors.tuna.tsinghua.edu.cn/jenkins/updates/update-center.jsonss</a></p>
+<h2 id="五、使用Jenkins"><a href="#五、使用Jenkins" class="headerlink" title="五、使用Jenkins"></a>五、使用Jenkins</h2><h3 id="使用构建"><a href="#使用构建" class="headerlink" title="使用构建"></a>使用构建</h3><p>配置DK、MAVEN、Git为实际对应的安装目录</p>
+<p><img src="https://img.huyunshun.com/img/20200413161952.png" alt="20200413161952"></p>
+<p>安装以下插件：</p>
+<pre><code>1、 Maven Integration plugin
+2、 Subversion Plugin
+3、 Checkstyle Plugin
+4、 Findbugs Plugin
+5、 PMD Plugin
+6、 Warnings Plugin
+7、 Maven Info Plugin
+8、 Maven Repository Scheduled Cleanup Plugin
+9、 Unleash Maven Plugin
+10、 Maven Invoker plugin
+
+Subversion Plug-in ## 版本管理 SVN 的插件
+Git plugin ## 版本管理 GIT 的插件
+Maven Integration plugin ## 项目构建 Maven 的插件
+Gradle Plugin ## 项目构建 Gradle 的插件</code></pre><p>无需重启 Jenkins 插件即生效。如遇失败可重试或离线安装。</p>
+<p>一般情况下，常使用到如下这些插件：</p>
+<pre><code>FindBugs Plug-in： 是一个静态分析工具，它检查类或者 JAR 文件，将字节码与一组缺陷模式进行对        比以发现可能的问题。
+Checkstyle Plug-in：是一个静态分析工具，检查Java程序代码。
+Deploy to container Plugin：用于构建项目后，自动发布war包重新部署的插件
+SSH Plugin：这个插件使用 SSH 协议执行远程 shell 命令。
+Multijob Plugin：这个插件是一个将多个项目连接在一起的插件。</code></pre><h3 id="1、构建Maven项目"><a href="#1、构建Maven项目" class="headerlink" title="1、构建Maven项目"></a>1、构建Maven项目</h3><p> <img src="https://img.huyunshun.com/img/20200413162214.png" alt="20200413162214"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">由用户 hu 启动</span><br><span class="line">Running as SYSTEM</span><br><span class="line">构建中 在工作空间 &#x2F;var&#x2F;lib&#x2F;jenkins&#x2F;workspace&#x2F;maven-jenkins-test 中</span><br><span class="line">using credential dd5c879e-a6f2-4902-95fc-81219b15096f</span><br><span class="line">Cloning the remote Git repository</span><br><span class="line">Cloning repository https:&#x2F;&#x2F;github.com&#x2F;huingsn&#x2F;demo</span><br><span class="line">&gt; git init &#x2F;var&#x2F;lib&#x2F;jenkins&#x2F;workspace&#x2F;maven-jenkins-test # timeout&#x3D;10</span><br><span class="line">Fetching upstream changes from https:&#x2F;&#x2F;github.com&#x2F;huingsn&#x2F;demo</span><br><span class="line">&gt; git --version # timeout&#x3D;10</span><br><span class="line">using GIT_ASKPASS to set credentials</span><br><span class="line">&gt; git fetch --tags --progress https:&#x2F;&#x2F;github.com&#x2F;huingsn&#x2F;demo +refs&#x2F;heads&#x2F;*:refs&#x2F;remotes&#x2F;origin&#x2F;*</span><br><span class="line">&gt; git config remote.origin.url https:&#x2F;&#x2F;github.com&#x2F;huingsn&#x2F;demo # timeout&#x3D;10</span><br><span class="line">&gt; git config --add remote.origin.fetch +refs&#x2F;heads&#x2F;*:refs&#x2F;remotes&#x2F;origin&#x2F;* # timeout&#x3D;10</span><br><span class="line">&gt; git config remote.origin.url https:&#x2F;&#x2F;github.com&#x2F;huingsn&#x2F;demo # timeout&#x3D;10</span><br><span class="line">Fetching upstream changes from https:&#x2F;&#x2F;github.com&#x2F;huingsn&#x2F;demo</span><br><span class="line">using GIT_ASKPASS to set credentials</span><br><span class="line">&gt; git fetch --tags --progress https:&#x2F;&#x2F;github.com&#x2F;huingsn&#x2F;demo +refs&#x2F;heads&#x2F;*:refs&#x2F;remotes&#x2F;origin&#x2F;*</span><br><span class="line">&gt; git rev-parse refs&#x2F;remotes&#x2F;origin&#x2F;master^&#123;commit&#125; # timeout&#x3D;10</span><br><span class="line">&gt; git rev-parse refs&#x2F;remotes&#x2F;origin&#x2F;origin&#x2F;master^&#123;commit&#125; # timeout&#x3D;10</span><br><span class="line">&gt; git rev-parse origin&#x2F;master^&#123;commit&#125; # timeout&#x3D;10</span><br><span class="line">ERROR: Couldn&#39;t find any revision to build. Verify the repository and branch configuration for this job.</span><br><span class="line">Finished: FAILURE</span><br></pre></td></tr></table></figure>
+<p>原因分析：jenkins无法准确识别revision</p>
+<p>操作方法：</p>
+<p><img src="https://img.huyunshun.com/img/20200413162306.png" alt="20200413162306"></p>
+<p>再次构建，成功！</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line">由用户 hu 启动</span><br><span class="line">Running as SYSTEM</span><br><span class="line">构建中 在工作空间 &#x2F;var&#x2F;lib&#x2F;jenkins&#x2F;workspace&#x2F;dsafsdfdsafas 中</span><br><span class="line">using credential dd5c879e-a6f2-4902-95fc-81219b15096f</span><br><span class="line">Cloning the remote Git repository</span><br><span class="line">Cloning repository https:&#x2F;&#x2F;github.com&#x2F;huingsn&#x2F;demo</span><br><span class="line">&gt; git init &#x2F;var&#x2F;lib&#x2F;jenkins&#x2F;workspace&#x2F;dsafsdfdsafas # timeout&#x3D;10</span><br><span class="line">Fetching upstream changes from https:&#x2F;&#x2F;github.com&#x2F;huingsn&#x2F;demo</span><br><span class="line">&gt; git --version # timeout&#x3D;10</span><br><span class="line">using GIT_ASKPASS to set credentials</span><br><span class="line">&gt; git fetch --tags --progress https:&#x2F;&#x2F;github.com&#x2F;huingsn&#x2F;demo +refs&#x2F;heads&#x2F;*:refs&#x2F;remotes&#x2F;origin&#x2F;*</span><br><span class="line">&gt; git config remote.origin.url https:&#x2F;&#x2F;github.com&#x2F;huingsn&#x2F;demo # timeout&#x3D;10</span><br><span class="line">&gt; git config --add remote.origin.fetch +refs&#x2F;heads&#x2F;*:refs&#x2F;remotes&#x2F;origin&#x2F;* # timeout&#x3D;10</span><br><span class="line">&gt; git config remote.origin.url https:&#x2F;&#x2F;github.com&#x2F;huingsn&#x2F;demo # timeout&#x3D;10</span><br><span class="line">Fetching upstream changes from https:&#x2F;&#x2F;github.com&#x2F;huingsn&#x2F;demo</span><br><span class="line">using GIT_ASKPASS to set credentials</span><br><span class="line">&gt; git fetch --tags --progress https:&#x2F;&#x2F;github.com&#x2F;huingsn&#x2F;demo +refs&#x2F;heads&#x2F;*:refs&#x2F;remotes&#x2F;origin&#x2F;*</span><br><span class="line">Seen branch in repository origin&#x2F;github.com&#x2F;huingsn&#x2F;demo</span><br><span class="line">Seen 1 remote branch</span><br><span class="line">&gt; git show-ref --tags -d # timeout&#x3D;10</span><br><span class="line">Checking out Revision c8688fb590873bd7b77f3537d11640a5139c0da4 (origin&#x2F;github.com&#x2F;huingsn&#x2F;demo)</span><br><span class="line">&gt; git config core.sparsecheckout # timeout&#x3D;10</span><br><span class="line">&gt; git checkout -f c8688fb590873bd7b77f3537d11640a5139c0da4</span><br><span class="line">Commit message: &quot;dfsdfsdfs&quot;</span><br><span class="line">First time build. Skipping changelog.</span><br><span class="line">Parsing POMs</span><br><span class="line">Discovered a new module com.hu:maven-jenkins-test maven-jenkins-test Maven Webapp</span><br><span class="line">Modules changed, recalculating dependency graph</span><br><span class="line">Established TCP socket on 37646</span><br><span class="line">[dsafsdfdsafas] $ &#x2F;usr&#x2F;lib&#x2F;jvm&#x2F;java-1.8.0-openjdk-1.8.0.201.b09-2.el7_6.x86_64&#x2F;bin&#x2F;java -cp &#x2F;var&#x2F;lib&#x2F;jenkins&#x2F;plugins&#x2F;maven-plugin&#x2F;WEB-INF&#x2F;lib&#x2F;maven3-agent-1.12.jar:&#x2F;usr&#x2F;share&#x2F;maven&#x2F;boot&#x2F;plexus-classworlds.jar org.jvnet.hudson.maven3.agent.Maven3Main &#x2F;usr&#x2F;share&#x2F;maven &#x2F;var&#x2F;cache&#x2F;jenkins&#x2F;war&#x2F;WEB-INF&#x2F;lib&#x2F;remoting-3.29.jar &#x2F;var&#x2F;lib&#x2F;jenkins&#x2F;plugins&#x2F;maven-plugin&#x2F;WEB-INF&#x2F;lib&#x2F;maven3-interceptor-1.12.jar &#x2F;var&#x2F;lib&#x2F;jenkins&#x2F;plugins&#x2F;maven-plugin&#x2F;WEB-INF&#x2F;lib&#x2F;maven3-interceptor-commons-1.12.jar 37646</span><br><span class="line">&lt;&#x3D;&#x3D;&#x3D;[JENKINS REMOTING CAPACITY]&#x3D;&#x3D;&#x3D;&gt;channel started</span><br><span class="line">Executing Maven:  -B -f &#x2F;var&#x2F;lib&#x2F;jenkins&#x2F;workspace&#x2F;dsafsdfdsafas&#x2F;pom.xml install</span><br><span class="line">[INFO] Scanning for projects...</span><br><span class="line">[INFO]                                                                        </span><br><span class="line">[INFO] ------------------------------------------------------------------------</span><br><span class="line">[INFO] Building maven-jenkins-test Maven Webapp 1.0-SNAPSHOT</span><br><span class="line">[INFO] ------------------------------------------------------------------------</span><br><span class="line">Downloading: https:&#x2F;&#x2F;repo.maven.apache.org&#x2F;maven2&#x2F;org&#x2F;apache&#x2F;maven&#x2F;plugins&#x2F;maven-resources-plugin&#x2F;3.0.2&#x2F;maven-resources-plugin-3.0.2.pom</span><br><span class="line">&#x2F;&#x2F;省略下载包过程</span><br><span class="line">Downloaded: https:&#x2F;&#x2F;repo.maven.apache.org&#x2F;maven2&#x2F;org&#x2F;codehaus&#x2F;plexus&#x2F;plexus-utils&#x2F;3.0.15&#x2F;plexus-utils-3.0.15.jar (234 KB at 17.8 KB&#x2F;sec)</span><br><span class="line">[INFO] Installing &#x2F;var&#x2F;lib&#x2F;jenkins&#x2F;workspace&#x2F;dsafsdfdsafas&#x2F;target&#x2F;maven-jenkins-test.war to &#x2F;root&#x2F;.m2&#x2F;repository&#x2F;com&#x2F;hu&#x2F;maven-jenkins-test&#x2F;1.0-SNAPSHOT&#x2F;maven-jenkins-test-1.0-SNAPSHOT.war</span><br><span class="line">[INFO] Installing &#x2F;var&#x2F;lib&#x2F;jenkins&#x2F;workspace&#x2F;dsafsdfdsafas&#x2F;pom.xml to &#x2F;root&#x2F;.m2&#x2F;repository&#x2F;com&#x2F;hu&#x2F;maven-jenkins-test&#x2F;1.0-SNAPSHOT&#x2F;maven-jenkins-test-1.0-SNAPSHOT.pom</span><br><span class="line"></span><br><span class="line">[INFO] ------------------------------------------------------------------------</span><br><span class="line">[INFO] BUILD SUCCESS</span><br><span class="line">[INFO] ------------------------------------------------------------------------</span><br><span class="line">[INFO] Total time: 6:17.736s</span><br><span class="line">[INFO] Finished at: Sat Apr 06 21:22:19 CST 2019</span><br><span class="line">[INFO] Final Memory: 14M&#x2F;79M</span><br><span class="line">[INFO] ------------------------------------------------------------------------</span><br><span class="line">Waiting for Jenkins to finish collecting data</span><br><span class="line">[JENKINS] Archiving &#x2F;var&#x2F;lib&#x2F;jenkins&#x2F;workspace&#x2F;dsafsdfdsafas&#x2F;pom.xml to com.hu&#x2F;maven-jenkins-test&#x2F;1.0-SNAPSHOT&#x2F;maven-jenkins-test-1.0-SNAPSHOT.pom</span><br><span class="line">[JENKINS] Archiving &#x2F;var&#x2F;lib&#x2F;jenkins&#x2F;workspace&#x2F;dsafsdfdsafas&#x2F;target&#x2F;maven-jenkins-test.war to com.hu&#x2F;maven-jenkins-test&#x2F;1.0-SNAPSHOT&#x2F;maven-jenkins-test-1.0-SNAPSHOT.war</span><br><span class="line">channel stopped</span><br><span class="line"></span><br><span class="line">Finished: SUCCESS</span><br></pre></td></tr></table></figure>
+<h3 id="构建触发器"><a href="#构建触发器" class="headerlink" title="构建触发器"></a>构建触发器</h3><p>指定的项目完成构建后，触发此项目的构建。</p>
+<p>Poll SCM</p>
+<p>1.首先格式为：* * * * *（五个星）；</p>
+<p>2.第一个*表示分钟，取值0~59</p>
+<pre><code>第二个*表示小时，取值0~23
+第三个*表示一个月的第几天，取值1~31
+第四个*表示第几月，取值1~12
+第五个*表示一周中的第几天，取值0~7，其中0和7代表的都是周日</code></pre><p>3.使用举例：</p>
+<pre><code>每隔10分钟构建一次：H/5 * * * *
+每隔1小时构建一次： H/1* *
+每月30号构建一次：   H 30 * *
+Build periodically：此选项仅仅通知Jenkins按指定的频率对项目进行构建，而不管SCM是否有变化。如果想在这个Job中运行一些测试用例的话，它就很有帮助。</code></pre><p><img src="https://img.huyunshun.com/img/20200413162444.png" alt="20200413162444"></p>
+<h3 id="构建"><a href="#构建" class="headerlink" title="构建"></a>构建</h3><p>　    这部分主要是配置构建的相关内容，用于定时触发构建或者手动执行构建的时候，对代码检验、编译时进行的操作。构建概念到处可查到，形象来说，构建就是要把代码从某个地方拷贝过来，编译，再拷贝到某个地方去等等操作，当然不仅与此，但是主要用来干这个。</p>
+<p>因为我的项目是用ant脚本实现的编译和打包，所以我选择的是Invoke Ant，Ant Version选择我Ant配置的那个名字（这里可以参见3.4.2），注意不要选择default喔，那个选择了没有用。</p>
+<h3 id="构建后操作"><a href="#构建后操作" class="headerlink" title="构建后操作"></a>构建后操作</h3><p>　　用于定义当前项目构建完之后的一些操作，比如构建完之后将checkstyle结果输出到指定日志文件，重新发布项目，去执行其他项目构建等。</p>
+<p><img src="https://img.huyunshun.com/img/20200413162513.png" alt="20200413162513"></p>
+<h3 id="构建后发布项目"><a href="#构建后发布项目" class="headerlink" title="构建后发布项目"></a>构建后发布项目</h3><p>注意，首先必须安装好Deploy Plugin插件，然后在tomcat的conf目录配置tomcat-users.xml文件，如我这里配置的是manager, 在<tomcat-users>节点里添加如下内容:</p>
+<p> <img src="https://img.huyunshun.com/img/20200413162537.png" alt="20200413162537"></p>
+<pre><code>WAR/EAR files：是war包的相对路径(相对于工作区路径,即在工作区中war包的相对路径.)如我的maven执行完成之后会在工作区的target目录下生成项目.war,所以这里我的路径就写target\项目.war.
+Context path：访问时需要输入的内容http://192.168.1.112:8000/maven-jenkins-test，如果为空，默认是war包的名字。
+Container：选择你的web容器，如tomca 7.x
+Manager user name：填入tomcat-users.xml配置的username内容
+Manager password：填入tomcat-users.xml配置的password内容</code></pre><p>Tomcat URL：<a href="http://192.168.1.112:8000" target="_blank" rel="noopener">http://192.168.1.112:8000</a></p>
+<p>Deploy on failure：构建失败依然部署，一般不选择</p>
+<p>　　注意：虽然这种部署方法可能会导致tomcat加载时出现卡死的现象。但是也是最简单的部署方式。如果卡死了重启下就好了，将tomcat的java内存参数调高可以解决这个问题。</p>
+<p>上面写入错入，Tomcat端口是8080，开始部署：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br></pre></td><td class="code"><pre><span class="line">Running as SYSTEM</span><br><span class="line">[EnvInject] - Loading node environment variables.</span><br><span class="line">构建中 在工作空间 &#x2F;var&#x2F;lib&#x2F;jenkins&#x2F;workspace&#x2F;first 中</span><br><span class="line">using credential dd5c879e-a6f2-4902-95fc-81219b15096f</span><br><span class="line">&gt; git rev-parse --is-inside-work-tree # timeout&#x3D;10</span><br><span class="line">Fetching changes from the remote Git repository</span><br><span class="line">&gt; git config remote.origin.url https:&#x2F;&#x2F;github.com&#x2F;huingsn&#x2F;demo # timeout&#x3D;10</span><br><span class="line">Fetching upstream changes from https:&#x2F;&#x2F;github.com&#x2F;huingsn&#x2F;demo</span><br><span class="line">&gt; git --version # timeout&#x3D;10</span><br><span class="line">using GIT_ASKPASS to set credentials</span><br><span class="line">&gt; git fetch --tags --progress https:&#x2F;&#x2F;github.com&#x2F;huingsn&#x2F;demo +refs&#x2F;heads&#x2F;*:refs&#x2F;remotes&#x2F;origin&#x2F;*</span><br><span class="line">Seen branch in repository origin&#x2F;github.com&#x2F;huingsn&#x2F;demo</span><br><span class="line">Seen 1 remote branch</span><br><span class="line">&gt; git show-ref --tags -d # timeout&#x3D;10</span><br><span class="line">Checking out Revision c8688fb590873bd7b77f3537d11640a5139c0da4 (origin&#x2F;github.com&#x2F;huingsn&#x2F;demo)</span><br><span class="line">&gt; git config core.sparsecheckout # timeout&#x3D;10</span><br><span class="line">&gt; git checkout -f c8688fb590873bd7b77f3537d11640a5139c0da4</span><br><span class="line">Commit message: &quot;dfsdfsdfs&quot;</span><br><span class="line">&gt; git rev-list --no-walk c8688fb590873bd7b77f3537d11640a5139c0da4 # timeout&#x3D;10</span><br><span class="line">Parsing POMs</span><br><span class="line">Established TCP socket on 36677</span><br><span class="line">[first] $ &#x2F;usr&#x2F;lib&#x2F;jvm&#x2F;java-1.8.0-openjdk-1.8.0.201.b09-2.el7_6.x86_64&#x2F;bin&#x2F;java -cp &#x2F;var&#x2F;lib&#x2F;jenkins&#x2F;plugins&#x2F;maven-plugin&#x2F;WEB-INF&#x2F;lib&#x2F;maven3-agent-1.12.jar:&#x2F;usr&#x2F;share&#x2F;maven&#x2F;boot&#x2F;plexus-classworlds.jar org.jvnet.hudson.maven3.agent.Maven3Main &#x2F;usr&#x2F;share&#x2F;maven &#x2F;var&#x2F;cache&#x2F;jenkins&#x2F;war&#x2F;WEB-INF&#x2F;lib&#x2F;remoting-3.29.jar &#x2F;var&#x2F;lib&#x2F;jenkins&#x2F;plugins&#x2F;maven-plugin&#x2F;WEB-INF&#x2F;lib&#x2F;maven3-interceptor-1.12.jar &#x2F;var&#x2F;lib&#x2F;jenkins&#x2F;plugins&#x2F;maven-plugin&#x2F;WEB-INF&#x2F;lib&#x2F;maven3-interceptor-commons-1.12.jar 36677</span><br><span class="line">&lt;&#x3D;&#x3D;&#x3D;[JENKINS REMOTING CAPACITY]&#x3D;&#x3D;&#x3D;&gt;channel started</span><br><span class="line"></span><br><span class="line">Executing Maven:  -B -f &#x2F;var&#x2F;lib&#x2F;jenkins&#x2F;workspace&#x2F;first&#x2F;pom.xml install</span><br><span class="line"></span><br><span class="line">[INFO] Scanning for projects...</span><br><span class="line"></span><br><span class="line">[INFO]                                                                        </span><br><span class="line">[INFO] ------------------------------------------------------------------------</span><br><span class="line">[INFO] Building maven-jenkins-test Maven Webapp 1.0-SNAPSHOT</span><br><span class="line">[INFO] ------------------------------------------------------------------------</span><br><span class="line">[INFO]</span><br><span class="line">[INFO] --- maven-resources-plugin:3.0.2:resources (default-resources) @ maven-jenkins-test ---</span><br><span class="line"></span><br><span class="line">[INFO] Using &#39;UTF-8&#39; encoding to copy filtered resources.</span><br><span class="line">[INFO] skip non existing resourceDirectory &#x2F;var&#x2F;lib&#x2F;jenkins&#x2F;workspace&#x2F;first&#x2F;src&#x2F;main&#x2F;resources</span><br><span class="line"></span><br><span class="line">[INFO]</span><br><span class="line">[INFO] --- maven-compiler-plugin:3.8.0:compile (default-compile) @ maven-jenkins-test ---</span><br><span class="line"></span><br><span class="line">[INFO] No sources to compile</span><br><span class="line">[INFO]</span><br><span class="line">[INFO] --- maven-resources-plugin:3.0.2:testResources (default-testResources) @ maven-jenkins-test ---</span><br><span class="line">[INFO] Using &#39;UTF-8&#39; encoding to copy filtered resources.</span><br><span class="line">[INFO] skip non existing resourceDirectory &#x2F;var&#x2F;lib&#x2F;jenkins&#x2F;workspace&#x2F;first&#x2F;src&#x2F;test&#x2F;resources</span><br><span class="line">[INFO]</span><br><span class="line">[INFO] --- maven-compiler-plugin:3.8.0:testCompile (default-testCompile) @ maven-jenkins-test ---</span><br><span class="line">[INFO] No sources to compile</span><br><span class="line">[INFO]</span><br><span class="line">[INFO] --- maven-surefire-plugin:2.22.1:test (default-test) @ maven-jenkins-test ---</span><br><span class="line"></span><br><span class="line">[INFO] No tests to run.</span><br><span class="line">[JENKINS] Recording test results</span><br><span class="line">[WARNING] Attempt to (de-)serialize anonymous class hudson.maven.reporters.BuildInfoRecorder$1; see: https:&#x2F;&#x2F;jenkins.io&#x2F;redirect&#x2F;serialization-of-anonymous-classes&#x2F;</span><br><span class="line">[INFO]</span><br><span class="line">[INFO] --- maven-war-plugin:3.2.2:war (default-war) @ maven-jenkins-test ---</span><br><span class="line"></span><br><span class="line">[INFO] Packaging webapp</span><br><span class="line">[INFO] Assembling webapp [maven-jenkins-test] in [&#x2F;var&#x2F;lib&#x2F;jenkins&#x2F;workspace&#x2F;first&#x2F;target&#x2F;maven-jenkins-test]</span><br><span class="line">[INFO] Processing war project</span><br><span class="line">[INFO] Copying webapp resources [&#x2F;var&#x2F;lib&#x2F;jenkins&#x2F;workspace&#x2F;first&#x2F;src&#x2F;main&#x2F;webapp]</span><br><span class="line">[INFO] Webapp assembled in [75 msecs]</span><br><span class="line">[INFO] Building war: &#x2F;var&#x2F;lib&#x2F;jenkins&#x2F;workspace&#x2F;first&#x2F;target&#x2F;maven-jenkins-test.war</span><br><span class="line"></span><br><span class="line">[INFO]</span><br><span class="line">[INFO] --- maven-install-plugin:2.5.2:install (default-install) @ maven-jenkins-test ---</span><br><span class="line"></span><br><span class="line">[INFO] Installing &#x2F;var&#x2F;lib&#x2F;jenkins&#x2F;workspace&#x2F;first&#x2F;target&#x2F;maven-jenkins-test.war to &#x2F;root&#x2F;.m2&#x2F;repository&#x2F;com&#x2F;hu&#x2F;maven-jenkins-test&#x2F;1.0-SNAPSHOT&#x2F;maven-jenkins-test-1.0-SNAPSHOT.war</span><br><span class="line">[INFO] Installing &#x2F;var&#x2F;lib&#x2F;jenkins&#x2F;workspace&#x2F;first&#x2F;pom.xml to &#x2F;root&#x2F;.m2&#x2F;repository&#x2F;com&#x2F;hu&#x2F;maven-jenkins-test&#x2F;1.0-SNAPSHOT&#x2F;maven-jenkins-test-1.0-SNAPSHOT.pom</span><br><span class="line"></span><br><span class="line">[INFO] ------------------------------------------------------------------------</span><br><span class="line">[INFO] BUILD SUCCESS</span><br><span class="line">[INFO] ------------------------------------------------------------------------</span><br><span class="line">[INFO] Total time: 9.804s</span><br><span class="line">[INFO] Finished at: Sat Apr 06 23:06:26 CST 2019</span><br><span class="line">[INFO] Final Memory: 13M&#x2F;98M</span><br><span class="line">[INFO] ------------------------------------------------------------------------</span><br><span class="line">Waiting for Jenkins to finish collecting data</span><br><span class="line">[JENKINS] Archiving &#x2F;var&#x2F;lib&#x2F;jenkins&#x2F;workspace&#x2F;first&#x2F;pom.xml to com.hu&#x2F;maven-jenkins-test&#x2F;1.0-SNAPSHOT&#x2F;maven-jenkins-test-1.0-SNAPSHOT.pom</span><br><span class="line">[JENKINS] Archiving &#x2F;var&#x2F;lib&#x2F;jenkins&#x2F;workspace&#x2F;first&#x2F;target&#x2F;maven-jenkins-test.war to com.hu&#x2F;maven-jenkins-test&#x2F;1.0-SNAPSHOT&#x2F;maven-jenkins-test-1.0-SNAPSHOT.war</span><br><span class="line">channel stopped</span><br><span class="line"></span><br><span class="line">Deploying &#x2F;var&#x2F;lib&#x2F;jenkins&#x2F;workspace&#x2F;first&#x2F;target&#x2F;maven-jenkins-test.war to container Tomcat 7.x Remote with context</span><br><span class="line"> [&#x2F;var&#x2F;lib&#x2F;jenkins&#x2F;workspace&#x2F;first&#x2F;target&#x2F;maven-jenkins-test.war] is not deployed. Doing a fresh deployment.</span><br><span class="line"> Deploying [&#x2F;var&#x2F;lib&#x2F;jenkins&#x2F;workspace&#x2F;first&#x2F;target&#x2F;maven-jenkins-test.war]</span><br><span class="line"></span><br><span class="line">Finished: SUCCESS</span><br></pre></td></tr></table></figure>
+<p>成功部署到Tomcat，<a href="http://192.168.1.112:8080/maven-jenkins-test/成功访问。" target="_blank" rel="noopener">http://192.168.1.112:8080/maven-jenkins-test/成功访问。</a></p>
+<p>好了！到此一个项目的获取源码，打包，远程部署</p>
+
+      
+    </div>
+     <!-- 相关文章推荐 -->
+    
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Jenkins/" rel="tag"># Jenkins</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/13/github+jenkins+maven+docker%E8%87%AA%E5%8A%A8%E5%8C%96%E6%9E%84%E5%BB%BA%E9%83%A8%E7%BD%B2/" rel="next" title="github+jenkins+maven+docker自动化构建部署">
+                <i class="fa fa-chevron-left"></i> github+jenkins+maven+docker自动化构建部署
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/04/14/ECMAScript_6_%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/" rel="prev" title="ECMAScript 6 基础知识">
+                ECMAScript 6 基础知识 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+<span class="jiathis_txt">分享到：</span>
+<a class="jiathis_button_fav">收藏夹</a>
+<a class="jiathis_button_copy">复制网址</a>
+<a class="jiathis_button_email">邮件</a>
+<a class="jiathis_button_weixin">微信</a>
+<a class="jiathis_button_qzone">QQ空间</a>
+<a class="jiathis_button_tqq">腾讯微博</a>
+<a class="jiathis_button_douban">豆瓣</a>
+<a class="jiathis_button_share">一键分享</a>
+
+<a href="http://www.jiathis.com/share?uid=2140465" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+<a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+var jiathis_config={
+  data_track_clickback:true,
+  summary:"",
+  shortUrl:false,
+  hideMore:false
+}
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://img.huyunshun.com/img/20200522182348.png"
+                alt="初晨" />
+            
+              <p class="site-author-name" itemprop="name">初晨</p>
+              <p class="site-description motion-element" itemprop="description">永远不要说你知道本质，更别说真相了。</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">249</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">46</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+<!--近期文章版块-->
+            
+                <div class="links-of-blogroll motion-element links-of-blogroll-block">
+                  <div class="links-of-blogroll-title">
+                    <!-- modify icon to fire by szw -->
+                    <i class="fa fa-history fa-" aria-hidden="true"></i>
+                    近期文章
+                  </div>
+                  <ul class="links-of-blogroll-list">
+                    
+                    
+                      <li>
+                        <a href="/2020/05/22/WebSocket%E3%80%81Socket%E3%80%81TCP%E3%80%81HTTP%E5%8C%BA%E5%88%AB/" title="WebSocket、Socket、TCP、HTTP区别" target="_blank">WebSocket、Socket、TCP、HTTP区别</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/19/Springboot%E9%A1%B9%E7%9B%AE%E7%9A%84%E6%8E%A5%E5%8F%A3%E9%98%B2%E5%88%B7/" title="Springboot项目的接口防刷" target="_blank">Springboot项目的接口防刷</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/03/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Volatile%E5%85%B3%E9%94%AE%E5%AD%97%E5%8F%8A%E5%85%B6%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/" title="深入理解Volatile关键字及其实现原理" target="_blank">深入理解Volatile关键字及其实现原理</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/04/20/%E4%BD%BF%E7%94%A8vscode%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0%E7%8E%AF%E5%A2%83/" title="使用vscode搭建个人笔记环境" target="_blank">使用vscode搭建个人笔记环境</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/01/20/HBase%E4%BB%8B%E7%BB%8D%E5%AE%89%E8%A3%85%E4%B8%8E%E6%93%8D%E4%BD%9C/" title="HBase介绍安装与操作" target="_blank">HBase介绍安装与操作</a>
+                      </li>
+                    
+                  </ul>
+                </div>
+            
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、什么是持续集成？"><span class="nav-number">1.</span> <span class="nav-text">一、什么是持续集成？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#（1）Continuous-integration（CI）"><span class="nav-number">1.1.</span> <span class="nav-text">（1）Continuous integration（CI）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#（2）没有持续集成"><span class="nav-number">1.2.</span> <span class="nav-text">（2）没有持续集成</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#（3）持续集成最佳实践："><span class="nav-number">1.3.</span> <span class="nav-text">（3）持续集成最佳实践：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#（4）jenkins介绍"><span class="nav-number">1.4.</span> <span class="nav-text">（4）jenkins介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#（5）部署代码上线流程："><span class="nav-number">1.5.</span> <span class="nav-text">（5）部署代码上线流程：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、安装使用"><span class="nav-number">2.</span> <span class="nav-text">二、安装使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#启动jenkins"><span class="nav-number">2.1.</span> <span class="nav-text">启动jenkins</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三、安装Maven"><span class="nav-number">3.</span> <span class="nav-text">三、安装Maven</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#四、安装git"><span class="nav-number">4.</span> <span class="nav-text">四、安装git</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#五、使用Jenkins"><span class="nav-number">5.</span> <span class="nav-text">五、使用Jenkins</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#使用构建"><span class="nav-number">5.1.</span> <span class="nav-text">使用构建</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1、构建Maven项目"><span class="nav-number">5.2.</span> <span class="nav-text">1、构建Maven项目</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#构建触发器"><span class="nav-number">5.3.</span> <span class="nav-text">构建触发器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#构建"><span class="nav-number">5.4.</span> <span class="nav-text">构建</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#构建后操作"><span class="nav-number">5.5.</span> <span class="nav-text">构建后操作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#构建后发布项目"><span class="nav-number">5.6.</span> <span class="nav-text">构建后发布项目</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Copyright</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

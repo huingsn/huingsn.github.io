@@ -1,0 +1,2339 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="永远不要说你知道本质，更别说真相了。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="简">
+<meta property="og:url" content="https://huyunshun.com/index.html">
+<meta property="og:site_name" content="简">
+<meta property="og:description" content="永远不要说你知道本质，更别说真相了。">
+<meta property="article:author" content="初晨">
+<meta property="article:tag" content="编程">
+<meta property="article:tag" content="开发">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://huyunshun.com/"/>
+
+
+
+
+
+  <title>简</title>
+  
+
+
+
+
+
+
+
+
+  <script type="text/javascript" src="/js/src/love.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
+
+  <!-- 看板娘 -->
+    
+        <script async src="/live2d-widget/autoload.js"></script>
+    
+ <!-- 飘动的彩带） -->
+  <script src="/js/src/piao.js" type="text/javascript"></script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left 
+  page-home">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">简</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">人生短暂，学海无边，而大道至简。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+  <section id="posts" class="posts-expand">
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://huyunshun.com/2020/05/22/WebSocket%E3%80%81Socket%E3%80%81TCP%E3%80%81HTTP%E5%8C%BA%E5%88%AB/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="初晨">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://img.huyunshun.com/img/20200522182348.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="简">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/05/22/WebSocket%E3%80%81Socket%E3%80%81TCP%E3%80%81HTTP%E5%8C%BA%E5%88%AB/" itemprop="url">WebSocket、Socket、TCP、HTTP区别</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-05-22T19:05:13+08:00">
+                2020-05-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            
+          
+        
+      
+    </div>
+     <!-- 相关文章推荐 -->
+    
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://huyunshun.com/2020/05/19/Springboot%E9%A1%B9%E7%9B%AE%E7%9A%84%E6%8E%A5%E5%8F%A3%E9%98%B2%E5%88%B7/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="初晨">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://img.huyunshun.com/img/20200522182348.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="简">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/05/19/Springboot%E9%A1%B9%E7%9B%AE%E7%9A%84%E6%8E%A5%E5%8F%A3%E9%98%B2%E5%88%B7/" itemprop="url">Springboot项目的接口防刷</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-05-19T16:25:27+08:00">
+                2020-05-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/spring-boot/" itemprop="url" rel="index">
+                    <span itemprop="name">spring boot</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>创建一个注解，通过注解控制接口请求次数</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Retention</span>(RetentionPolicy.RUNTIME)</span><br><span class="line"><span class="meta">@Target</span>(ElementType.METHOD)</span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> AccessControl &#123;</span><br><span class="line">    <span class="comment">// 在 second 秒内，最大只能请求 maxCount 次</span></span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">seconds</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">maxCount</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>拦截器处理注解信息</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AccessControlInterceptor</span> <span class="keyword">extends</span> <span class="title">HandlerInterceptorAdapter</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> RedisTemplate redisTemplate;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">preHandle</span><span class="params">(HttpServletRequest request, HttpServletResponse response, Object handler)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="comment">//判断请求是否属于方法的请求</span></span><br><span class="line">        <span class="keyword">if</span>(handler <span class="keyword">instanceof</span> HandlerMethod)&#123;</span><br><span class="line">            HandlerMethod hm = (HandlerMethod) handler;</span><br><span class="line">            <span class="comment">//获取方法中的注解,看是否有该注解</span></span><br><span class="line">            AccessControl accessControl = hm.getMethodAnnotation(AccessControl<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">            <span class="keyword">if</span>(accessControl == <span class="keyword">null</span>)&#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">int</span> seconds = accessControl.seconds();</span><br><span class="line">            <span class="keyword">int</span> maxCount = accessControl.maxCount();</span><br><span class="line">            String key = request.getRequestURI()+request.getSession().getId();</span><br><span class="line">            <span class="comment">// 从缓存中获取，当前这个请求访问了几次</span></span><br><span class="line">            Integer redisCount = (Integer) redisTemplate.opsForValue().get(key);</span><br><span class="line">            <span class="keyword">if</span>(redisCount == <span class="keyword">null</span>)&#123;</span><br><span class="line">                redisTemplate.opsForValue().set(key,<span class="number">1</span>,seconds, TimeUnit.SECONDS);</span><br><span class="line">            &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">                <span class="keyword">if</span>(redisCount.intValue() &gt;= maxCount)&#123;</span><br><span class="line">                    render(response,<span class="string">"次数超过"</span>);</span><br><span class="line">                    <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                redisTemplate.opsForValue().increment(key);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">super</span>.preHandle(request, response, handler);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">render</span><span class="params">(HttpServletResponse response, String msg)</span><span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        response.setContentType(<span class="string">"application/json;charset=UTF-8"</span>);</span><br><span class="line">        OutputStream out = response.getOutputStream();</span><br><span class="line">        out.write(msg.getBytes(<span class="string">"UTF-8"</span>));</span><br><span class="line">        out.flush();</span><br><span class="line">        out.close();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>注册拦截器</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">WebConfig</span> <span class="keyword">implements</span> <span class="title">WebMvcConfigurer</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> AccessControlInterceptor interceptor;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addInterceptors</span><span class="params">(InterceptorRegistry registry)</span> </span>&#123;</span><br><span class="line">        registry.addInterceptor(interceptor);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>使用</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@AccessControl</span>(seconds = <span class="number">60</span>,maxCount = <span class="number">1</span>)</span><br><span class="line"><span class="meta">@RequestMapping</span>(<span class="string">"register"</span>)</span><br><span class="line"><span class="function"><span class="keyword">public</span> ModelAndView <span class="title">register</span><span class="params">(User user)</span> <span class="keyword">throws</span> Exception</span>&#123;</span><br><span class="line">    <span class="comment">//.......</span></span><br></pre></td></tr></table></figure>
+          
+        
+      
+    </div>
+     <!-- 相关文章推荐 -->
+    
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://huyunshun.com/2020/05/03/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Volatile%E5%85%B3%E9%94%AE%E5%AD%97%E5%8F%8A%E5%85%B6%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="初晨">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://img.huyunshun.com/img/20200522182348.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="简">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/05/03/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Volatile%E5%85%B3%E9%94%AE%E5%AD%97%E5%8F%8A%E5%85%B6%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/" itemprop="url">深入理解Volatile关键字及其实现原理</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-05-03T20:55:46+08:00">
+                2020-05-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>volatile通常被比喻成”轻量级的synchronized”，是Java中提供的另一种解决可见性和有序性问题的方案。</p>
+<h2 id="volatile的原理"><a href="#volatile的原理" class="headerlink" title="volatile的原理"></a>volatile的原理</h2><h3 id="可见性实现"><a href="#可见性实现" class="headerlink" title="可见性实现"></a>可见性实现</h3><p>为了提高处理器的执行速度，在处理器和内存之间增加了多级缓存来提升。但是由于引入了多级缓存，就存在缓存数据不一致问题。在多处理器下，为了保证各个处理器的缓存是一致的，就会实现缓存一致性协议。</p>
+<p>缓存一致性协议：每个处理器通过嗅探在总线上传播的数据来检查自己缓存的值是不是过期了，当处理器发现自己缓存行对应的内存地址被修改，就会将当前处理器的缓存行设置成无效状态，当处理器要对这个数据进行修改操作的时候，会强制重新从系统内存里把数据读到处理器缓存里。</p>
+<p>对于volatile变量，当对volatile变量进行写操作的时候，JVM会向处理器发送一条lock前缀的指令，将这个缓存中的变量回写到系统主存中。而其他处理器的缓存由于遵守了缓存一致性协议，也会把这个变量的值从主存加载到自己的缓存中。这就保证了一个volatile在并发编程中，其值在多个缓存中是可见的。</p>
+<p>每个线程的工作内存是CPU寄存器和高速缓存的抽象。</p>
+<p>两条线程Thread-A与Threab-B同时操作主存中的一个volatile变量i时，Thread-A写了变量i，那么：</p>
+<p>Thread-A发出LOCK#指令 发出的LOCK#指令锁总线（或锁缓存行），同时让Thread-B高速缓存中的缓存行内容失效。</p>
+<p>Thread-A向主存回写最新修改的i   Thread-B读取变量i，那么：</p>
+<p>Thread-B发现对应地址的缓存行被锁了，等待锁的释放，缓存一致性协议会保证它读取到最新的值</p>
+<p>由此可以看出，volatile关键字的读和普通变量的读取相比基本没差别，差别主要还是在变量的写操作上。</p>
+<h3 id="有序性"><a href="#有序性" class="headerlink" title="有序性"></a>有序性</h3><h4 id="Happen-before"><a href="#Happen-before" class="headerlink" title="Happen-before"></a>Happen-before</h4><p>JSR 133中对Happen-before的定义：如果a happen-before b，则a所做的任何操作对b是可见的。</p>
+<p>happen-before规则：</p>
+<pre><code>同一个线程中的，前面的操作 happen-before 后续的操作。（即单线程内按代码顺序执行。但是，在不影响在单线程环境执行结果的前提下，编译器和处理器可以进行重排序，这是合法的。换句话说，这一是规则无法保证编译重排和指令重排）。
+监视器上的解锁操作 happen-before 其后续的加锁操作。（Synchronized 规则）
+对volatile变量的写操作 happen-before 后续的读操作。（volatile 规则）
+线程的start() 方法 happen-before 该线程所有的后续操作。（线程启动规则）
+线程所有的操作 happen-before 其他线程在该线程上调用 join 返回成功后的操作。
+如果 a happen-before b，b happen-before c，则a happen-before c（传递性）。</code></pre><p>有序性即程序执行的顺序按照代码的先后顺序执行。</p>
+<p>除了引入了时间片以外，由于处理器优化和指令重排等，CPU还可能对输入代码进行乱序执行，这就是可能存在有序性问题。</p>
+<p>而volatile除了可以保证数据的可见性之外，还有一个强大的功能，那就是他可以禁止指令重排优化等。</p>
+<p>普通的变量仅仅会保证在该方法的执行过程中所依赖的赋值结果的地方都能获得正确的结果，而不能保证变量的赋值操作的顺序与程序代码中的执行顺序一致。</p>
+<p>volatile可以禁止指令重排，这就保证了代码的程序会严格按照代码的先后顺序执行。这就保证了有序性。被volatile修饰的变量的操作，会严格按照代码顺序执行。</p>
+<h2 id="volatile与synchronized的区别"><a href="#volatile与synchronized的区别" class="headerlink" title="volatile与synchronized的区别"></a>volatile与synchronized的区别</h2><ul>
+<li>（1）使用上的区别：Volatile只能修饰变量，synchronized只能修饰方法和语句块</li>
+<li>（2）对原子性的保证：synchronized可以保证原子性，Volatile不能保证原子性</li>
+<li>（3）对可见性的保证：都可以保证可见性，但实现原理不同，Volatile对变量加了lock，synchronized使用monitorEnter和monitorexit  monitor  JVM</li>
+<li>（4）对有序性的保证：Volatile能保证有序，synchronized可以保证有序性，但是代价（重量级）并发退化到串行</li>
+<li>（5）synchronized引起阻塞，Volatile不会引起阻塞</li>
+</ul>
+
+          
+        
+      
+    </div>
+     <!-- 相关文章推荐 -->
+    
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://huyunshun.com/2020/04/20/%E4%BD%BF%E7%94%A8vscode%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0%E7%8E%AF%E5%A2%83/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="初晨">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://img.huyunshun.com/img/20200522182348.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="简">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/04/20/%E4%BD%BF%E7%94%A8vscode%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0%E7%8E%AF%E5%A2%83/" itemprop="url">使用vscode搭建个人笔记环境</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-04-20T13:37:10+08:00">
+                2020-04-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%85%B6%E4%BB%96/" itemprop="url" rel="index">
+                    <span itemprop="name">其他</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="下载安装vscode"><a href="#下载安装vscode" class="headerlink" title="下载安装vscode"></a>下载安装vscode</h2><h2 id="安装插件"><a href="#安装插件" class="headerlink" title="安装插件"></a>安装插件</h2><h3 id="中文包"><a href="#中文包" class="headerlink" title="中文包"></a>中文包</h3><p>Chinese (Simplified) Language Pack for Visual Studio Code</p>
+<h3 id="Markdown显示插件"><a href="#Markdown显示插件" class="headerlink" title="Markdown显示插件"></a>Markdown显示插件</h3><p>类似于github的模板：Markdown Preview Github Styling</p>
+<h3 id="Markdown编辑插件"><a href="#Markdown编辑插件" class="headerlink" title="Markdown编辑插件"></a>Markdown编辑插件</h3><p>Markdown Shortcuts</p>
+<h3 id="图床插件"><a href="#图床插件" class="headerlink" title="图床插件"></a>图床插件</h3><p>picgo</p>
+<p>配置：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">Pic Bed: Current</span><br><span class="line"></span><br><span class="line">Picgo › Pic Bed › Github: Branch</span><br><span class="line">master</span><br><span class="line"></span><br><span class="line">Picgo › Pic Bed › Github: Custom Url</span><br><span class="line">https:&#x2F;&#x2F;cdn.jsdelivr.net&#x2F;gh&#x2F;huingsggn&#x2F;image-cloudings</span><br><span class="line"></span><br><span class="line">Picgo › Pic Bed › Github: Path</span><br><span class="line">img&#x2F;</span><br><span class="line"></span><br><span class="line">Picgo › Pic Bed › Github: Repo</span><br><span class="line">huingsggn&#x2F;image-cloudings</span><br><span class="line"></span><br><span class="line">Picgo › Pic Bed › Github: Token</span><br></pre></td></tr></table></figure>
+
+<h3 id="文件头插件"><a href="#文件头插件" class="headerlink" title="文件头插件"></a>文件头插件</h3><p>vscode-fileheader</p>
+<p>配置：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Fileheader: Author</span><br><span class="line">初晨</span><br><span class="line">Fileheader: Last Modified By</span><br><span class="line"></span><br><span class="line">Fileheader: Tpl</span><br><span class="line"></span><br><span class="line">---\r\ntitle: \r\ntags: []\r\ncategory: \r\nauthor: &#123;author&#125;\r\ndate: &#123;createTime&#125;\r\n---</span><br><span class="line"></span><br><span class="line">使用 Ctrl+Alt+I就可以生成要的格式</span><br></pre></td></tr></table></figure>
+
+<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><p>在git上新建一个保存图片的库，按照上面的配置picgo，后 图片复制后 Ctrl+Alt+U即可上传到仓库，并且生成markdown的信息。</p>
+<p>在git新建笔记库，在vscode代码库中 拉取后，就可以编写，加入库，推送等等操作。</p>
+<p><img src="https://img.huyunshun.com/img/20200420142856.png" alt="20200420142856"></p>
+<h3 id="预览html文档的插件"><a href="#预览html文档的插件" class="headerlink" title="预览html文档的插件"></a>预览html文档的插件</h3>
+          
+        
+      
+    </div>
+     <!-- 相关文章推荐 -->
+    
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://huyunshun.com/2020/01/20/HBase%E4%BB%8B%E7%BB%8D%E5%AE%89%E8%A3%85%E4%B8%8E%E6%93%8D%E4%BD%9C/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="初晨">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://img.huyunshun.com/img/20200522182348.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="简">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/01/20/HBase%E4%BB%8B%E7%BB%8D%E5%AE%89%E8%A3%85%E4%B8%8E%E6%93%8D%E4%BD%9C/" itemprop="url">HBase介绍安装与操作</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-01-20T16:23:32+08:00">
+                2020-01-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/HBase/" itemprop="url" rel="index">
+                    <span itemprop="name">HBase</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h4 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h4><ul>
+<li>HBase是Apache Hadoop的数据库，能够对大型数据提供随机、实时的读写访问，是Google的BigTable的开源实现。</li>
+<li>HBase的目标是存储并处理大型的数据，更具体地说仅用普通的硬件配置，能够处理成千上万的行和列所组成的大型数据库。</li>
+<li>HBase是一个开源的、分布式的、多版本的、面向列的存储模型。可以直接使用本地文件系统，也可使用Hadoop的HDFS文件存储系统。</li>
+</ul>
+<p>为了提高数据的可靠性和系统的健壮性，并且发挥HBase处理大型数据的能力，还是使用HDFS作为文件存储系统更佳。</p>
+<p>另外，HBase存储的是松散型数据，具体来说，HBase存储的数据介于映射（key/value）和关系型数据之间。如下图所示，HBase存储的数据从逻辑上看就是一张很大的表，并且它的数据列可以根据需要动态增加。每一个cell中的数据又可以有多个版本（通过时间戳来区别），从下图来看，HBase还具有 “ 向下提供存储，向上提供运算 “ 的特点。</p>
+<h5 id="逻辑结构"><a href="#逻辑结构" class="headerlink" title="逻辑结构"></a>逻辑结构</h5><p>逻辑上，HBase的数据模型和关系型数据库类似，有表，有行列。但是从底层物理存储结构k-v来看，它更像一个多维度map。</p>
+<p><img src="https://img.huyunshun.com/img/20200423162536.png" alt="20200423162536"></p>
+<h5 id="物理存储结构"><a href="#物理存储结构" class="headerlink" title="物理存储结构"></a>物理存储结构</h5><p><img src="https://img.huyunshun.com/img/20200423162547.png" alt="20200423162547"></p>
+<h5 id="数据模型"><a href="#数据模型" class="headerlink" title="数据模型"></a>数据模型</h5><h6 id="Name-Space"><a href="#Name-Space" class="headerlink" title="Name Space"></a>Name Space</h6><p>命名空间，类似于关系型数据库的 DatabBase 概念，每个命名空间下有多个表。HBase有两个自带的命名空间，分别是 hbase 和 default，hbase 中存放的是 HBase 内置的表，default 表是用户默认使用的命名空间。</p>
+<h6 id="Region"><a href="#Region" class="headerlink" title="Region"></a>Region</h6><p>类似于关系型数据库的表概念。不同的是，HBase 定义表时只需要声明列族即可，不需要声明具体的列。往 HBase 写入数据时，字段可以动态、按需指定。因此，和关系型数据库相比，HBase 能够轻松应对字段变更的场景。</p>
+<h6 id="Row"><a href="#Row" class="headerlink" title="Row"></a>Row</h6><p>HBase表中的每行数据都由一个 RowKey 和多个 Column（列）组成，数据是按照 RowKey的字典顺序存储的，并且查询数据时只能根据 RowKey 进行检索。</p>
+<h6 id="Column"><a href="#Column" class="headerlink" title="Column"></a>Column</h6><p>HBase 中的每个列都由 Column Family(列族)和 Column Qualifier（列限定符）进行限定，例如 info：name，info：age。建表时，只需指明列族，而列限定符无需预先定义。</p>
+<h6 id="Time-Stamp"><a href="#Time-Stamp" class="headerlink" title="Time Stamp"></a>Time Stamp</h6><p>用于标识数据的不同版本（version），每条数据写入时，如果不指定时间戳，系统会自动为其加上该字段，其值为写入 HBase 的时间。</p>
+<h6 id="Cell"><a href="#Cell" class="headerlink" title="Cell"></a>Cell</h6><p>由{rowkey, column Family：column Qualifier, time Stamp} 唯一确定的单元。cell 中的数据是没有类型的，全部是字节码形式存贮。</p>
+<h5 id="HBase体系架构"><a href="#HBase体系架构" class="headerlink" title="HBase体系架构"></a>HBase体系架构</h5><p>HBase的服务器体系结构遵从简单的主从服务器架构，它由HRegion Server群和HBase Master服务器构成。HBase Master负责管理所有的HRegion Server，而HBase中的所有RegionServer都是通过ZooKeeper来协调，并处理HBase服务器运行期间可能遇到的错误。</p>
+<p>HBase Master Server本身并不存储HBase中的任何数据，HBase逻辑上的表可能会被划分成多个Region，然后存储到HRegion Server群中。HBase Master Server中存储的是从数据到HRegion Server的映射。HBase体系结构如下图所示：</p>
+<p><img src="https://img.huyunshun.com/img/20200423162558.png" alt="20200423162558"></p>
+<h6 id="Client"><a href="#Client" class="headerlink" title="Client"></a>Client</h6><p>HBase Client使用HBase的RPC机制与HMaster和HRegionServer进行通信，对于管理类操作，Client与HMaster进行RPC；对于数据读写类操作，Client与HRegionServer进行RPC。</p>
+<h6 id="Zookeeper"><a href="#Zookeeper" class="headerlink" title="Zookeeper"></a>Zookeeper</h6><p>Zookeeper Quorum中除了存储了ROOT表的地址和HMaster的地址，HRegionServer也会把自己以Ephemeral方式注册到 Zookeeper中，使得HMaster可以随时感知到各个HRegionServer的健康状态。此外，Zookeeper也避免了HMaster的单点问题。</p>
+<h6 id="HMaster"><a href="#HMaster" class="headerlink" title="HMaster"></a>HMaster</h6><ul>
+<li>管理用户对表的操作：create, delete, alter；</li>
+<li>管理HRegion Server的负载均衡，调整Region分布；</li>
+<li>在Region Split后，负责新Region的分配；</li>
+<li>在HRegion Server停机后，负责失效HRegion Server 上的Regions迁移。<h6 id="HDFS"><a href="#HDFS" class="headerlink" title="HDFS"></a>HDFS</h6>HDFS 为 HBase 提供最终的底层数据存储服务，同时为 HBase 提供高可用的支持。<h6 id="Region-1"><a href="#Region-1" class="headerlink" title="Region"></a>Region</h6><img src="https://img.huyunshun.com/img/20200423162607.png" alt="20200423162607"></li>
+</ul>
+<p>当表的大小超过设置值的时候，HBase会自动地将表划分为不同的区域，每个区域包含所有行的一个子集。对用户来说，每个表是一堆数据的集合，靠主键来区分。从物理上来说，一张表被拆分成了多块，每一块就是一个Region。一个Region会保存一个表里面某段连续的数据，从开始主键到结束主键，一张完整的表格是保存在多个Region上面。</p>
+<h6 id="HRegionServer"><a href="#HRegionServer" class="headerlink" title="HRegionServer"></a>HRegionServer</h6><p>Region 的管理者，主要作用:对于数据的操作：get, put, delete；对于 Region 的操作：splitRegion、compactRegion。</p>
+<p><img src="https://img.huyunshun.com/img/20200423162617.png" alt="20200423162617"></p>
+<ul>
+<li>所有的数据库数据一般是保存在Hadoop HDFS分布式文件系统上面，用户通过一系列HRegion Server获取这些数据，一台机器上面一般只运行一个HRegion Server，且每一个区段的HRegion也只会被一个HRegion Server维护。</li>
+<li>HRegion Server主要负责响应用户I/O请求，向HDFS文件系统中读写数据，是HBase中最核心的模块。</li>
+<li>HRegion Server内部管理了一系列HRegion对象，每个HRegion对应了Table中的一个Region，Region中由多个Store组成。每个Store对应了Table中的一个Column Family的存储，可以看出每个Column Family其实就是一个集中的存储单元，因此最好将具备共同IO特性的column放在一个Column Family中，这样最高效。<h6 id="HStore​-StoreFile"><a href="#HStore​-StoreFile" class="headerlink" title="HStore​(StoreFile)"></a>HStore​(StoreFile)</h6></li>
+<li>HBase存储的核心。由MemStore和StoreFile组成。。</li>
+<li>MemStore是Sorted Memory Buffer</li>
+</ul>
+<p>Client写入 -&gt; 存入MemStore，一直到MemStore满 -&gt; Flush成一个StoreFile，直至增长到一定阈值 -&gt; 触发Compact合并操作 -&gt; 多个StoreFile合并成一个StoreFile，同时进行版本合并和数据删除 -&gt; 当StoreFiles Compact后，逐步形成越来越大的StoreFile -&gt; 单个StoreFile大小超过一定阈值后，触发Split操作，把当前Region Split成2个Region，Region会下线，新Split出的2个孩子Region会被HMaster分配到相应的HRegionServer上，使得原先1个Region的压力得以分流到2个Region上。</p>
+<p><img src="https://img.huyunshun.com/img/20200423162625.png" alt="20200423162625"></p>
+<p>所以，HBase只是增加数据，有所得更新和删除操作，都是在Compact阶段做的，所以，用户写操作只需要进入到内存即可立即返回，从而保证I/O高性能。</p>
+<ul>
+<li>HFile是底层的实现。<h6 id="MemStore"><a href="#MemStore" class="headerlink" title="MemStore"></a>MemStore</h6>写缓存，由于 HFile 中的数据要求是有序的，所以数据是先存储在 MemStore 中，排好序后，等到达刷写时机才会刷写到 HFile，每次刷写都会形成一个新的 HFile。<h6 id="Hlog"><a href="#Hlog" class="headerlink" title="Hlog"></a>Hlog</h6>在分布式系统环境中，无法避免系统出错或者宕机，因此一旦HRegion Server意外退出，MemStore中的内存数据将会丢失，这就需要引入HLog了。每个HRegion Server中都有一个HLog对象。</li>
+</ul>
+<p>每个HRegionServer中都会有一个HLog对象，HLog是一个实现Write Ahead Log的类，每次用户操作写入Memstore的同时，也会写一份数据到HLog文件，HLog文件定期会滚动出新，并删除旧的文件(已持久化到StoreFile中的数据)。当HRegionServer意外终止后，HMaster会通过Zookeeper感知，HMaster首先处理遗留的HLog文件，将不同region的log数据拆分，分别放到相应region目录下，然后再将失效的region重新分配，领取到这些region的HRegionServer在Load Region的过程中，会发现有历史HLog需要处理，因此会Replay HLog中的数据到MemStore中，然后flush到StoreFiles，完成数据恢复。</p>
+<h6 id="Hbase的存储格式"><a href="#Hbase的存储格式" class="headerlink" title="Hbase的存储格式"></a>Hbase的存储格式</h6><p>HBase中的所有数据文件都存储在Hadoop HDFS文件系统上为例，主要包括上述提出的两种文件类型：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">HFile， HBase中KeyValue数据的存储格式，HFile是Hadoop的二进制格式文件，实际上StoreFile就是对HFile做了轻量级包装，即StoreFile底层就是HFile。</span><br><span class="line">HLog File，HBase中WAL（Write Ahead Log） 的存储格式，物理上是Hadoop的Sequence File。</span><br></pre></td></tr></table></figure>
+<ul>
+<li>Hbase的存储格式（HFile）*</li>
+</ul>
+<p><img src="https://img.huyunshun.com/img/20200423162635.png" alt="20200423162635"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">HFile文件不定长，长度固定的块只有两个：Trailer和FileInfo</span><br><span class="line">Trailer中指针指向其他数据块的起始点</span><br><span class="line">File Info中记录了文件的一些Meta信息，例如：AVG_KEY_LEN, AVG_VALUE_LEN, LAST_KEY, COMPARATOR, MAX_SEQ_ID_KEY等</span><br><span class="line">Data Index和Meta Index块记录了每个Data块和Meta块的起始点</span><br><span class="line">Data Block是HBase I&#x2F;O的基本单元，为了提高效率，HRegionServer中有基于LRU的Block Cache机制</span><br><span class="line">每个Data块的大小可以在创建一个Table的时候通过参数指定，大号的Block有利于顺序Scan，小号Block利于随机查询</span><br><span class="line">每个Data块除了开头的Magic以外就是一个个KeyValue对拼接而成, Magic内容就是一些随机数字，目的是防止数据损坏</span><br><span class="line"></span><br><span class="line">HFile里面的每个KeyValue对就是一个简单的byte数组。这个byte数组里面包含了很多项，并且有固定的结构。</span><br></pre></td></tr></table></figure>
+<p><img src="https://img.huyunshun.com/img/20200423162645.png" alt="20200423162645"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">KeyLength和ValueLength：两个固定的长度，分别代表Key和Value的长度</span><br><span class="line">Key部分：Row Length是固定长度的数值，表示RowKey的长度，Row 就是RowKey</span><br><span class="line">Column Family Length是固定长度的数值，表示Family的长度</span><br><span class="line">接着就是Column Family，再接着是Qualifier，然后是两个固定长度的数值，表示Time Stamp和Key Type（Put&#x2F;Delete）</span><br><span class="line">Value部分没有这么复杂的结构，就是纯粹的二进制数据</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>Hbase的存储格式（HLog File）*</li>
+</ul>
+<p><img src="https://img.huyunshun.com/img/20200423162657.png" alt="20200423162657"></p>
+<p>　　HLog文件就是一个普通的Hadoop Sequence File，Sequence File 的Key是HLogKey对象，HLogKey中记录了写入数据的归属信息，除了table和region名字外，同时还包括 sequence number和timestamp，timestamp是“写入时间”，sequence number的起始值为0，或者是最近一次存入文件系统中sequence number。</p>
+<p>　　HLog Sequece File的Value是HBase的KeyValue对象，即对应HFile中的KeyValue</p>
+<h6 id="ROOT表和META表"><a href="#ROOT表和META表" class="headerlink" title="ROOT表和META表"></a>ROOT表和META表</h6><p>用户表的Regions元数据被存储在.META.表中，随着Region的增多，.META.表中的数据也会增大，并分裂成多个Regions。为了定位.META.表中各个Regions的位置，把.META.表中所有Regions的元数据保存在-ROOT-表中，最后由ZooKeeper记录-ROOT-表的位置信息。所有客户端访问用户数据前，需要首先访问ZooKeeper获得-ROOT-的位置，然后访问-ROOT-表获得.META.表的位置，最后根据.META.表中的信息确定用户数据存放的位置，如下图所示。</p>
+<p><img src="https://img.huyunshun.com/img/20200423162706.png" alt="20200423162706"></p>
+<p>ROOT 表永远不会被分割，它只有一个Region，这样可以保证最多需要三次跳转就可以定位任意一个Region。为了加快访问速度，.META.表的Regions全部保存在内存中。客户端会将查询过的位置信息缓存起来，且缓存不会主动失效。如果客户端根据缓存信息还访问不到数据，则询问只有相关.META.表的Region服务器，试图获取数据的位置，如果还是失败，则询问-ROOT-表相关的.META.表在哪里。最后，如果前面的信息全部失效，则通过ZooKeeper重新定位Region的信息。所以如果客户端上的缓存全部是失效，则需要进行6次网络来回，才能定位到正确的Region。</p>
+<p><img src="https://img.huyunshun.com/img/20200423162716.png" alt="20200423162716"></p>
+<h6 id="MapReduce-On-HBase"><a href="#MapReduce-On-HBase" class="headerlink" title="MapReduce On HBase"></a>MapReduce On HBase</h6><p>在HBase系统上运行批处理运算，最方便和实用的模型依然是MapReduce，如下图：</p>
+<p><img src="https://img.huyunshun.com/img/20200423162725.png" alt="20200423162725"></p>
+<p>HBase Table和Region的关系，比较类似HDFS File和Block的关系，HBase提供了配套的TableInputFormat和TableOutputFormat API，可以方便的将HBase Table作为Hadoop MapReduce的Source和Sink，对于MapReduce Job应用开发人员来说，基本不需要关注HBase系统自身的细节。</p>
+<h5 id="写流程"><a href="#写流程" class="headerlink" title="写流程"></a>写流程</h5><p><img src="https://img.huyunshun.com/img/20200423162734.png" alt="20200423162734"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">1）Client 先访问 zookeeper，获取 hbase:meta 表位于哪个 Region Server。 </span><br><span class="line">2）访问对应的 Region Server，获取 hbase:meta 表，根据读请求的 namespace:table&#x2F;rowkey，查询出目标数据位于哪个 Region Server 中的哪个 Region 中。并将该 table 的 region 信息以及 meta 表的位置信息缓存在客户端的 meta cache，方便下次访问。</span><br><span class="line">3）与目标 Region Server 进行通讯；</span><br><span class="line">4）将数据顺序写入（追加）到 WAL； </span><br><span class="line">5）将数据写入对应的 MemStore，数据会在 MemStore 进行排序； </span><br><span class="line">6）向客户端发送 ack； </span><br><span class="line">7）等达到 MemStore 的刷写时机后，将数据刷写到 HFile。</span><br></pre></td></tr></table></figure>
+<h5 id="MemStore-Flush"><a href="#MemStore-Flush" class="headerlink" title="MemStore Flush"></a>MemStore Flush</h5><p><img src="https://img.huyunshun.com/img/20200423162743.png" alt="20200423162743"></p>
+<p>MemStore 刷写时机：</p>
+<p>1.当某个 memstroe 的大小达到了 hbase.hregion.memstore.flush.size（默认值 128M）， 其所在 region 的所有 memstore 都会刷写。 </p>
+<p>** 当 memstore 的大小达到了hbase.hregion.memstore.flush.size（默认值 128M） ✖ hbase.hregion.memstore.block.multiplier（默认值 4）时 **，会阻止继续往该 memstore 写数据。</p>
+<p>2.当 region server 中 memstore 的总大小达到** java_heapsize✖hbase.regionserver.global.memstore.size（默认值 0.4）✖hbase.regionserver.global.memstore.size.lower.limit（默认值 0.95） **，region 会按照其所有 memstore 的大小顺序（由大到小）依次进行刷写。</p>
+<p>直到 region server中所有 memstore 的总大小减小到上述值以下。 当 region server 中 memstore 的总大小达到<strong>java_heapsize✖hbase.regionserver.global.memstore.size</strong>（默认值 0.4）时，会阻止继续往所有的 memstore 写数据。</p>
+<ol start="3">
+<li>到达自动刷写的时间，也会触发 memstore flush。自动刷新的时间间隔由该属性进行配置 hbase.regionserver.optionalcacheflushinterval（默认 1 小时）。</li>
+</ol>
+<p>4.当 WAL 文件的数量超过 hbase.regionserver.max.logs，region 会按照时间顺序依次进行刷写，直到 WAL 文件数量减小到 hbase.regionserver.max.log 以下（该属性名已经废弃，现无需手动设置，最大值为 32）。</p>
+<h5 id="读流程"><a href="#读流程" class="headerlink" title="读流程"></a>读流程</h5><p><img src="https://img.huyunshun.com/img/20200423162755.png" alt="20200423162755"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">1）Client 先访问 zookeeper，获取 hbase:meta 表位于哪个 Region Server。</span><br><span class="line">2）访问对应的 Region Server，获取 hbase:meta 表，根据读请求的 namespace:table&#x2F;rowkey，查询出目标数据位于哪个 Region Server 中的哪个 Region 中。并将该 table 的 region 信息以及 meta 表的位置信息缓存在客户端的 meta cache，方便下次访问。</span><br><span class="line">3）与目标 Region Server 进行通讯；</span><br><span class="line">4）分别在 Block Cache（读缓存），MemStore 和 Store File（HFile）中查询目标数据，并将查到的所有数据进行合并。此处所有数据是指同一条数据的不同版本（time stamp）或者不同的类型（Put&#x2F;Delete）。</span><br><span class="line">5） 将从文件中查询到的数据块（Block，HFile 数据存储单元，默认大小为 64KB）缓存到Block Cache。 6）将合并后的最终结果返回给客户端。</span><br></pre></td></tr></table></figure>
+<h5 id="StoreFile-Compaction"><a href="#StoreFile-Compaction" class="headerlink" title="StoreFile Compaction"></a>StoreFile Compaction</h5><p>由于memstore每次刷写都会生成一个新的HFile，且同一个字段的不同版本（timestamp）和不同类型（Put/Delete）有可能会分布在不同的 HFile 中，因此查询时需要遍历所有的 HFile。为了减少 HFile 的个数，以及清理掉过期和删除的数据，会进行 StoreFile Compaction。</p>
+<p>Compaction 分为两种，分别是 Minor Compaction 和 Major Compaction。Minor Compaction会将临近的若干个较小的 HFile 合并成一个较大的 HFile，但不会清理过期和删除的数据。</p>
+<p>Major Compaction 会将一个 Store 下的所有的 HFile 合并成一个大 HFile，并且会清理掉过期和删除的数据</p>
+<p><img src="https://img.huyunshun.com/img/20200423162804.png" alt="20200423162804"></p>
+<h5 id="Region-Split"><a href="#Region-Split" class="headerlink" title="Region Split"></a>Region Split</h5><p>默认情况下，每个 Table 起初只有一个 Region，随着数据的不断写入，Region 会自动进行拆分。刚拆分时，两个子 Region 都位于当前的 Region Server，但处于负载均衡的考虑，HMaster 有可能会将某个 Region 转移给其他的 Region Server。</p>
+<p>Region Split 时机：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1.当1个region中的某个Store下所有StoreFile的总大小超过hbase.hregion.max.filesize， 该 Region 就会进行拆分（0.94 版本之前）。</span><br><span class="line">2. 当 1 个 region 中 的 某 个 Store 下所有 StoreFile 的 总 大 小 超 过 Min(R^2 * &quot;hbase.hregion.memstore.flush.size&quot;,hbase.hregion.max.filesize&quot;)，该 Region 就会进行拆分，其中 R 为当前 Region Server 中属于该 Table 的个数（0.94 版本之后）。</span><br></pre></td></tr></table></figure>
+<p><img src="https://img.huyunshun.com/img/20200423162817.png" alt="20200423162817"></p>
+<h4 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h4><p>1、docker安装</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">docker run -d -h docker-hbase \</span><br><span class="line">    -p 2181:2181 \</span><br><span class="line">    -p 8081:8080 \</span><br><span class="line">    -p 8085:8085 \</span><br><span class="line">    -p 9090:9090 \</span><br><span class="line">    -p 9000:9000 \</span><br><span class="line">    -p 9095:9095 \</span><br><span class="line">    -p 16000:16000 \</span><br><span class="line">    -p 16010:16010 \</span><br><span class="line">    -p 16201:16201 \</span><br><span class="line">    -p 16301:16301 \</span><br><span class="line">    -p 16020:16020\</span><br><span class="line">    --name hbase \</span><br><span class="line">    harisekhon&#x2F;hbase</span><br><span class="line"></span><br><span class="line">-d 表示后台运行</span><br><span class="line">-h 该容器的host为docker-hbase</span><br><span class="line">-p 宿主机端口:容器端口</span><br><span class="line">--name 该容器的名字</span><br></pre></td></tr></table></figure>
+<p>启动成功，访问web界面。</p>
+<p><img src="https://img.huyunshun.com/img/20200423162835.png" alt="20200423162835"></p>
+<p>进入容器可以看到hbase正常</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[root@VM_0_3_centos ~]# docker exec -it 6a &#x2F;bin&#x2F;bash</span><br><span class="line">bash-4.4# hbase shell</span><br><span class="line">2020-01-08 10:13:42,496 WARN  [main] util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable</span><br><span class="line">HBase Shell</span><br><span class="line">Use &quot;help&quot; to get list of supported commands.</span><br><span class="line">Use &quot;exit&quot; to quit this interactive shell.</span><br><span class="line">For Reference, please visit: http:&#x2F;&#x2F;hbase.apache.org&#x2F;2.0&#x2F;book.html#shell</span><br><span class="line">Version 2.1.3, rda5ec9e4c06c537213883cca8f3cc9a7c19daf67, Mon Feb 11 15:45:33 CST 2019</span><br></pre></td></tr></table></figure>
+<p>2、集群搭建</p>
+<p>3、常用操作命令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">查看集群状态status</span><br><span class="line"></span><br><span class="line">查看hbase版本version</span><br><span class="line"></span><br><span class="line">查看所有表list</span><br><span class="line"></span><br><span class="line">创建表 create &#39;t1&#39;,&#39;[Column Family 1]&#39;,&#39;[Column Family 2]&#39;</span><br><span class="line"></span><br><span class="line">例如创建一个菜谱表，调味料为一个列族(类)，食材则为另一个列族(类)，脚本为create &#39;cookbook&#39;,&#39;seasoning&#39;,&#39;ngredients&#39;</span><br><span class="line"></span><br><span class="line">查看表的结构describe &#39;t1&#39;</span><br><span class="line">删除表</span><br><span class="line">disable &#39;t1&#39; 之后 drop &#39;t1&#39;</span><br><span class="line">检查表是否存在exists &#39;t1&#39;</span><br><span class="line">获取表中所有数据scan &#39;t1&#39;</span><br><span class="line">-获取表中前10行数据scan &#39;t1&#39;,&#123;LIMIT&#x3D;&gt;10&#125;</span><br><span class="line">获取指定column(ad:pv)的前10行数据scan &#39;t1&#39;,&#123;COLUMNS&#x3D;&gt;[&#39;ad:pv&#39;],LIMIT&#x3D;&gt;10&#125;</span><br><span class="line">加Filter：如过滤rowkey以“2015”开头的前10行数据 scan &#39;t1&#39;,&#123;FILTER&#x3D;&gt;&quot;PrefixFilter(&#39;2015&#39;)&quot;,LIMIT&#x3D;&gt;10&#125;</span><br><span class="line">查询rowkey&#x3D;001下所有的数据get &#39;t1&#39;,&#39;001&#39;</span><br><span class="line">查询rowkey&#x3D;001下family&#x3D;ad,column&#x3D;pvget &#39;t1&#39;,&#39;001&#39;,&#39;ad:pv&#39; 或者 get &#39;t1&#39;,&#39;001&#39;,&#123;COLUMN&#x3D;&gt;&#39;ad:pv&#39;&#125;</span><br><span class="line">添加数据put &lt;table&gt;,&lt;rowkey&gt;,&lt;family:column&gt;,&lt;value&gt;,&lt;timestamp&gt;</span><br><span class="line">例如：向’t1’表中添加rowkey&#x3D;002,family&#x3D;ad,column&#x3D;pv,value&#x3D;1000,时间戳默认</span><br><span class="line">put &#39;t1&#39;,&#39;002&#39;,&#39;ad:pv&#39;,&#39;1000&#39;</span><br><span class="line"></span><br><span class="line">删除rowkey&#x3D;002的所有数据deleteall &#39;t1&#39;,&#39;002&#39;</span><br><span class="line">删除rowkey&#x3D;002中ad:pv数据delete &#39;t1&#39;,&#39;002&#39;,&#39;ad:pv&#39;</span><br><span class="line">清空表truncate &#39;t1&#39;</span><br><span class="line">统计行数count &#39;t1&#39;</span><br><span class="line">查询表t1中的行数，每100条显示一次count &#39;t1&#39;,&#123;INTERVAL&#x3D;&gt;100&#125;</span><br></pre></td></tr></table></figure>
+
+<p>附录：Hbase默认端口</p>
+<p><img src="https://img.huyunshun.com/img/20200423162851.png" alt="20200423162851"></p>
+
+          
+        
+      
+    </div>
+     <!-- 相关文章推荐 -->
+    
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://huyunshun.com/2019/12/23/Hadoop%E5%AE%89%E8%A3%85%E5%92%8C%E9%85%8D%E7%BD%AE/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="初晨">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://img.huyunshun.com/img/20200522182348.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="简">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/12/23/Hadoop%E5%AE%89%E8%A3%85%E5%92%8C%E9%85%8D%E7%BD%AE/" itemprop="url">Hadoop安装和配置及使用介绍</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-12-23T16:23:32+08:00">
+                2019-12-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Hadoop/" itemprop="url" rel="index">
+                    <span itemprop="name">Hadoop</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>由于Hadoop是基于Java开发，所以首选在Linux上安装好Java环境。</p>
+<h4 id="1、Hadoop的下载安装"><a href="#1、Hadoop的下载安装" class="headerlink" title="1、Hadoop的下载安装"></a>1、Hadoop的下载安装</h4><p>下载包到/usr/local</p>
+<p>解压：tar -zxvf /usr/local/hadoop-3.1.2.tar.gz -C /usr/local</p>
+<p>添加环境变量vim /etc/profile</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">export HADOOP_HOME&#x3D;&#x2F;usr&#x2F;local&#x2F;hadoop-3.1.2</span><br><span class="line">export HADOOP_COMMON_LIB_NATIVE_DIR&#x3D;$HADOOP_HOME&#x2F;lib&#x2F;native</span><br><span class="line">export PATH&#x3D;$PATH:$HADOOP_HOME&#x2F;sbin</span><br><span class="line">export PATH&#x3D;$PATH:$HADOOP_HOME&#x2F;bin</span><br></pre></td></tr></table></figure>
+<p>source /etc/profile</p>
+<p>执行测试：hadoop version</p>
+<h4 id="2、目录结构"><a href="#2、目录结构" class="headerlink" title="2、目录结构"></a>2、目录结构</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">bin目录：存放对Hadoop相关服务（HDFS,YARN）进行操作的脚本</span><br><span class="line">etc目录：Hadoop的配置文件目录，存放Hadoop的配置文件</span><br><span class="line">lib目录：存放Hadoop的本地库（对数据进行压缩解压缩功能）</span><br><span class="line">sbin目录：存放启动或停止Hadoop相关服务的脚本</span><br><span class="line">share目录：存放Hadoop的依赖jar包、文档、和官方案例</span><br></pre></td></tr></table></figure>
+
+<p>Hadoop运行模式包括：本地模式、伪分布式模式以及完全分布式模式。</p>
+<h4 id="3、本地运行模式（单机模式）"><a href="#3、本地运行模式（单机模式）" class="headerlink" title="3、本地运行模式（单机模式）"></a>3、本地运行模式（单机模式）</h4><h6 id="3-1、官方Grep案例"><a href="#3-1、官方Grep案例" class="headerlink" title="3.1、官方Grep案例"></a>3.1、官方Grep案例</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">创建在hadoop-2.7.2文件下面创建一个input文件夹</span><br><span class="line">[root@VM_0_3_centos hadoop-3.1.2]# mkdir input</span><br><span class="line">将Hadoop的xml配置文件复制到input</span><br><span class="line">[root@VM_0_3_centos hadoop-3.1.2]# cp etc&#x2F;hadoop&#x2F;*.xml input</span><br><span class="line">执行share目录下的MapReduce程序(统计符合后面正则式的词)</span><br><span class="line">[root@VM_0_3_centos hadoop-3.1.2]# bin&#x2F;hadoop jar share&#x2F;hadoop&#x2F;mapreduce&#x2F;hadoop-mapreduce-examples-3.1.2.jar grep input output &#39;dfs[a-z.]+&#39;</span><br><span class="line">查看输出结果</span><br><span class="line">[root@VM_0_3_centos hadoop-3.1.2]# cat output&#x2F;*</span><br><span class="line">1	dfsadmin</span><br></pre></td></tr></table></figure>
+<h6 id="3-2、官方WordCount案例"><a href="#3-2、官方WordCount案例" class="headerlink" title="3.2、官方WordCount案例 *"></a>3.2、官方WordCount案例 *</h6><p>统计单词数</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">建立输入目录和文件，并且写入测试内容</span><br><span class="line">[root@VM_0_3_centos hadoop-3.1.2]# mkdir wcinput</span><br><span class="line">[root@VM_0_3_centos hadoop-3.1.2]# cd wcinput</span><br><span class="line">[root@VM_0_3_centos wcinput]# vim wc.input</span><br><span class="line">[root@VM_0_3_centos wcinput]# cat wc.input</span><br><span class="line">hadoop yarn</span><br><span class="line">hadoop mapreduce</span><br><span class="line">huyun</span><br><span class="line">huyun</span><br><span class="line"></span><br><span class="line">执行统计程序</span><br><span class="line">[root@VM_0_3_centos hadoop-3.1.2]# hadoop jar share&#x2F;hadoop&#x2F;mapreduce&#x2F;hadoop-mapreduce-examples-3.1.2.jar wordcount wcinput wcoutput</span><br><span class="line">查看结果</span><br><span class="line">[root@VM_0_3_centos hadoop-3.1.2]# cat wcoutput&#x2F;*</span><br><span class="line">hadoop	2</span><br><span class="line">huyun	2</span><br><span class="line">mapreduce	1</span><br><span class="line">yarn	1</span><br></pre></td></tr></table></figure>
+<h4 id="3、伪分布式运行模式"><a href="#3、伪分布式运行模式" class="headerlink" title="3、伪分布式运行模式"></a>3、伪分布式运行模式</h4><h6 id="3-1、启动HDFS并运行MapReduce程序"><a href="#3-1、启动HDFS并运行MapReduce程序" class="headerlink" title="3.1、启动HDFS并运行MapReduce程序"></a>3.1、启动HDFS并运行MapReduce程序</h6><p>** 配置集群 **<br>配置：hadoop-env.sh</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">vim etc&#x2F;hadoop&#x2F;hadoop-env.sh</span><br><span class="line">修改JAVA_HOME 路径：export JAVA_HOME&#x3D;</span><br></pre></td></tr></table></figure>
+<p>配置：core-site.xml</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">[root@VM_0_3_centos hadoop-3.1.2]# vim etc&#x2F;hadoop&#x2F;core-site.xml</span><br><span class="line"></span><br><span class="line">&lt;configuration&gt;</span><br><span class="line">    &lt;!-- 指定HDFS中NameNode的地址 --&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;fs.defaultFS&lt;&#x2F;name&gt;</span><br><span class="line">        &lt;value&gt;hdfs:&#x2F;&#x2F;localhost:9000&lt;&#x2F;value&gt;</span><br><span class="line">    &lt;&#x2F;property&gt;</span><br><span class="line"></span><br><span class="line">    &lt;!-- 指定Hadoop运行时产生文件的存储目录 --&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;hadoop.tmp.dir&lt;&#x2F;name&gt;</span><br><span class="line">        &lt;value&gt;&#x2F;usr&#x2F;local&#x2F;hadoop-3.1.2&#x2F;data&#x2F;tmp&lt;&#x2F;value&gt;</span><br><span class="line">    &lt;&#x2F;property&gt;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&lt;&#x2F;configuration&gt;</span><br></pre></td></tr></table></figure>
+<p>HDFS core-site.xml 参数配置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">– fs.default.name</span><br><span class="line">– 文件系统的名字。通常是NameNode的hostname与port</span><br><span class="line">– 需要在每一个需要访问集群的机器上指定，包括集群中的节点 </span><br><span class="line">– 例如：hdfs:&#x2F;&#x2F;&lt;your_namenode&gt;:9000&#x2F;</span><br><span class="line"></span><br><span class="line">– fs.checkpoint.dir</span><br><span class="line">– 以逗号分隔的文件夹列表，SecondNameNode用来存储checkpoint image文件 </span><br><span class="line">– 如果多于一个文件夹，那么都会被写入数据 </span><br><span class="line">– 需要在SecondNameNode上设定</span><br><span class="line">– 默认值：$&#123;hadoop.tmp.dir&#125;&#x2F;dfs&#x2F;namesecondary</span><br><span class="line"></span><br><span class="line">– hadoop.tmp.dir</span><br><span class="line">– HDFS与本地磁盘的临时文件 </span><br><span class="line">默认是&#x2F;tmp&#x2F;hadoop-$&#123;user.name&#125;.需要在所有的节点中设定</span><br><span class="line"></span><br><span class="line">– fs.trash.interval</span><br><span class="line">– 当一个文件被删掉后，它会被放到用户目录的.Trash目录下，而不是立即删掉 </span><br><span class="line">– 经过此参数设置的分钟数之后，再删掉数据 </span><br><span class="line">– 默认是0，禁用此功能，建议1440（一天）</span><br><span class="line"></span><br><span class="line">– io.file.buffer.size</span><br><span class="line">– 设定在读写数据时的缓存大小，应该为硬件分页大小的2倍 </span><br><span class="line">– 默认是4096，建议为65536 （ 64K） </span><br><span class="line"></span><br><span class="line">– hadoop.logfile.size</span><br><span class="line">– hadoop.logfile.count</span><br><span class="line">– 设置log文件的大小和数量</span><br></pre></td></tr></table></figure>
+<p>配置：hdfs-site.xml</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">vim etc&#x2F;hadoop&#x2F;hdfs-site.xml</span><br><span class="line"></span><br><span class="line">&lt;!-- 指定HDFS副本的数量 --&gt;</span><br><span class="line">&lt;property&gt;</span><br><span class="line">	&lt;name&gt;dfs.replication&lt;&#x2F;name&gt;</span><br><span class="line">	&lt;value&gt;1&lt;&#x2F;value&gt;</span><br><span class="line">&lt;&#x2F;property&gt;</span><br></pre></td></tr></table></figure>
+<p>HDFS  hdfs-site.xml 参数配置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line">– dfs.name.dir</span><br><span class="line">– NameNode 元数据存放位置</span><br><span class="line">– 默认值：使用core-site.xml中的hadoop.tmp.dir&#x2F;dfs&#x2F;name</span><br><span class="line"></span><br><span class="line">– dfs.block.size</span><br><span class="line">– 对于新文件切分的大小，单位byte。默认是64M,建议是128M。每一个节点都要指定，包括客户端。</span><br><span class="line">– 默认值：67108864</span><br><span class="line"></span><br><span class="line">– dfs.data.dir</span><br><span class="line">– DataNode在本地磁盘存放block的位置，可以是以逗号分隔的目录列表，DataNode循环向磁盘中写入数据，每个DataNode可单独指定与其它DataNode不一样</span><br><span class="line">– 默认值：$&#123;hadoop.tmp.dir&#125;&#x2F;dfs&#x2F;data</span><br><span class="line"></span><br><span class="line">– dfs.namenode.handler.count</span><br><span class="line">– NameNode用来处理来自DataNode的RPC请求的线程数量 </span><br><span class="line">– 建议设置为DataNode数量的10%，一般在10~200个之间 </span><br><span class="line">– 如设置太小，DataNode在传输数据的时候日志中会报告“connecton refused&quot;信息 </span><br><span class="line">– 在NameNode上设定</span><br><span class="line">– 默认值：10</span><br><span class="line"></span><br><span class="line">– dfs.datanode.handler.count</span><br><span class="line">– DataNode用来连接NameNode的RPC请求的线程数量</span><br><span class="line">– 取决于系统的繁忙程度 </span><br><span class="line">– 设置太小会导致性能下降甚至报错</span><br><span class="line">– 在DataNode上设定</span><br><span class="line">– 默认值：3</span><br><span class="line"></span><br><span class="line">– dfs.datanode.max.xcievers</span><br><span class="line">– DataNode可以同时处理的数据传输连接数 </span><br><span class="line">– 默认值：256</span><br><span class="line">– 建议值：4096</span><br><span class="line"></span><br><span class="line">– dfs.permissions</span><br><span class="line">– 如果是true则检查权限，否则不检查（每一个人都可以存取文件） </span><br><span class="line">– 于NameNode上设定</span><br><span class="line">– 默认值：true</span><br><span class="line"></span><br><span class="line">– dfs.datanode.du.reserved</span><br><span class="line">– 在每个卷上面HDFS不能使用的空间大小 </span><br><span class="line">– 在每个DataNode上面设定</span><br><span class="line">– 默认值：0</span><br><span class="line">– 建议为10737418240，即10G。需要结合MapReduce场景设置。 </span><br><span class="line"></span><br><span class="line">– dfs.datanode.failed.volumes.tolerated</span><br><span class="line">– DataNode可以容忍损块的磁盘数量，超过这个数量DataNode将会离线，所有在这个节点上面的block将会被重新复制 </span><br><span class="line">– 默认是0，但是在有多块磁盘的时候一般会增大这个值</span><br><span class="line"></span><br><span class="line">– dfs.replication</span><br><span class="line">– 在文件被写入的时候，每一块将要被复制多少份 </span><br><span class="line">– 默认是3份。建议3份 </span><br><span class="line">– 在客户端上设定 </span><br><span class="line"></span><br><span class="line">通常也需要在DataNode上设定</span><br></pre></td></tr></table></figure>
+<p>** 启动集群 **</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">格式化NameNode（第一次启动时格式化）</span><br><span class="line">注意：格式化NameNode，会产生新的集群id,导致NameNode和DataNode的集群id不一致，集群找不到已往数据。所以，格式NameNode时，一定要先删除data数据和log日志，然后再格式化NameNode。</span><br><span class="line">[root@VM_0_3_centos hadoop-3.1.2]# bin&#x2F;hdfs namenode -format</span><br><span class="line"></span><br><span class="line">启动NameNode</span><br><span class="line">[root@VM_0_3_centos hadoop-3.1.2]# sbin&#x2F;hadoop-daemon.sh start namenode</span><br><span class="line">WARNING: Use of this script to start HDFS daemons is deprecated.</span><br><span class="line">WARNING: Attempting to execute replacement &quot;hdfs --daemon start&quot; instead.</span><br><span class="line"></span><br><span class="line">启动DataNode</span><br><span class="line">[atguigu@hadoop101 hadoop-2.7.2]$ sbin&#x2F;hadoop-daemon.sh start datanode</span><br><span class="line"></span><br><span class="line">查看java进程</span><br><span class="line">[root@VM_0_3_centos hadoop-3.1.2]# jps</span><br><span class="line">10678 Jps</span><br><span class="line">10599 DataNode</span><br><span class="line">10044 NameNode</span><br><span class="line"></span><br><span class="line">新版本可以用 sbin&#x2F;start-dfs.sh启动，但是报错，</span><br><span class="line">    Starting namenodes on [localhost]</span><br><span class="line">    ERROR: Attempting to operate on hdfs namenode as root</span><br><span class="line">解决方式：</span><br><span class="line">        $ vim sbin&#x2F;start-dfs.sh</span><br><span class="line">        $ vim sbin&#x2F;stop-dfs.sh</span><br><span class="line">    最前面增加以下内容</span><br><span class="line">        HDFS_DATANODE_USER&#x3D;root</span><br><span class="line">        HADOOP_SECURE_DN_USER&#x3D;hdfs</span><br><span class="line">        HDFS_NAMENODE_USER&#x3D;root</span><br><span class="line">        HDFS_SECONDARYNAMENODE_USER&#x3D;root</span><br><span class="line"></span><br><span class="line">        $ vim sbin&#x2F;start-yarn.sh</span><br><span class="line">        $ vim sbin&#x2F;stop-yarn.sh</span><br><span class="line">    最前面增加以下内容</span><br><span class="line">        YARN_RESOURCEMANAGER_USER&#x3D;root</span><br><span class="line">        HADOOP_SECURE_DN_USER&#x3D;yarn</span><br><span class="line">        YARN_NODEMANAGER_USER&#x3D;root</span><br></pre></td></tr></table></figure>
+<p>web端查看HDFS文件系统：<a href="http://152.*****:9870/dfshealth.html#tab-overview" target="_blank" rel="noopener">http://152.*****:9870/dfshealth.html#tab-overview</a>  老版本端口是50070</p>
+<p>查看Log日志  /usr/local/hadoop-3.1.2/logs</p>
+<p>** 操作集群 **<br>在HDFS文件系统上创建一个input文件夹</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@VM_0_3_centos hadoop-3.1.2]# bin&#x2F;hdfs dfs -mkdir -p &#x2F;user&#x2F;root&#x2F;input</span><br><span class="line">2020-01-17 17:29:48,425 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable</span><br></pre></td></tr></table></figure>
+<p>将测试文件内容上传到文件系统上</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@VM_0_3_centos hadoop-3.1.2]# bin&#x2F;hdfs dfs -put wcinput&#x2F;wc.input &#x2F;user&#x2F;root&#x2F;input&#x2F;</span><br><span class="line">2020-01-17 17:31:20,430 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable</span><br></pre></td></tr></table></figure>
+<p>查看上传的文件是否正确</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@VM_0_3_centos hadoop-3.1.2]# bin&#x2F;hdfs dfs -ls  &#x2F;user&#x2F;root&#x2F;input&#x2F;</span><br><span class="line">2020-01-17 17:32:25,279 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable</span><br><span class="line">Found 1 items</span><br><span class="line">-rw-r--r--   1 root supergroup         43 2020-01-17 17:31 &#x2F;user&#x2F;root&#x2F;input&#x2F;wc.input</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[root@VM_0_3_centos hadoop-3.1.2]# bin&#x2F;hdfs dfs -cat  &#x2F;user&#x2F;root&#x2F; input&#x2F;wc.input</span><br><span class="line">2020-01-17 17:32:37,910 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable</span><br><span class="line">cat: &#96;&#x2F;user&#x2F;root&#39;: Is a directory</span><br><span class="line">hadoop yarn</span><br><span class="line">hadoop mapreduce</span><br><span class="line">huyun</span><br><span class="line">huyun</span><br></pre></td></tr></table></figure>
+<p>运行MapReduce程序</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@VM_0_3_centos hadoop-3.1.2]# bin&#x2F;hadoop jar share&#x2F;hadoop&#x2F;mapreduce&#x2F;hadoop-mapreduce-examples-3.1.2.jar wordcount &#x2F;user&#x2F;root&#x2F;input&#x2F; &#x2F;user&#x2F;root&#x2F;output</span><br></pre></td></tr></table></figure>
+<p>查看输出结果</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root@VM_0_3_centos hadoop-3.1.2]# bin&#x2F;hdfs dfs -cat &#x2F;user&#x2F;root&#x2F;output&#x2F;*</span><br><span class="line">2020-01-17 17:34:03,420 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable</span><br><span class="line">hadoop	2</span><br><span class="line">huyun	2</span><br><span class="line">mapreduce	1</span><br><span class="line">yarn	1</span><br></pre></td></tr></table></figure>
+<p>将测试文件内容下载到本地</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@VM_0_3_centos hadoop-3.1.2]# hdfs dfs -get &#x2F;user&#x2F;root&#x2F;output&#x2F;* .&#x2F;wcoutput&#x2F;</span><br><span class="line">2020-01-17 17:36:40,621 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable</span><br><span class="line">get: &#96;.&#x2F;wcoutput&#x2F;_SUCCESS&#39;: File exists</span><br><span class="line">get: &#96;.&#x2F;wcoutput&#x2F;part-r-00000&#39;: File exists</span><br></pre></td></tr></table></figure>
+<p>本地文件存在，先删除在下载</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@VM_0_3_centos hadoop-3.1.2]# rm -rf .&#x2F;wcoutput&#x2F;*</span><br><span class="line">[root@VM_0_3_centos hadoop-3.1.2]# hdfs dfs -get &#x2F;user&#x2F;root&#x2F;output&#x2F;* .&#x2F;wcoutput&#x2F;</span><br><span class="line">2020-01-17 17:37:20,030 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable</span><br></pre></td></tr></table></figure>
+<p>查看本地结果</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@VM_0_3_centos hadoop-3.1.2]# cat .&#x2F;wcoutput&#x2F;*</span><br><span class="line">hadoop	2</span><br><span class="line">huyun	2</span><br><span class="line">mapreduce	1</span><br><span class="line">yarn	1</span><br></pre></td></tr></table></figure>
+<p>删除输出结果</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hdfs dfs -rm -r &#x2F;user&#x2F;root&#x2F;output</span><br></pre></td></tr></table></figure>
+<h6 id="3-2、启动YARN并运行MapReduce程序"><a href="#3-2、启动YARN并运行MapReduce程序" class="headerlink" title="3.2、启动YARN并运行MapReduce程序"></a>3.2、启动YARN并运行MapReduce程序</h6><p><strong>配置集群</strong><br>配置环境</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@VM_0_3_centos hadoop-3.1.2]# vim etc&#x2F;hadoop&#x2F;yarn-env.sh </span><br><span class="line">[root@VM_0_3_centos hadoop]# vim mapred-env.sh </span><br><span class="line"></span><br><span class="line">export JAVA_HOME&#x3D;&#x2F;usr&#x2F;local&#x2F;java8&#x2F;jdk1.8.0_144</span><br></pre></td></tr></table></figure>
+
+<p>配置yarn-site.xml</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- Reducer获取数据的方式 --&gt;</span><br><span class="line">&lt;property&gt;</span><br><span class="line"> 	&lt;name&gt;yarn.nodemanager.aux-services&lt;&#x2F;name&gt;</span><br><span class="line"> 	&lt;value&gt;mapreduce_shuffle&lt;&#x2F;value&gt;</span><br><span class="line">&lt;&#x2F;property&gt;</span><br><span class="line"></span><br><span class="line">&lt;!-- 指定YARN的ResourceManager的地址 --&gt;</span><br><span class="line">&lt;property&gt;</span><br><span class="line">	&lt;name&gt;yarn.resourcemanager.hostname&lt;&#x2F;name&gt;</span><br><span class="line">	&lt;value&gt;VM_0_3_centos&lt;&#x2F;value&gt;</span><br><span class="line">&lt;&#x2F;property&gt;</span><br></pre></td></tr></table></figure>
+<p>配置：mapred-site.xml</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">[root@VM_0_3_centos hadoop]# vim mapred-site.xml </span><br><span class="line"></span><br><span class="line">&lt;!-- 指定MR运行在YARN上 --&gt;</span><br><span class="line">&lt;property&gt;</span><br><span class="line">		&lt;name&gt;mapreduce.framework.name&lt;&#x2F;name&gt;</span><br><span class="line">		&lt;value&gt;yarn&lt;&#x2F;value&gt;</span><br><span class="line">&lt;&#x2F;property&gt;</span><br><span class="line">&lt;property&gt;</span><br><span class="line">&lt;name&gt;yarn.app.mapreduce.am.env&lt;&#x2F;name&gt;</span><br><span class="line">&lt;value&gt;HADOOP_MAPRED_HOME&#x3D;&#x2F;usr&#x2F;local&#x2F;hadoop-3.1.2&lt;&#x2F;value&gt;</span><br><span class="line">&lt;&#x2F;property&gt;</span><br><span class="line">&lt;property&gt;</span><br><span class="line">&lt;name&gt;mapreduce.map.env&lt;&#x2F;name&gt;</span><br><span class="line">&lt;value&gt;HADOOP_MAPRED_HOME&#x3D;&#x2F;usr&#x2F;local&#x2F;hadoop-3.1.2&lt;&#x2F;value&gt;</span><br><span class="line">&lt;&#x2F;property&gt;</span><br><span class="line">&lt;property&gt;</span><br><span class="line">&lt;name&gt;mapreduce.reduce.env&lt;&#x2F;name&gt;</span><br><span class="line">&lt;value&gt;HADOOP_MAPRED_HOME&#x3D;&#x2F;usr&#x2F;local&#x2F;hadoop-3.1.2&lt;&#x2F;value&gt;</span><br><span class="line">&lt;&#x2F;property&gt;</span><br><span class="line"></span><br><span class="line">&lt;property&gt; </span><br><span class="line">    &lt;name&gt;mapreduce.application.classpath&lt;&#x2F;name&gt;</span><br><span class="line">    &lt;value&gt;&#x2F;usr&#x2F;local&#x2F;hadoop-3.1.2&#x2F;share&#x2F;hadoop&#x2F;mapreduce&#x2F;*,&#x2F;usr&#x2F;local&#x2F;hadoop-3.1.2&#x2F;share&#x2F;hadoop&#x2F;mapreduce&#x2F;lib&#x2F;*&lt;&#x2F;value&gt;</span><br><span class="line">&lt;&#x2F;property&gt;</span><br></pre></td></tr></table></figure>
+
+<p><strong>启动集群</strong><br>启动前必须保证NameNode和DataNode已经启动</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">[root@VM_0_3_centos hadoop-3.1.2]# sbin&#x2F;yarn-daemon.sh start resourcemanager</span><br><span class="line">WARNING: Use of this script to start YARN daemons is deprecated.</span><br><span class="line">WARNING: Attempting to execute replacement &quot;yarn --daemon start&quot; instead.</span><br><span class="line"></span><br><span class="line">[root@VM_0_3_centos hadoop-3.1.2]# sbin&#x2F;yarn-daemon.sh start nodemanager</span><br><span class="line">WARNING: Use of this script to start YARN daemons is deprecated.</span><br><span class="line">WARNING: Attempting to execute replacement &quot;yarn --daemon start&quot; instead.</span><br><span class="line"></span><br><span class="line">[root@VM_0_3_centos hadoop-3.1.2]# jps</span><br><span class="line">21680 DataNode</span><br><span class="line">13315 ResourceManager</span><br><span class="line">13831 Jps</span><br><span class="line">13706 NodeManager</span><br><span class="line">21482 NameNode</span><br></pre></td></tr></table></figure>
+<p><strong>集群操作</strong><br>YARN的浏览器查看：<a href="http://152.....56:8088/cluster" target="_blank" rel="noopener">http://152.....56:8088/cluster</a></p>
+<p><img src="https://img.huyunshun.com/img/20200423162313.png" alt="20200423162313"></p>
+<p>删除文件系统上的output文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@VM_0_3_centos hadoop-3.1.2]# bin&#x2F;hdfs dfs -rm -R &#x2F;user&#x2F;root&#x2F;output</span><br></pre></td></tr></table></figure>
+<p>执行MapReduce程序</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bin&#x2F;hadoop jar share&#x2F;hadoop&#x2F;mapreduce&#x2F;hadoop-mapreduce-examples-3.1.2.jar wordcount &#x2F;user&#x2F;root&#x2F;input&#x2F; &#x2F;user&#x2F;root&#x2F;output</span><br></pre></td></tr></table></figure>
+<p>查看运行结果可以通过浏览器查看。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h6 id="3-3、配置历史服务器"><a href="#3-3、配置历史服务器" class="headerlink" title="3.3、配置历史服务器"></a>3.3、配置历史服务器</h6><p>为了查看程序的历史运行情况，需要配置一下历史服务器。</p>
+<p><strong>配置mapred-site.xml</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">vim mapred-site.xml</span><br><span class="line"></span><br><span class="line">&lt;!-- 历史服务器端地址 --&gt;</span><br><span class="line">&lt;property&gt;</span><br><span class="line">&lt;name&gt;mapreduce.jobhistory.address&lt;&#x2F;name&gt;</span><br><span class="line">&lt;value&gt;VM_0_3_centos:10020&lt;&#x2F;value&gt;</span><br><span class="line">&lt;&#x2F;property&gt;</span><br><span class="line">&lt;!-- 历史服务器web端地址 --&gt;</span><br><span class="line">&lt;property&gt;</span><br><span class="line">    &lt;name&gt;mapreduce.jobhistory.webapp.address&lt;&#x2F;name&gt;</span><br><span class="line">    &lt;value&gt;VM_0_3_centos:19888&lt;&#x2F;value&gt;</span><br><span class="line">&lt;&#x2F;property&gt;</span><br></pre></td></tr></table></figure>
+<p><strong>启动历史服务器</strong></p>
+<p>sbin/mr-jobhistory-daemon.sh start historyserver</p>
+<p><strong>查看JobHistory</strong></p>
+<p><a href="http://IP:19888/jobhistory" target="_blank" rel="noopener">http://IP:19888/jobhistory</a></p>
+<h6 id="3-4、配置日志的聚集"><a href="#3-4、配置日志的聚集" class="headerlink" title="3.4、配置日志的聚集"></a>3.4、配置日志的聚集</h6><p>应用运行完成以后，将程序运行日志信息上传到HDFS系统上。方便的查看到程序运行详情，方便开发调试。</p>
+<p>注意：开启日志聚集功能，需要重新启动NodeManager 、ResourceManager和HistoryManager。</p>
+<p><strong>配置yarn-site.xml</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">[atguigu@hadoop101 hadoop]$ vi yarn-site.xml</span><br><span class="line"></span><br><span class="line">&lt;!-- 日志聚集功能使能 --&gt;</span><br><span class="line">&lt;property&gt;</span><br><span class="line">&lt;name&gt;yarn.log-aggregation-enable&lt;&#x2F;name&gt;</span><br><span class="line">&lt;value&gt;true&lt;&#x2F;value&gt;</span><br><span class="line">&lt;&#x2F;property&gt;</span><br><span class="line"></span><br><span class="line">&lt;!-- 日志保留时间设置7天 --&gt;</span><br><span class="line">&lt;property&gt;</span><br><span class="line">&lt;name&gt;yarn.log-aggregation.retain-seconds&lt;&#x2F;name&gt;</span><br><span class="line">&lt;value&gt;604800&lt;&#x2F;value&gt;</span><br><span class="line">&lt;&#x2F;property&gt;</span><br></pre></td></tr></table></figure>
+<p><strong>重启NodeManager 、ResourceManager和HistoryManager</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[root@VM_0_3_centos hadoop-3.1.2]# sbin&#x2F;yarn-daemon.sh stop resourcemanager</span><br><span class="line">[root@VM_0_3_centos hadoop-3.1.2]# sbin&#x2F;yarn-daemon.sh stop nodemanager</span><br><span class="line">[root@VM_0_3_centos hadoop-3.1.2]# sbin&#x2F;mr-jobhistory-daemon.sh stop historyserver</span><br><span class="line"></span><br><span class="line">[root@VM_0_3_centos hadoop-3.1.2]# sbin&#x2F;yarn-daemon.sh start resourcemanager</span><br><span class="line">[root@VM_0_3_centos hadoop-3.1.2]# sbin&#x2F;yarn-daemon.sh start nodemanager</span><br><span class="line">[root@VM_0_3_centos hadoop-3.1.2]# sbin&#x2F;mr-jobhistory-daemon.sh start historyserver</span><br></pre></td></tr></table></figure>
+<p><strong>删除HDFS上已经存在的输出文件</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@VM_0_3_centos hadoop-3.1.2]# bin&#x2F;hdfs dfs -rm -R &#x2F;user&#x2F;root&#x2F;output</span><br></pre></td></tr></table></figure>
+<p><strong>执行WordCount程序</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@VM_0_3_centos hadoop-3.1.2]# hadoop jar share&#x2F;hadoop&#x2F;mapreduce&#x2F;hadoop-mapreduce-examples-3.1.2.jar wordcount &#x2F;user&#x2F;root&#x2F;input &#x2F;user&#x2F;root&#x2F;output</span><br></pre></td></tr></table></figure>
+<p><strong>查看日志</strong></p>
+<p><a href="http://IP:19888/jobhistory" target="_blank" rel="noopener">http://IP:19888/jobhistory</a></p>
+<h6 id="3-5、配置文件说明"><a href="#3-5、配置文件说明" class="headerlink" title="3.5、配置文件说明"></a>3.5、配置文件说明</h6><p>Hadoop配置文件分两类：默认配置文件和自定义配置文件，只有用户想修改某一默认配置值时，才需要修改自定义配置文件，更改相应属性值。</p>
+<p>默认配置文件：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">默认文件	                      在Hadoop的jar包中的位置</span><br><span class="line">[core-default.xml]	hadoop-common-2.7.2.jar&#x2F; core-default.xml</span><br><span class="line">[hdfs-default.xml]	hadoop-hdfs-2.7.2.jar&#x2F; hdfs-default.xml</span><br><span class="line">[yarn-default.xml]	hadoop-yarn-common-2.7.2.jar&#x2F; yarn-default.xml</span><br><span class="line">[mapred-default.xml]	hadoop-mapreduce-client-core-2.7.2.jar&#x2F; mapred-default.xml</span><br></pre></td></tr></table></figure>
+<p>自定义配置文件：core-site.xml、hdfs-site.xml、yarn-site.xml、mapred-site.xml</p>
+<h4 id="4、完全分布式运行模式"><a href="#4、完全分布式运行模式" class="headerlink" title="4、完全分布式运行模式"></a>4、完全分布式运行模式</h4>
+          
+        
+      
+    </div>
+     <!-- 相关文章推荐 -->
+    
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://huyunshun.com/2019/12/23/centos%20%E8%AE%BE%E7%BD%AEsystemctl%E8%87%AA%E5%90%AF%E6%9C%8D%E5%8A%A1%E6%96%87%E4%BB%B6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="初晨">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://img.huyunshun.com/img/20200522182348.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="简">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/12/23/centos%20%E8%AE%BE%E7%BD%AEsystemctl%E8%87%AA%E5%90%AF%E6%9C%8D%E5%8A%A1%E6%96%87%E4%BB%B6/" itemprop="url">centos 设置systemctl自启服务文件</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-12-23T16:14:52+08:00">
+                2019-12-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/linux/" itemprop="url" rel="index">
+                    <span itemprop="name">linux</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="方式一"><a href="#方式一" class="headerlink" title="方式一"></a>方式一</h1><h2 id="建立服务文件"><a href="#建立服务文件" class="headerlink" title="建立服务文件"></a>建立服务文件</h2><p>vim /usr/lib/systemd/system/mongodb.service</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">[Unit] </span><br><span class="line">   </span><br><span class="line">Description&#x3D;mongodb  </span><br><span class="line">After&#x3D;network.target remote-fs.target nss-lookup.target </span><br><span class="line">   </span><br><span class="line">[Service] </span><br><span class="line">Type&#x3D;forking </span><br><span class="line">ExecStart&#x3D;&#x2F;usr&#x2F;local&#x2F;mongodb&#x2F;bin&#x2F;mongod -config &#x2F;usr&#x2F;local&#x2F;mongodb&#x2F;bin&#x2F;mongodb.conf</span><br><span class="line">ExecReload&#x3D;&#x2F;bin&#x2F;kill -s HUP $MAINPID </span><br><span class="line">ExecStop&#x3D;&#x2F;usr&#x2F;local&#x2F;mongodb&#x2F;bin&#x2F;mongod --shutdown -config &#x2F;usr&#x2F;local&#x2F;mongodb&#x2F;bin&#x2F;mongodb.conf </span><br><span class="line">PrivateTmp&#x3D;true </span><br><span class="line">     </span><br><span class="line">[Install] </span><br><span class="line">WantedBy&#x3D;multi-user.target</span><br></pre></td></tr></table></figure>
+
+<p>文件内容解释</p>
+<p>Description:描述服务</p>
+<p>After:描述服务类别</p>
+<p>[Service]服务运行参数的设置</p>
+<p>Type=forking是后台运行的形式</p>
+<p>ExecStart为服务的具体运行命令</p>
+<p>ExecReload为重启命令</p>
+<p>ExecStop为停止命令</p>
+<p>PrivateTmp=True表示给服务分配独立的临时空间</p>
+<p>注意：启动、重启、停止命令全部要求使用绝对路径</p>
+<p>[Install]服务安装的相关设置，可设置为多用户</p>
+<h2 id="设置开机自启动"><a href="#设置开机自启动" class="headerlink" title="设置开机自启动"></a>设置开机自启动</h2><p>任意目录下执行</p>
+<p>systemctl enable xxx.service </p>
+<h2 id="其他命令"><a href="#其他命令" class="headerlink" title="其他命令"></a>其他命令</h2><p>启动服务</p>
+<p>systemctl start xxxx.service</p>
+<p>设置开机自启动</p>
+<p>systemctl enable xxxx.service</p>
+<p>停止开机自启动</p>
+<p>systemctl disable xxxx.service</p>
+<p>查看服务当前状态</p>
+<p>systemctl status xxx.service</p>
+<p>重新启动服务</p>
+<p>systemctl restart xxx.service</p>
+<p>查看所有已启动的服务</p>
+<p>systemctl list-units –type=service</p>
+<h2 id="CentOS7-0中systemctl启动关闭服务的用法"><a href="#CentOS7-0中systemctl启动关闭服务的用法" class="headerlink" title="CentOS7.0中systemctl启动关闭服务的用法"></a>CentOS7.0中systemctl启动关闭服务的用法</h2><p>systemctl是主要的工具，它融合之前service和chkconfig的功能于一体。可以使用它永久性或只在当前会话中启用/禁用服务。<br>systemctl可以列出正在运行的服务状态<br>systemd-cgls以树形列出正在运行的进程，它可以递归显示控制组内容。    </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">启动&#x2F;关闭、启用&#x2F;禁用服务：</span><br><span class="line">启动一个服务：systemctl start postfix.service</span><br><span class="line">关闭一个服务：systemctl stop postfix.service</span><br><span class="line">重启一个服务：systemctl restart postfix.service</span><br><span class="line">显示一个服务的状态：systemctl status postfix.service</span><br><span class="line"></span><br><span class="line">在开机时启用一个服务：systemctl enable postfix.service</span><br><span class="line">在开机时禁用一个服务：systemctl disable postfix.service</span><br><span class="line">查看服务是否开机启动：systemctl is-enabled postfix.service;echo $?</span><br><span class="line"></span><br><span class="line">查看已启动的服务列表：systemctl list-unit-files|grep enabled</span><br></pre></td></tr></table></figure>
+<p>说明：启用服务就是在当前“runlevel”的配置文件目录/etc/systemd/system/multi-user.target.wants/里，建立/usr/lib/systemd/system里面对应服务配置文件的软链接；禁用服务就是删除此软链接</p>
+<h1 id="方式二"><a href="#方式二" class="headerlink" title="方式二"></a>方式二</h1><p>先在/etc/rc.d/init.d下新建文件 mongod</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">#!&#x2F;bin&#x2F;sh</span><br><span class="line">#</span><br><span class="line">#chkconfig: 2345 80 90</span><br><span class="line">#description: mongodb</span><br><span class="line"></span><br><span class="line">if test -f &#x2F;sys&#x2F;kernel&#x2F;mm&#x2F;transparent_hugepage&#x2F;enabled; then</span><br><span class="line">   echo never &gt; &#x2F;sys&#x2F;kernel&#x2F;mm&#x2F;transparent_hugepage&#x2F;enabled</span><br><span class="line">fi</span><br><span class="line">if test -f &#x2F;sys&#x2F;kernel&#x2F;mm&#x2F;transparent_hugepage&#x2F;defrag; then</span><br><span class="line">   echo never &gt; &#x2F;sys&#x2F;kernel&#x2F;mm&#x2F;transparent_hugepage&#x2F;defrag</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line">start() &#123;</span><br><span class="line">&#x2F;usr&#x2F;local&#x2F;mongodb&#x2F;bin&#x2F;mongod -config &#x2F;usr&#x2F;local&#x2F;mongodb&#x2F;bin&#x2F;mongodb.conf</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">stop() &#123;</span><br><span class="line">&#x2F;usr&#x2F;local&#x2F;mongodb&#x2F;bin&#x2F;mongod -config &#x2F;usr&#x2F;local&#x2F;mongodb&#x2F;bin&#x2F;mongodb.conf --shutdown</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">case &quot;$1&quot; in</span><br><span class="line">  start)</span><br><span class="line">    start</span><br><span class="line">    ;;</span><br><span class="line">  stop)</span><br><span class="line">    stop</span><br><span class="line">    ;;</span><br><span class="line">  restart)</span><br><span class="line">    stop</span><br><span class="line">    start</span><br><span class="line">    ;;</span><br><span class="line">  *)</span><br><span class="line"> echo $&quot;Usage: $0 &#123;start|stop|restart&#125;&quot;</span><br><span class="line"> exit 1</span><br><span class="line">esac</span><br></pre></td></tr></table></figure>
+<p>授权 等操作：</p>
+<p>chmod +x /etc/rc.d/init.d/mongod</p>
+<p>chkconfig –add mongod</p>
+<p>chkconfig –level 345 mongod on</p>
+<p>chkconfig –list mongod</p>
+<p>service mongod start</p>
+<p>之后就可以开始使用service mongod start|stop|restart 管理mongodb服务了。</p>
+
+          
+        
+      
+    </div>
+     <!-- 相关文章推荐 -->
+    
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://huyunshun.com/2019/12/23/Hexo%E6%90%AD%E5%BB%BA/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="初晨">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://img.huyunshun.com/img/20200522182348.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="简">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/12/23/Hexo%E6%90%AD%E5%BB%BA/" itemprop="url">Hexo搭建</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-12-23T14:42:54+08:00">
+                2019-12-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/hexo/" itemprop="url" rel="index">
+                    <span itemprop="name">hexo</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>Hexo搭建</p>
+<p>解决重定向问题：<br>npm i hexo-generator-cname –save</p>
+<p>NodeJS内存不足 node –max-old-space-size=8192 –optimize-for-size –max-executable-size=8192 –max_old_space_size=8192 –optimize_for_size –max_executable_size=8192 node_modules/karma/bin/karma start –single-run –max_new_space_size=8192 –prod –aot</p>
+
+          
+        
+      
+    </div>
+     <!-- 相关文章推荐 -->
+    
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://huyunshun.com/2019/09/02/Redis%20%E7%AE%A1%E9%81%93%E6%8A%80%E6%9C%AF/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="初晨">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://img.huyunshun.com/img/20200522182348.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="简">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/09/02/Redis%20%E7%AE%A1%E9%81%93%E6%8A%80%E6%9C%AF/" itemprop="url">Redis 管道技术</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-09-02T16:11:59+08:00">
+                2019-09-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/redis/" itemprop="url" rel="index">
+                    <span itemprop="name">redis</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h5 id="管道"><a href="#管道" class="headerlink" title="管道"></a>管道</h5><p>Redis是一种基于客户端-服务端模型以及请求/响应协议的TCP服务。这意味着通常情况下一个请求会遵循以下步骤：</p>
+<ul>
+<li>客户端向服务端发送一个查询请求，并监听Socket返回，通常是以阻塞模式，等待服务端响应。</li>
+<li>服务端处理命令，并将结果返回给客户端。</li>
+</ul>
+<p>Redis 管道技术可以在服务端未响应时，客户端可以继续向服务端发送请求，并最终一次性读取所有服务端的响应。</p>
+<p>管道技术最显著的优势是提高了 redis 服务的性能。</p>
+<p>pipeline的思想</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">如果client执行一些相互之间无关的命令或者不需要获取命令的返回值，那么redis允许你连续发送多条命令，而不需要等待前面命令执行完毕。</span><br><span class="line">比如我们执行3条INCR命令，如果使用管道，理论上只需要一个RTT+3条命令的执行时间即可，如果不适用管道，那么可能需要额外的两个RTT时间。</span><br><span class="line">管道相当于批处理脚本，相当于是命令集。</span><br></pre></td></tr></table></figure>
+
+
+<p>Redis的管道可以在大量数据需要一次性操作完成的时候，使用Pipeline进行批处理，将一大队的操作合并成一次操作，可以减少链路层的时间消耗。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Pipeline pipe = jedis.pipelined(); <span class="comment">// 先创建一个pipeline的链接对象</span></span><br><span class="line"><span class="keyword">long</span> start_pipe = System.currentTimeMillis();</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10000</span>; i++) &#123;</span><br><span class="line">	pipe.set(String.valueOf(i), String.valueOf(i));</span><br><span class="line">&#125;</span><br><span class="line">pipe.sync(); <span class="comment">// 获取所有的response</span></span><br><span class="line"><span class="keyword">long</span> end_pipe = System.currentTimeMillis();</span><br><span class="line">logger.info(<span class="string">"the pipe total time is:"</span> + (end_pipe - start_pipe));</span><br></pre></td></tr></table></figure>
+
+<h5 id="SCAN、SSCAN、HSCAN、ZSCAN"><a href="#SCAN、SSCAN、HSCAN、ZSCAN" class="headerlink" title="SCAN、SSCAN、HSCAN、ZSCAN"></a>SCAN、SSCAN、HSCAN、ZSCAN</h5><p>SCAN、SSCAN、HSCAN、ZSCAN 4 个命令，分别用于集合、哈希键及有序集等。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">SCAN：命令用于迭代当前数据库中的数据库键。</span><br><span class="line">SSCAN：命令用于迭代集合键中的元素。</span><br><span class="line">HSCAN：命令用于迭代哈希键中的键值对。</span><br><span class="line">ZSCAN：命令用于迭代有序集合中的元素（包括元素成员和元素分值）。</span><br></pre></td></tr></table></figure>
+<p>SCAN cursor [MATCH pattern] [COUNT count]</p>
+<p>当需要模糊查询或者大批量时候，keys * 进行查询 key 的时候会进行堵塞，导致 redis 整体不可用，因为redis是单线程，而使用 scan 命令则不会。</p>
+<p>scan 游标 MATCH &lt;返回和给定模式相匹配的元素&gt; count 每次迭代所返回的元素数量 SCAN 命令是增量的循环，每次调用只会返回一小部分的元素。</p>
+<p>在 Redis 中的具体用法如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">scan 0 match xttblog.com* count 5</span><br><span class="line">sscan myset 0 match 胡*</span><br></pre></td></tr></table></figure>
+<p>SCAN 命令对应的 Jedis </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">Jedis jedis = pool.getResource();</span><br><span class="line">ScanParams scanParams = <span class="keyword">new</span> ScanParams();</span><br><span class="line">List&lt;String&gt; list = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">scanParams.match(key);</span><br><span class="line">scanParams.count(<span class="number">100</span>);</span><br><span class="line"><span class="comment">//当 SCAN 命令的游标参数被设置为 0 时， 服务器将开始一次新的迭代， 而当服务器向用户返回值为 0 的游标时， 表示迭代已结束。</span></span><br><span class="line">String cursor = ScanParams.SCAN_POINTER_START;</span><br><span class="line"><span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">    ScanResult&lt;String&gt; scan = jedis.scan(cursor, scanParams);</span><br><span class="line">    List&lt;String&gt; elements = scan.getResult();</span><br><span class="line">    <span class="keyword">if</span> (CollectionUtils.isNotEmpty(elements)) &#123;</span><br><span class="line">        list.addAll(elements);</span><br><span class="line">    &#125;</span><br><span class="line">    String cursor = scan.getStringCursor();</span><br><span class="line">    log.info(<span class="string">"scan：返回用于下次遍历的游标   "</span> + cursor);</span><br><span class="line">    log.info(<span class="string">"scan：返回结果  "</span> + elements);</span><br><span class="line">    <span class="keyword">if</span> (ScanParams.SCAN_POINTER_START.equals(cursor)) &#123;</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">jedis.close();</span><br></pre></td></tr></table></figure>
+<p>其他操作类似。<a href="https://www.xttblog.com/?p=3635" target="_blank" rel="noopener">https://www.xttblog.com/?p=3635</a></p>
+<p>注意：SCAN 命令不能保证每次返回的值都是有序的，同一个 key 有可能返回多次，不做区分，需要应用程序去处理。</p>
+<p>一个批量删除的例子。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//key有模糊匹配*，查找到对应的去删除，启动一个线程去查找。通过游标的方式，用管道技术操作。</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> Long <span class="title">executeDel</span><span class="params">(Jedis jedis, String key)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">    Long count = <span class="number">0L</span>;</span><br><span class="line">    CountDownLatch countDownLatch = <span class="keyword">new</span> CountDownLatch(<span class="number">0</span>);</span><br><span class="line">    Future[] futureArray = <span class="keyword">new</span> Future[<span class="number">1</span>];</span><br><span class="line">    ScanParams scanParams = <span class="keyword">new</span> ScanParams().count(<span class="number">1</span>);</span><br><span class="line">    scanParams.match(key);</span><br><span class="line">    ExecutorService executor = Executors.newSingleThreadExecutor();</span><br><span class="line">    futureArray[<span class="number">0</span>] = executor.submit(<span class="keyword">new</span> JedisDeleteThread(jedis, scanParams, countDownLatch));</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="comment">//等待线程汇总</span></span><br><span class="line">        countDownLatch.await();</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (<span class="keyword">null</span> != futureArray &amp;&amp; futureArray.length &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; futureArray.length; i++) &#123;</span><br><span class="line">                    count += (<span class="keyword">long</span>) futureArray[i].get();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">            log.error(e.getMessage());</span><br><span class="line">        &#125; <span class="keyword">catch</span> (ExecutionException e) &#123;</span><br><span class="line">            log.error(e.getMessage());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">        log.error(e.getMessage());</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> count;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//线程 执行查找和删除处理</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">JedisDeleteThread</span> <span class="keyword">implements</span> <span class="title">Callable</span>&lt;<span class="title">Long</span>&gt; </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> Jedis jedis;</span><br><span class="line">    ScanParams params;</span><br><span class="line">    CountDownLatch countDownLatch;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">JedisDeleteThread</span><span class="params">(Jedis jedis, ScanParams params, CountDownLatch downLatch)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.jedis = jedis;</span><br><span class="line">        <span class="keyword">this</span>.params = params;</span><br><span class="line">        <span class="keyword">this</span>.countDownLatch = downLatch;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Long <span class="title">call</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">long</span> sum = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            String cursor = ScanParams.SCAN_POINTER_START;</span><br><span class="line">            ScanResult&lt;String&gt; scanResult = <span class="keyword">null</span>;</span><br><span class="line">            List&lt;String&gt; result = <span class="keyword">null</span>;</span><br><span class="line">            Pipeline pipeline = jedis.pipelined();</span><br><span class="line">            <span class="keyword">do</span> &#123;</span><br><span class="line">                scanResult = jedis.scan(cursor, params);</span><br><span class="line">                result = scanResult.getResult();</span><br><span class="line">                <span class="keyword">if</span> (result != <span class="keyword">null</span> &amp;&amp; result.size() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                    sum += result.size();</span><br><span class="line">                    <span class="keyword">int</span> num = <span class="number">0</span>;</span><br><span class="line">                    <span class="keyword">for</span> (String key : result) &#123;</span><br><span class="line">                        pipeline.del(key);</span><br><span class="line">                        num++;</span><br><span class="line">                        <span class="keyword">if</span> (num &gt; <span class="number">500</span>) &#123;</span><br><span class="line">                            num = <span class="number">0</span>;</span><br><span class="line">                            pipeline.sync();</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">if</span> (num &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                        pipeline.sync();</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                cursor = scanResult.getStringCursor();</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">while</span> (!cursor.equals(<span class="string">"0"</span>));</span><br><span class="line">            <span class="keyword">if</span> (pipeline != <span class="keyword">null</span>) &#123;</span><br><span class="line">                pipeline.close();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            log.error(<span class="string">"delete key error:"</span>, e);</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            countDownLatch.countDown();</span><br><span class="line">            jedis.close();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> sum;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+          
+        
+      
+    </div>
+     <!-- 相关文章推荐 -->
+    
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://huyunshun.com/2019/08/26/3%E3%80%81%E5%86%85%E5%AD%98%E4%BA%A4%E4%BA%92/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="初晨">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://img.huyunshun.com/img/20200522182348.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="简">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/08/26/3%E3%80%81%E5%86%85%E5%AD%98%E4%BA%A4%E4%BA%92/" itemprop="url">jvm深入-内存交互</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-08-26T00:00:00+08:00">
+                2019-08-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>每一个线程有一个工作内存。工作内存和主存独立。工作内存存放主存中变量的值的拷贝。</p>
+<p><img src="https://img.huyunshun.com/img/20200423161045.png" alt="20200423161045"></p>
+<p>当数据从主内存复制到工作存储时，必须出现两个动作：第一，由主内存执行的读（read）操作；第二，由工作内存执行的相应的load操作；当数据从工作内存拷贝到主内存时，也出现两个操作：第一个，由工作内存执行的存储（store）操作；第二，由主内存执行的相应的写（write）操作。</p>
+<p>每一个操作都是原子的，即执行期间不会被中断</p>
+<p>对于普通变量，一个线程中更新的值，不能马上反应在其他变量中。如果需要在其他线程中立即可见，需要使用volatile关键字作为标识。</p>
+<p><img src="https://img.huyunshun.com/img/20200423161055.png" alt="20200423161055"></p>
+<p>1、可见性：一个线程修改了变量，其他线程可以立即知道</p>
+<p>保证可见性的方法：</p>
+<ul>
+<li>volatile</li>
+<li>synchronized （unlock之前，写变量值回主存）</li>
+<li>final(一旦初始化完成，其他线程就可见)</li>
+</ul>
+<p>2、有序性：本线程内，操作都是有序的；线程外观察，操作都是无序的。</p>
+<p>3、指令重排：</p>
+<p><img src="https://img.huyunshun.com/img/20200423161110.png" alt="20200423161110"></p>
+<p>指令重排：破坏了线程间的有序性：</p>
+<p><img src="https://img.huyunshun.com/img/20200423161119.png" alt="20200423161119"></p>
+<p>指令重排：保证有序性的方法：</p>
+<p><img src="https://img.huyunshun.com/img/20200423161127.png" alt="20200423161127"></p>
+<p>指令重排的基本原则：</p>
+<p>程序顺序原则：一个线程内保证语义的串行性</p>
+<p>volatile规则：volatile变量的写，先发生于读</p>
+<p>锁规则：解锁(unlock)必然发生在随后的加锁(lock)前</p>
+<p>传递性：A先于B，B先于C 那么A必然先于C</p>
+<p>线程的start方法先于它的每一个动作</p>
+<p>线程的所有操作先于线程的终结（Thread.join()）</p>
+<p>线程的中断（interrupt()）先于被中断线程的代码</p>
+<p>对象的构造函数执行结束先于finalize()方法</p>
+
+          
+        
+      
+    </div>
+     <!-- 相关文章推荐 -->
+    
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+  </section>
+
+  
+  <nav class="pagination">
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/25/">25</a><a class="extend next" rel="next" href="/page/2/">下一页</a>
+  </nav>
+
+
+
+          </div>
+          
+
+
+          
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://img.huyunshun.com/img/20200522182348.png"
+                alt="初晨" />
+            
+              <p class="site-author-name" itemprop="name">初晨</p>
+              <p class="site-description motion-element" itemprop="description">永远不要说你知道本质，更别说真相了。</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">249</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">46</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+<!--近期文章版块-->
+            
+                <div class="links-of-blogroll motion-element links-of-blogroll-block">
+                  <div class="links-of-blogroll-title">
+                    <!-- modify icon to fire by szw -->
+                    <i class="fa fa-history fa-" aria-hidden="true"></i>
+                    近期文章
+                  </div>
+                  <ul class="links-of-blogroll-list">
+                    
+                    
+                      <li>
+                        <a href="/2020/05/22/WebSocket%E3%80%81Socket%E3%80%81TCP%E3%80%81HTTP%E5%8C%BA%E5%88%AB/" title="WebSocket、Socket、TCP、HTTP区别" target="_blank">WebSocket、Socket、TCP、HTTP区别</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/19/Springboot%E9%A1%B9%E7%9B%AE%E7%9A%84%E6%8E%A5%E5%8F%A3%E9%98%B2%E5%88%B7/" title="Springboot项目的接口防刷" target="_blank">Springboot项目的接口防刷</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/03/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Volatile%E5%85%B3%E9%94%AE%E5%AD%97%E5%8F%8A%E5%85%B6%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/" title="深入理解Volatile关键字及其实现原理" target="_blank">深入理解Volatile关键字及其实现原理</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/04/20/%E4%BD%BF%E7%94%A8vscode%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0%E7%8E%AF%E5%A2%83/" title="使用vscode搭建个人笔记环境" target="_blank">使用vscode搭建个人笔记环境</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/01/20/HBase%E4%BB%8B%E7%BB%8D%E5%AE%89%E8%A3%85%E4%B8%8E%E6%93%8D%E4%BD%9C/" title="HBase介绍安装与操作" target="_blank">HBase介绍安装与操作</a>
+                      </li>
+                    
+                  </ul>
+                </div>
+            
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Copyright</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

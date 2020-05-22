@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="定时任务," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="一、java最基本方式使用使用java.util.Timer类 1234567891011121314 public class TimedTask &amp;#123;    private static void useTimerImplTimedTask()&amp;#123;        &#x2F;&#x2F; 第一个参数是任务，第二个参数为首次执行的延时时间，第三个参数为定时执行的间隔时间，时间单位是毫秒">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java实现任务调度定时方式总结">
+<meta property="og:url" content="https://huyunshun.com/2019/04/12/Java%E5%AE%9E%E7%8E%B0%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6%E5%AE%9A%E6%97%B6%E6%96%B9%E5%BC%8F/index.html">
+<meta property="og:site_name" content="简">
+<meta property="og:description" content="一、java最基本方式使用使用java.util.Timer类 1234567891011121314 public class TimedTask &amp;#123;    private static void useTimerImplTimedTask()&amp;#123;        &#x2F;&#x2F; 第一个参数是任务，第二个参数为首次执行的延时时间，第三个参数为定时执行的间隔时间，时间单位是毫秒">
+<meta property="article:published_time" content="2019-04-12T06:23:48.000Z">
+<meta property="article:modified_time" content="2020-05-20T10:04:24.705Z">
+<meta property="article:author" content="初晨">
+<meta property="article:tag" content="定时任务">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://huyunshun.com/2019/04/12/Java实现任务调度定时方式/"/>
+
+
+
+
+
+  <title>Java实现任务调度定时方式总结 | 简</title>
+  
+
+
+
+
+
+
+
+
+  <script type="text/javascript" src="/js/src/love.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
+
+  <!-- 看板娘 -->
+    
+        <script async src="/live2d-widget/autoload.js"></script>
+    
+ <!-- 飘动的彩带） -->
+  <script src="/js/src/piao.js" type="text/javascript"></script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">简</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">人生短暂，学海无边，而大道至简。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://huyunshun.com/2019/04/12/Java%E5%AE%9E%E7%8E%B0%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6%E5%AE%9A%E6%97%B6%E6%96%B9%E5%BC%8F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="初晨">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://img.huyunshun.com/img/20200522182348.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="简">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Java实现任务调度定时方式总结</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-12T14:23:48+08:00">
+                2019-04-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="一、java最基本方式使用"><a href="#一、java最基本方式使用" class="headerlink" title="一、java最基本方式使用"></a>一、java最基本方式使用</h2><p>使用java.util.Timer类</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"> <span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TimedTask</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">useTimerImplTimedTask</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="comment">// 第一个参数是任务，第二个参数为首次执行的延时时间，第三个参数为定时执行的间隔时间，时间单位是毫秒</span></span><br><span class="line">        <span class="keyword">new</span> Timer().scheduleAtFixedRate(<span class="keyword">new</span> TimerTask() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123; </span><br><span class="line">                System.out.println(<span class="string">"Local Time is "</span> + <span class="keyword">new</span> Date().toString());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;,<span class="number">0L</span>,<span class="number">1000L</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        useTimerImplTimedTask();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>使用java.util.concurrent.ScheduledExecutorService</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"> <span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TimedTask</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">userScheduledExecutorServiceImplTiemdTask</span><span class="params">()</span></span>&#123;</span><br><span class="line">        Runnable runnable = <span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                System.out.println(<span class="string">"Local Time is "</span> + <span class="keyword">new</span> Date().toString());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line">        ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();</span><br><span class="line">        <span class="comment">// 第一个参数是任务，第二个参数为首次执行的延时时间，第三个参数为定时执行的间隔时间,第四个参数是时间单位</span></span><br><span class="line">        service.scheduleAtFixedRate(runnable, <span class="number">0L</span>, <span class="number">1L</span>, TimeUnit.SECONDS);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        userScheduledExecutorServiceImplTiemdTask();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这样不好，建议创建使用线程池</p>
+<p>推荐使用java.util.concurrent.ScheduledThreadPoolExecutor结合org.apache.commons.lang3.concurrent.BasicThreadFactory</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"> <span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TimedTask</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">useScheduledThreadPoolExecutorImplTimedTask</span><span class="params">()</span></span>&#123;</span><br><span class="line">        ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = <span class="keyword">new</span> ScheduledThreadPoolExecutor(</span><br><span class="line">                <span class="number">1</span>, <span class="keyword">new</span> BasicThreadFactory.Builder().namingPattern(<span class="string">"schedule-pool-%d"</span>).daemon(<span class="keyword">false</span>).build());</span><br><span class="line">        <span class="comment">// 第一个参数是任务，第二个参数为首次执行的延时时间，第三个参数为定时执行的间隔时间,第四个参数是时间单位</span></span><br><span class="line">        scheduledThreadPoolExecutor.scheduleAtFixedRate(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                System.out.println(<span class="string">"Local Time is "</span> + <span class="keyword">new</span> Date().toString());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;, <span class="number">0L</span>, <span class="number">1L</span>, TimeUnit.SECONDS);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        useScheduledThreadPoolExecutorImplTimedTask();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>使用java.lang.Thread方式</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"> <span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TimedTask</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">useThreadImplTimedTask</span><span class="params">()</span></span>&#123;</span><br><span class="line">        Runnable runnable = <span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">                    System.out.println(<span class="string">"Local Time is "</span> + <span class="keyword">new</span> Date().toString());</span><br><span class="line">                    <span class="keyword">try</span> &#123;</span><br><span class="line">                        <span class="comment">//时间间隔，单位是毫秒</span></span><br><span class="line">                        Thread.sleep(<span class="number">1000L</span>);</span><br><span class="line">                    &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">                        e.printStackTrace();</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line">        Thread thread = <span class="keyword">new</span> Thread(runnable);</span><br><span class="line">        thread.start();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        useThreadImplTimedTask();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这种方式不优雅</p>
+<h2 id="二、Quartz框架实现"><a href="#二、Quartz框架实现" class="headerlink" title="二、Quartz框架实现"></a>二、Quartz框架实现</h2><p>Quartz是一个强大任务调度框架，一个简单示例：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"> <span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.quartz-scheduler<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>quartz<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.3.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>任务逻辑</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* 实现任务，任务执行逻辑</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">HelloJob</span> <span class="keyword">implements</span> <span class="title">Job</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">execute</span><span class="params">(JobExecutionContext jobExecutionContext)</span> <span class="keyword">throws</span> JobExecutionException </span>&#123;</span><br><span class="line">        Date date = <span class="keyword">new</span> Date();</span><br><span class="line">        SimpleDateFormat sf = <span class="keyword">new</span> SimpleDateFormat(<span class="string">"yyyy-MM-dd HH:mm:ss"</span>);</span><br><span class="line">        System.out.println(<span class="string">"现在的时间是："</span>+ sf.format(date));</span><br><span class="line">        <span class="comment">//每两秒钟打印</span></span><br><span class="line">        System.out.println(<span class="string">"Hello"</span>);</span><br><span class="line">        <span class="comment">//每天晚上12点执行任务</span></span><br><span class="line">        <span class="comment">//System.out.println("开始生成任务报表");</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>任务调度</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"> <span class="comment">/**</span></span><br><span class="line"><span class="comment">* 任务调用，或者说任务触发地方</span></span><br><span class="line"><span class="comment">* 一个基本Quartz的任务再来介绍一下Quartz的3个重要组成，JobDetail，Trigger，Scheduler</span></span><br><span class="line"><span class="comment">* Scheduler - 用于与调度程序交互的主程序接口。</span></span><br><span class="line"><span class="comment">* Job - 我们预先定义的希望在未来时间能被调度程序执行的任务类。</span></span><br><span class="line"><span class="comment">* JobDetail - 使用JobDetail来定义定时任务的实例。</span></span><br><span class="line"><span class="comment">* Trigger - 触发器，表明任务在什么时候会执行，执行的时间条件。</span></span><br><span class="line"><span class="comment">* JobBuilder -用于声明一个任务实例，也可以定义关于该任务的详情比如任务名、组名等，这个声明的实例将会作为一个实际执行的任务。</span></span><br><span class="line"><span class="comment">* TriggerBuilder - 触发器创建器，用于创建触发器trigger实例。</span></span><br><span class="line"><span class="comment">* 一个调度器过程</span></span><br><span class="line"><span class="comment">* 1、创建调度工厂();  　　</span></span><br><span class="line"><span class="comment">* 2、根据工厂取得调度器实例();  　　</span></span><br><span class="line"><span class="comment">* 3、Builder模式构建子组件&lt;Job,Trigger&gt; 　　 // builder模式, 如JobBuilder、TriggerBuilder、DateBuilder</span></span><br><span class="line"><span class="comment">* 4、通过调度器组装子组件  调度器.组装&lt;子组件1,子组件2...&gt;  　　</span></span><br><span class="line"><span class="comment">* 5、调度器.start();</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">HelloScheduler</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> SchedulerException </span>&#123;</span><br><span class="line">        <span class="comment">//创建一个任务的实例，将该实例与HelloJob Class绑定</span></span><br><span class="line">        JobDetail jobDetail = JobBuilder.newJob(HelloJob.class).withIdentity("demoJob").build();</span><br><span class="line">        <span class="comment">//创建一个Trigger触发器的实例，定义该job立即执行，并且每4秒执行一次，一直执行</span></span><br><span class="line">        SimpleTrigger trigger = TriggerBuilder.newTrigger().withIdentity(<span class="string">"demoTrigger"</span>).startNow().withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(<span class="number">4</span>).repeatForever()).build();</span><br><span class="line">        <span class="comment">//每天晚上12点触发任务</span></span><br><span class="line">        <span class="comment">//CronTrigger cronTrigger = TriggerBuilder.newTrigger().withIdentity("cronTrigger").withSchedule(CronScheduleBuilder.cronSchedule("0 0 12 * * ?")).build();</span></span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">        * cron表达式编写规则</span></span><br><span class="line"><span class="comment">        * Quartz Cron 表达式支持7个域 ,分别是秒/分/时/日/月/周/年，其中年是非必须项</span></span><br><span class="line"><span class="comment">        */</span></span><br><span class="line">        <span class="comment">//创建schedule实例</span></span><br><span class="line">        StdSchedulerFactory factory = <span class="keyword">new</span> StdSchedulerFactory();</span><br><span class="line">        Scheduler scheduler = factory.getScheduler();</span><br><span class="line">        <span class="comment">//执行任务</span></span><br><span class="line">        scheduler.start();</span><br><span class="line">        scheduler.scheduleJob(jobDetail,trigger);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="cron表达式编写规则"><a href="#cron表达式编写规则" class="headerlink" title="cron表达式编写规则"></a>cron表达式编写规则</h3><p>Quartz Cron 表达式支持7个域 ,分别是秒/分/时/日/月/周/年，其中年是非必须项</p>
+<pre><code>名称    是否必须    允许值    特殊字符
+秒    是    0-59    , - * /
+分    是    0-59    , - * /
+时    是    0-23    , - * /
+日    是    1-31    , - * ? / L W C
+月    是    1-12 或 JAN-DEC    , - * /
+周    是    1-7 或 SUN-SAT    , - * ? / L C #
+年    否    空 或 1970-2099    , - * /
+cron表达式中不区分大小写.
+
+星号(*)：可用在所有字段中，表示对应时间域的每一个时刻，例如， 在分钟字段时，表示“每分钟”；
+问号（?）：该字符只在日期和星期字段中使用，它通常指定为“无意义的值”，相当于点位符；
+减号(-)：表达一个范围，如在小时字段中使用“10-12”，则表示从10到12点，即10,11,12；
+逗号(,)：表达一个列表值，如在星期字段中使用“MON,WED,FRI”，则表示星期一，星期三和星期五；
+斜杠(/)：x/y表达一个等步长序列，x为起始值，y为增量步长值。如在分钟字段中使用0/15，则表示为0,15,30和45秒，而5/15在分钟字段中表示5,20,35,50，你也可以使用*/y，它等同于0/y；
+L：该字符只在日期和星期字段中使用，代表“Last”的意思，但它在两个字段中意思不同。L在日期字段中，表示这个月份的最后一天，如一月的31号，非闰年二月的28号；如果L用在星期中，则表示星期六，等同于7。但是，如果L出现在星期字段里，而且在前面有一个数值X，则表示“这个月的最后X天”，例如，6L表示该月的最后星期五；
+W：该字符只能出现在日期字段里，是对前导日期的修饰，表示离该日期最近的工作日。例如15W表示离该月15号最近的工作日，如果该月15号是星期六，则匹配14号星期五；如果15日是星期日，则匹配16号星期一；如果15号是星期二，那结果就是15号星期二。但必须注意关联的匹配日期不能够跨月，如你指定1W，如果1号是星期六，结果匹配的是3号星期一，而非上个月最后的那天。W字符串只能指定单一日期，而不能指定日期范围；
+LW组合：在日期字段可以组合使用LW，它的意思是当月的最后一个工作日；
+井号(#)：该字符只能在星期字段中使用，表示当月某个工作日。如6#3表示当月的第三个星期五(6表示星期五，#3表示当前的第三个)，而4#5表示当月的第五个星期三，假设当月没有第五个星期三，忽略不触发；
+C：该字符只在日期和星期字段中使用，代表“Calendar”的意思。它的意思是计划所关联的日期，如果日期没有被关联，则相当于日历中所有日期。例如5C在日期字段中就相当于日历5日以后的第一天。1C在星期字段中相当于星期日后的第一天。
+Cron表达式对特殊字符的大小写不敏感，对代表星期的缩写英文大小写也不敏感。
+官方示例：
+表示式    说明
+0 0 12 * * ?    每天12点运行
+0 15 10 * * ?    每天10:15运行
+0 15 10 * * ? 2008    在2008年的每天10：15运行
+0 * 14 * * ?    每天14点到15点之间每分钟运行一次，开始于14:00，结束于14:59。
+0 0/5 14 * * ?    每天14点到15点每5分钟运行一次，开始于14:00，结束于14:55。
+0 0/5 14,18 * * ?    每天14点到15点每5分钟运行一次，此外每天18点到19点每5钟也运行一次。                         
+0 0-5 14 * * ?    每天14:00点到14:05，每分钟运行一次。
+0 10,44 14 ? 3 WED    3月每周三的14:10分到14:44，每分钟运行一次。
+0 15 10 ? * MON-FRI    每周一，二，三，四，五的10:15分运行。
+0 15 10 15 * ?    每月15日10:15分运行。
+0 15 10 L * ?    每月最后一天10:15分运行。
+0 15 10 ? * 6L    每月最后一个星期五10:15分运行。
+0 15 10 ? * 6L 2007-2009                             在2007,2008,2009年每个月的最后一个星期五的10:15分运行。
+0 15 10 ? * 6#3    每月第三个星期五的10:15分运行。</code></pre><p>Quartz对任务调度的领域问题进行了高度的抽象，提出了调度器、任务和触发器这3个核心的概念，主要类和接口解释：</p>
+<pre><code>Job：是一个接口，只有一个方法void execute(JobExecutionContext context)，开发者实现该接口定义运行任务，JobExecutionContext类提供了调度上下文的各种信息。Job运行时的信息保存在JobDataMap实例中；
+
+JobDetail：Quartz在每次执行Job时，都重新创建一个Job实例，所以它不直接接受一个Job的实例，它接收一个Job实现类，以便运行时通过newInstance()的反射机制实例化Job。因此需要通过一个类来描述Job的实现类及其它相关的静态信息，如Job名字、描述、关联监听器等信息，JobDetail承担了这一角色。
+
+Trigger：是一个类，描述触发Job执行的时间触发规则。主要有SimpleTrigger和CronTrigger这两个子类。当仅需触发一次或者以固定时间间隔周期执行，SimpleTrigger是最适合的选择；而CronTrigger则可以通过Cron表达式定义出各种复杂时间规则的调度方案；
+
+Calendar：org.quartz.Calendar和java.util.Calendar不同，它是一些日历特定时间点的集合，一个Trigger可以和多个Calendar关联，以便排除或包含某些时间点。
+
+Scheduler：代表一个Quartz的独立运行容器，Trigger和JobDetail可以注册到Scheduler中，两者在Scheduler中拥有各自的组及名称，组及名称是Scheduler查找定位容器中某一对象的依据，Trigger的组及名称必须唯一，JobDetail的组和名称也必须唯一（但可以和Trigger的组和名称相同，因为它们是不同类型的）。Scheduler定义了多个接口方法，允许外部通过组及名称访问和控制容器中Trigger和JobDetail。
+
+Scheduler可以将Trigger绑定到某一JobDetail中，这样当Trigger触发时，对应的Job就被执行。一个Job可以对应多个Trigger，但一个Trigger只能对应一个Job。可以通过SchedulerFactory创建一个Scheduler实例。Scheduler拥有一个SchedulerContext，保存着Scheduler上下文信息，Job和Trigger都可以访问SchedulerContext内的信息。SchedulerContext内部通过一个Map，以键值对的方式维护这些上下文数据，SchedulerContext为保存和获取数据提供了多个put()和getXxx()的方法。可以通过Scheduler# getContext()获取对应的SchedulerContext实例；
+
+ThreadPool：Scheduler使用一个线程池作为任务运行的基础设施，任务通过共享线程池中的线程提高运行效率。
+
+Job有一个StatefulJob子接口，代表有状态的任务，该接口是一个没有方法的标签接口，其目的是让Quartz知道任务的类型，以便采用不同的执行方案。无状态任务在执行时拥有自己的JobDataMap拷贝，对JobDataMap的更改不会影响下次的执行。而有状态任务共享共享同一个JobDataMap实例，每次任务执行对JobDataMap所做的更改会保存下来，后面的执行可以看到这个更改，也即每次执行任务后都会对后面的执行发生影响。
+
+    所以，无状态的Job可以并发执行，而有状态的StatefulJob不能并发执行，这意味着如果前次的StatefulJob还没有执行完毕，下一次的任务将阻塞等待，直到前次任务执行完毕。有状态任务比无状态任务需要考虑更多的因素，程序往往拥有更高的复杂度，因此除非必要，应该尽量使用无状态的Job。
+　　如果Quartz使用了数据库持久化任务调度信息，无状态的JobDataMap仅会在Scheduler注册任务时保持一次，而有状态任务对应的JobDataMap在每次执行任务后都会进行保存。
+
+　　Trigger自身也可以拥有一个JobDataMap，其关联的Job可以通过JobExecutionContext#getTrigger().getJobDataMap()获取Trigger中的JobDataMap。不管是有状态还是无状态的任务，在任务执行期间对Trigger的JobDataMap所做的更改都不会进行持久，也即不会对下次的执行产生影响。
+
+　　Quartz拥有完善的事件和监听体系，大部分组件都拥有事件，如任务执行前事件、任务执行后事件、触发器触发前事件、触发后事件、调度器开始事件、关闭事件等等，可以注册相应的监听器处理事件。</code></pre><p>Quartz的3大API之Job <a href="https://www.cnblogs.com/zhanghaoliang/p/7886110.html" target="_blank" rel="noopener">https://www.cnblogs.com/zhanghaoliang/p/7886110.html</a></p>
+<h2 id="三、Spring方式实现"><a href="#三、Spring方式实现" class="headerlink" title="三、Spring方式实现"></a>三、Spring方式实现</h2><h3 id="1、使用注解"><a href="#1、使用注解" class="headerlink" title="1、使用注解"></a>1、使用注解</h3><p>在spring配置中加入task的命名空间：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"> xmlns:task="http://www.springframework.org/schema/task"</span><br><span class="line">xsi:schemaLocation="http://www.springframework.org/schema/task</span><br><span class="line">        http://www.springframework.org/schema/task/spring-task-4.0.xsd"</span><br></pre></td></tr></table></figure>
+<p>然后使用task配置扫描注解<br> <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"> <span class="comment">&lt;!-- 定时任务 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">task:annotation-driven</span> <span class="attr">scheduler</span>=<span class="string">"qbScheduler"</span> <span class="attr">mode</span>=<span class="string">"proxy"</span>/&gt;</span> </span><br><span class="line"><span class="tag">&lt;<span class="name">task:scheduler</span> <span class="attr">id</span>=<span class="string">"qbScheduler"</span> /&gt;</span></span><br></pre></td></tr></table></figure><br>此时就可以直接使用@Scheduled(cron = “时间格式串”)，应用该注解就可以实现定时的功能。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"> <span class="meta">@Scheduled</span>(cron = <span class="string">"0/5 * * * * ?"</span>)  <span class="comment">//每隔5秒执行一次定时任务</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">consoleInfo</span><span class="params">()</span></span>&#123;</span><br><span class="line">    System.out.println(<span class="string">"定时任务"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="2、不使用注解实现定时任务"><a href="#2、不使用注解实现定时任务" class="headerlink" title="2、不使用注解实现定时任务"></a>2、不使用注解实现定时任务</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"> xmlns:task="http://www.springframework.org/schema/task"</span><br><span class="line">xsi:schemaLocation=" http://www.springframework.org/schema/task  </span><br><span class="line">        http://www.springframework.org/schema/task/spring-task-3.0.xsd”</span><br><span class="line">                        <span class="tag">&lt;<span class="name">description</span>&gt;</span></span><br><span class="line">        定时任务</span><br><span class="line">    <span class="tag">&lt;/<span class="name">description</span>&gt;</span></span><br><span class="line">    //定时注解驱动</span><br><span class="line">    <span class="tag">&lt;<span class="name">task:annotation-driven</span> /&gt;</span></span><br><span class="line">    //进行定时任务的类，将其定义为一个bean</span><br><span class="line">    <span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"spaceStatisticsService"</span> <span class="attr">class</span>=<span class="string">"com.pojo.system.manager.sigar.impl.SpaceStatisticsServiceImpl"</span>&gt;</span><span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line">    //通过task标签，定义定时功能</span><br><span class="line">    <span class="tag">&lt;<span class="name">task:scheduled-tasks</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">task:scheduled</span> <span class="attr">ref</span>=<span class="string">"spaceStatisticsService"</span> <span class="attr">method</span>=<span class="string">"statisticSpace"</span> <span class="attr">cron</span>=<span class="string">"59 59 23 * * ?"</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">task:scheduled-tasks</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>Java：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"> <span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SpaceStatisticsServiceImpl</span> <span class="keyword">implements</span> <span class="title">SpaceStatisticsService</span></span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">statisticSpace</span><span class="params">()</span>    </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"实现定时功能"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="3、spring-boot上使用"><a href="#3、spring-boot上使用" class="headerlink" title="3、spring boot上使用"></a>3、spring boot上使用</h2><p>开启定时任务功能</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"> <span class="meta">@SpringBootApplication</span></span><br><span class="line"><span class="meta">@EnableScheduling</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ReadingListApplication</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="comment">//启动入口</span></span><br><span class="line">        SpringApplication.run(ReadingListApplication<span class="class">.<span class="keyword">class</span>, <span class="title">args</span>)</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">任务：</span><br><span class="line"> <span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Task</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Scheduled</span>(cron = <span class="string">"0/5 * * * * ?"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">pringMsg</span><span class="params">()</span></span>&#123;</span><br><span class="line">        System.out.println(<span class="number">11</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>运行项目就会有结果</p>
+<p>上面是单线程执行，如果需要并发多线程执行，这样做：</p>
+<p>增加配置</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* 并发任务，使其任务在多线程执行。</span></span><br><span class="line"><span class="comment">* 通过ScheduleConfig配置文件实现SchedulingConfigurer接口，并重写setSchedulerfang方法</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ScheduledConfig</span> <span class="keyword">implements</span> <span class="title">SchedulingConfigurer</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">configureTasks</span><span class="params">(ScheduledTaskRegistrar scheduledTaskRegistrar)</span> </span>&#123;</span><br><span class="line">        scheduledTaskRegistrar.setScheduler(Executors.newScheduledThreadPool(<span class="number">2</span>));<span class="comment">//分配两个线程</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">多个任务：</span><br><span class="line"> <span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Task</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Scheduled</span>(cron = <span class="string">"0/5 * * * * ?"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">pringMsg</span><span class="params">()</span></span>&#123;</span><br><span class="line">        DateFormat sdf = <span class="keyword">new</span> SimpleDateFormat(<span class="string">"yyyy-MM-dd HH:mm:ss"</span>);</span><br><span class="line">        System.out.println(sdf.format(<span class="keyword">new</span> Date())+<span class="string">"----每5秒执行一次"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Scheduled</span>(cron = <span class="string">"0/1 * * * * ?"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">pringMsg1</span><span class="params">()</span></span>&#123;</span><br><span class="line">        DateFormat sdf = <span class="keyword">new</span> SimpleDateFormat(<span class="string">"yyyy-MM-dd HH:mm:ss"</span>);</span><br><span class="line">        System.out.println(sdf.format(<span class="keyword">new</span> Date())+<span class="string">"----每1秒执行一次"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="四、Spring-Boot集成Quartz"><a href="#四、Spring-Boot集成Quartz" class="headerlink" title="四、Spring Boot集成Quartz"></a>四、Spring Boot集成Quartz</h2><p>这里直接介绍spring boot整合Quartz</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"> <span class="meta">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">project</span> <span class="attr">xmlns</span>=<span class="string">"http://maven.apache.org/POM/4.0.0"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">xmlns:xsi</span>=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">xsi:schemaLocation</span>=<span class="string">"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">modelVersion</span>&gt;</span>4.0.0<span class="tag">&lt;/<span class="name">modelVersion</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.hu<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>quartz-springboot<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0-SNAPSHOT<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">parent</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-parent<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.0.2.RELEASE<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">parent</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="comment">&lt;!-- quartz --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-quartz<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">build</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">plugins</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-maven-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">plugins</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">build</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">project</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>创建两个任务：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestTask1</span> <span class="keyword">extends</span> <span class="title">QuartzJobBean</span></span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">executeInternal</span><span class="params">(JobExecutionContext context)</span><span class="keyword">throws</span> JobExecutionException</span>&#123;</span><br><span class="line">        SimpleDateFormat sdf=<span class="keyword">new</span> SimpleDateFormat(<span class="string">"yyyy-MM-dd HH:mm:ss"</span>);</span><br><span class="line">        System.out.println(<span class="string">"TestQuartz01----"</span>+sdf.format(<span class="keyword">new</span> Date()));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestTask2</span> <span class="keyword">extends</span> <span class="title">QuartzJobBean</span></span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">executeInternal</span><span class="params">(JobExecutionContext context)</span> <span class="keyword">throws</span> JobExecutionException </span>&#123;</span><br><span class="line">        SimpleDateFormat sdf=<span class="keyword">new</span> SimpleDateFormat(<span class="string">"yyyy-MM-dd HH:mm:ss"</span>);</span><br><span class="line">        System.out.println(<span class="string">"TestQuartz02----"</span> + sdf.format(<span class="keyword">new</span> Date()));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>配置定时任务执行：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* 配置定时任务</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">QuartzConfig</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> JobDetail <span class="title">testQuartz1</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        return JobBuilder.newJob(TestTask1.class).withIdentity("testTask1").storeDurably().build();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Trigger <span class="title">testQuartzTrigger1</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">//5秒执行一次</span></span><br><span class="line">        SimpleScheduleBuilder scheduleBuilder = SimpleScheduleBuilder.simpleSchedule()</span><br><span class="line">                .withIntervalInSeconds(<span class="number">5</span>)</span><br><span class="line">                .repeatForever();</span><br><span class="line">        <span class="keyword">return</span> TriggerBuilder.newTrigger().forJob(testQuartz1())</span><br><span class="line">                .withIdentity(<span class="string">"testTask1"</span>)</span><br><span class="line">                .withSchedule(scheduleBuilder)</span><br><span class="line">                .build();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> JobDetail <span class="title">testQuartz2</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        return JobBuilder.newJob(TestTask2.class).withIdentity("testTask2").storeDurably().build();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Trigger <span class="title">testQuartzTrigger2</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">//cron方式，每隔1秒执行一次</span></span><br><span class="line">        <span class="keyword">return</span> TriggerBuilder.newTrigger().forJob(testQuartz2())</span><br><span class="line">                .withIdentity(<span class="string">"testTask2"</span>)</span><br><span class="line">                .withSchedule(CronScheduleBuilder.cronSchedule(<span class="string">"*/1 * * * * ?"</span>))</span><br><span class="line">                .build();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>入口：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@SpringBootApplication</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Application</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        SpringApplication.run(Application<span class="class">.<span class="keyword">class</span>, <span class="title">args</span>)</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>运行没问题</p>
+<pre><code>2019-05-28 19:24:31.254  INFO 4368 --- [          main] org.quartz.core.QuartzScheduler          : Scheduler quartzScheduler_$_NON_CLUSTERED started.
+TestQuartz02----2019-05-28 19:24:31
+TestQuartz01----2019-05-28 19:24:31
+2019-05-28 19:24:31.270  INFO 4368 --- [          main] com.hu.Application                      : Started Application in 0.656 seconds (JVM running for 1.008)
+TestQuartz02----2019-05-28 19:24:32
+TestQuartz02----2019-05-28 19:24:33
+TestQuartz02----2019-05-28 19:24:34
+TestQuartz02----2019-05-28 19:24:35
+TestQuartz02----2019-05-28 19:24:36
+TestQuartz01----2019-05-28 19:24:36
+TestQuartz02----2019-05-28 19:24:37
+TestQuartz02----2019-05-28 19:24:38</code></pre><p>具体见项目spring-boot-starter-quartz<br><a href="https://github.com/huingsn/spring-boot-sample-demo/tree/master/quartz" target="_blank" rel="noopener">https://github.com/huingsn/spring-boot-sample-demo/tree/master/quartz</a><br>参考<a href="https://www.jianshu.com/p/d52d62fb2ac6" target="_blank" rel="noopener">https://www.jianshu.com/p/d52d62fb2ac6</a></p>
+<p>在新版本的SpringBoot2.0发布后，SpringBoot2.0版本集成了Quartz2.3.0官网最新版本，整合到spring-boot-starter-quartz。针对Quartz新版本进行了 AutoConfiguration自动化配置，省去了很多繁琐的配置。</p>
+<p>之前调度中心简单例子中，使用spring集成Quartz，这个示例把之前改为使用spring-boot-starter-quartz的项目。<br>见：spring-boot-starter-quartz<br>在此基础上修改：<br>1、pom.xml配置文件，SpringBoot为我们提供了对应的依赖，我们将之前的quartz相关依赖删除，替换为spring-boot-starter-quartz。<br>2、删除QuartzConfiguration配置类<br>之前使用 QuartzConfiguration配置类来完成了 Quartz需要的一系列配置，如： JobFactory、 SchedulerFactoryBean等，在我们添加 spring-boot-starter-quartz依赖后就不需要主动声明工厂类，因为 spring-boot-starter-quartz已经为我们自动化配置好了。</p>
+<p>自动化配置源码<br>查看spring-boot-autoconfigure-2.0.0.RELEASE.jar，找到org.springframework.boot.autoconfigure.quartz，该目录就是SpringBoot提供的Quartz自动化配置源码实现，在该目录下有如下所示几个类：<br>AutowireCapableBeanJobFactory<br>该类替代了我们之前在QuartzConfiguration配置类的AutowiringSpringBeanJobFactory内部类实现，主要作用是我们自定义的QuartzJobBean子类被Spring IOC进行托管，可以在定时任务类内使用注入任意被Spring IOC托管的类。<br>JobStoreType<br>该类是一个枚举类型，定义了对应application.yml、application.properties文件内spring.quartz.job-store-type配置，其目的是配置quartz任务的数据存储方式，分别为：MEMORY（内存方式：默认）、JDBC（数据库方式）。<br>QuartzAutoConfiguration<br>该类是自动配置的主类，内部配置了SchedulerFactoryBean以及JdbcStoreTypeConfiguration，使用QuartzProperties作为属性自动化配置条件。<br>QuartzDataSourceInitializer<br>该类主要用于数据源初始化后的一些操作，根据不同平台类型的数据库进行选择不同的数据库脚本。<br>QuartzProperties<br>该类对应了spring.quartz在application.yml、application.properties文件内开头的相关配置。<br>SchedulerFactoryBeanCustomizer<br>这是一个接口，我们实现该接口后并且将实现类使用Spring IOC托管，可以完成SchedulerFactoryBean的个性化设置，这里的设置完全可以对SchedulerFactoryBean做出全部的设置变更。</p>
+<p>3、在springboot配置文件中增加Quartz的配置信息，移除之前的Quartz配置文件。<br>其实就是把之前 quartz.properties配置文件内的所有配置转换成 YAML风格，对应的添加在该配置下即可，在 QuartzAutoConfiguration类内，会自动调用 SchedulerFactoryBean的 setQuartzProperties方法，把 spring.quartz.properties内的所有配置进行设置。</p>
+<p>完成，启动测试和之前一样。        </p>
+
+      
+    </div>
+     <!-- 相关文章推荐 -->
+    
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/" rel="tag"># 定时任务</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/12/Nodejs%E2%80%94MVVM/" rel="next" title="Nodejs—MVVM">
+                <i class="fa fa-chevron-left"></i> Nodejs—MVVM
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/04/12/%E5%9F%BA%E4%BA%8ESpringBoot%E3%80%81Quartz%E5%88%86%E5%B8%83%E5%BC%8F%E5%A4%9A%E8%8A%82%E7%82%B9%E8%B4%9F%E8%BD%BD%E6%8C%81%E4%B9%85%E5%8C%96/" rel="prev" title="基于SpringBoot、Quartz分布式多节点负载持久化">
+                基于SpringBoot、Quartz分布式多节点负载持久化 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+<span class="jiathis_txt">分享到：</span>
+<a class="jiathis_button_fav">收藏夹</a>
+<a class="jiathis_button_copy">复制网址</a>
+<a class="jiathis_button_email">邮件</a>
+<a class="jiathis_button_weixin">微信</a>
+<a class="jiathis_button_qzone">QQ空间</a>
+<a class="jiathis_button_tqq">腾讯微博</a>
+<a class="jiathis_button_douban">豆瓣</a>
+<a class="jiathis_button_share">一键分享</a>
+
+<a href="http://www.jiathis.com/share?uid=2140465" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+<a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+var jiathis_config={
+  data_track_clickback:true,
+  summary:"",
+  shortUrl:false,
+  hideMore:false
+}
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://img.huyunshun.com/img/20200522182348.png"
+                alt="初晨" />
+            
+              <p class="site-author-name" itemprop="name">初晨</p>
+              <p class="site-description motion-element" itemprop="description">永远不要说你知道本质，更别说真相了。</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">249</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">46</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+<!--近期文章版块-->
+            
+                <div class="links-of-blogroll motion-element links-of-blogroll-block">
+                  <div class="links-of-blogroll-title">
+                    <!-- modify icon to fire by szw -->
+                    <i class="fa fa-history fa-" aria-hidden="true"></i>
+                    近期文章
+                  </div>
+                  <ul class="links-of-blogroll-list">
+                    
+                    
+                      <li>
+                        <a href="/2020/05/22/WebSocket%E3%80%81Socket%E3%80%81TCP%E3%80%81HTTP%E5%8C%BA%E5%88%AB/" title="WebSocket、Socket、TCP、HTTP区别" target="_blank">WebSocket、Socket、TCP、HTTP区别</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/19/Springboot%E9%A1%B9%E7%9B%AE%E7%9A%84%E6%8E%A5%E5%8F%A3%E9%98%B2%E5%88%B7/" title="Springboot项目的接口防刷" target="_blank">Springboot项目的接口防刷</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/03/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Volatile%E5%85%B3%E9%94%AE%E5%AD%97%E5%8F%8A%E5%85%B6%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/" title="深入理解Volatile关键字及其实现原理" target="_blank">深入理解Volatile关键字及其实现原理</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/04/20/%E4%BD%BF%E7%94%A8vscode%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0%E7%8E%AF%E5%A2%83/" title="使用vscode搭建个人笔记环境" target="_blank">使用vscode搭建个人笔记环境</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/01/20/HBase%E4%BB%8B%E7%BB%8D%E5%AE%89%E8%A3%85%E4%B8%8E%E6%93%8D%E4%BD%9C/" title="HBase介绍安装与操作" target="_blank">HBase介绍安装与操作</a>
+                      </li>
+                    
+                  </ul>
+                </div>
+            
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、java最基本方式使用"><span class="nav-number">1.</span> <span class="nav-text">一、java最基本方式使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、Quartz框架实现"><span class="nav-number">2.</span> <span class="nav-text">二、Quartz框架实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#cron表达式编写规则"><span class="nav-number">2.1.</span> <span class="nav-text">cron表达式编写规则</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三、Spring方式实现"><span class="nav-number">3.</span> <span class="nav-text">三、Spring方式实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1、使用注解"><span class="nav-number">3.1.</span> <span class="nav-text">1、使用注解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2、不使用注解实现定时任务"><span class="nav-number">3.2.</span> <span class="nav-text">2、不使用注解实现定时任务</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3、spring-boot上使用"><span class="nav-number">4.</span> <span class="nav-text">3、spring boot上使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#四、Spring-Boot集成Quartz"><span class="nav-number">5.</span> <span class="nav-text">四、Spring Boot集成Quartz</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Copyright</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

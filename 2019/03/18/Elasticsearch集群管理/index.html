@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Elasticsearch," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="集群规划搭建一个集群我们需要考虑如下几个问题： 123451. 我们需要多大规模的集群？2. 集群中的节点角色如何分配？3. 如何避免脑裂问题？4. 索引应该设置多少个分片？5. 分片应该设置几个副本？  我们需要多大规模的集群需要从以下两个方面考虑： 当前的数据量有多大？数据增长情况如何？ 你的机器配置如何？cpu、多大内存、多大硬盘容量？ 推算的依据： 12ES JVM heap 最大可以设置">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Elasticsearch集群管理">
+<meta property="og:url" content="https://huyunshun.com/2019/03/18/Elasticsearch%E9%9B%86%E7%BE%A4%E7%AE%A1%E7%90%86/index.html">
+<meta property="og:site_name" content="简">
+<meta property="og:description" content="集群规划搭建一个集群我们需要考虑如下几个问题： 123451. 我们需要多大规模的集群？2. 集群中的节点角色如何分配？3. 如何避免脑裂问题？4. 索引应该设置多少个分片？5. 分片应该设置几个副本？  我们需要多大规模的集群需要从以下两个方面考虑： 当前的数据量有多大？数据增长情况如何？ 你的机器配置如何？cpu、多大内存、多大硬盘容量？ 推算的依据： 12ES JVM heap 最大可以设置">
+<meta property="article:published_time" content="2019-03-17T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-05-20T10:04:24.698Z">
+<meta property="article:author" content="初晨">
+<meta property="article:tag" content="Elasticsearch">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://huyunshun.com/2019/03/18/Elasticsearch集群管理/"/>
+
+
+
+
+
+  <title>Elasticsearch集群管理 | 简</title>
+  
+
+
+
+
+
+
+
+
+  <script type="text/javascript" src="/js/src/love.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
+
+  <!-- 看板娘 -->
+    
+        <script async src="/live2d-widget/autoload.js"></script>
+    
+ <!-- 飘动的彩带） -->
+  <script src="/js/src/piao.js" type="text/javascript"></script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">简</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">人生短暂，学海无边，而大道至简。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://huyunshun.com/2019/03/18/Elasticsearch%E9%9B%86%E7%BE%A4%E7%AE%A1%E7%90%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="初晨">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://img.huyunshun.com/img/20200522182348.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="简">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Elasticsearch集群管理</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-03-18T00:00:00+08:00">
+                2019-03-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Elasticsearch/" itemprop="url" rel="index">
+                    <span itemprop="name">Elasticsearch</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="集群规划"><a href="#集群规划" class="headerlink" title="集群规划"></a>集群规划</h1><p>搭建一个集群我们需要考虑如下几个问题：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">1. 我们需要多大规模的集群？</span><br><span class="line">2. 集群中的节点角色如何分配？</span><br><span class="line">3. 如何避免脑裂问题？</span><br><span class="line">4. 索引应该设置多少个分片？</span><br><span class="line">5. 分片应该设置几个副本？</span><br></pre></td></tr></table></figure>
+
+<h2 id="我们需要多大规模的集群"><a href="#我们需要多大规模的集群" class="headerlink" title="我们需要多大规模的集群"></a>我们需要多大规模的集群</h2><p>需要从以下两个方面考虑：</p>
+<p>当前的数据量有多大？数据增长情况如何？</p>
+<p>你的机器配置如何？cpu、多大内存、多大硬盘容量？</p>
+<p>推算的依据：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ES JVM heap 最大可以设置32G 。</span><br><span class="line">30G heap 大概能处理的数据量 10 T。如果内存很大如128G，可在一台机器上运行多个ES节点实例。</span><br></pre></td></tr></table></figure>
+<p>备注：集群规划满足当前数据规模+适量增长规模即可，后续可按需扩展。</p>
+<p>两类应用场景：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">A. 用于构建业务搜索功能模块，且多是垂直领域的搜索。数据量级几千万到数十亿级别。一般2-4台机器的规模。</span><br><span class="line">B. 用于大规模数据的实时OLAP（联机处理分析），经典的如ELK Stack，数据规模可能达到千亿或更多。几十到上百节点的规模。</span><br></pre></td></tr></table></figure>
+
+<h2 id="集群中的节点角色如何分配"><a href="#集群中的节点角色如何分配" class="headerlink" title="集群中的节点角色如何分配"></a>集群中的节点角色如何分配</h2><p>** 节点角色 **</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Master</span><br><span class="line">node.master: true 节点可以作为主节点</span><br><span class="line">DataNode</span><br><span class="line">node.data: true 默认是数据节点。</span><br><span class="line">Coordinate node 协调节点</span><br><span class="line">如果仅担任协调节点，将上两个配置设为false。</span><br></pre></td></tr></table></figure>
+<p>说明：</p>
+<p>一个节点可以充当一个或多个角色，默认三个角色都有</p>
+<p>协调节点：一个节点只作为接收请求、转发请求到其他节点、汇总各个节点返回数据等功能的节点。</p>
+<p>** 如何分配 **</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">A. 小规模集群，不需严格区分。</span><br><span class="line">B. 中大规模集群（十个以上节点），应考虑单独的角色充当。特别并发查询量大，查询的合并量大，可以增加独立的协调节点。角色分开的好处是分工分开，不互影响。如不会因协调角色负载过高而影响数据节点的能力。</span><br></pre></td></tr></table></figure>
+
+<h2 id="如何避免脑裂问题"><a href="#如何避免脑裂问题" class="headerlink" title="如何避免脑裂问题"></a>如何避免脑裂问题</h2><p>脑裂问题：一个集群中只有一个A主节点，A主节点因为需要处理的东西太多或者网络过于繁忙，从而导致其他从节点ping不通A主节点，这样其他从节点就会认为A主节点不可用了，就会重新选出一个新的主节点B。过了一会A主节点恢复正常了，这样就出现了两个主节点，导致一部分数据来源于A主节点，另外一部分数据来源于B主节点，出现数据不一致问题，这就是脑裂。</p>
+<p>尽量避免脑裂，需要添加最小数量的主节点配置：discovery.zen.minimum_master_nodes: (有master资格节点数/2) + 1</p>
+<p>这个参数控制的是，选举主节点时需要看到最少多少个具有master资格的活节点，才能进行选举。官方的推荐值是(N/2)+1，其中N是具有master资格的节点的数量。</p>
+<p>** 常用做法 **（中大规模集群）：</p>
+<ul>
+<li><ol>
+<li>Master 和 dataNode 角色分开，配置奇数个master </li>
+</ol>
+</li>
+<li><ol start="2">
+<li>单播发现机制，配置master资格节点：<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">discovery.zen.ping.multicast.enabled: false —— 关闭多播发现机制，默认是关闭的</span><br><span class="line">discovery.zen.ping.unicast.hosts: [&quot;master1&quot;, &quot;master2&quot;, &quot;master3&quot;] —— 配置单播发现的主节点ip地址，其他从节点要加入进来，就得去询问单播发现机制里面配置的主节点我要加入到集群里面了，主节点同意以后才能加入，然后主节点再通知集群中的其他节点有新节点加入</span><br></pre></td></tr></table></figure></li>
+</ol>
+</li>
+<li><ol start="3">
+<li>配置选举发现数，及延长ping master的等待时长<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">discovery.zen.ping_timeout: 30（默认值是3秒）——其他节点ping主节点多久时间没有响应就认为主节点不可用了</span><br><span class="line">discovery.zen.minimum_master_nodes: 2 —— 选举主节点时需要看到最少多少个具有master资格的活节点，才能进行选举</span><br></pre></td></tr></table></figure>
+
+</li>
+</ol>
+</li>
+</ul>
+<h2 id="索引应该设置多少个分片"><a href="#索引应该设置多少个分片" class="headerlink" title="索引应该设置多少个分片"></a>索引应该设置多少个分片</h2><p>说明：分片数指定后不可变，除非重索引。</p>
+<p>思考：</p>
+<p>分片对应的存储实体是什么？存储的实体是索引</p>
+<p>分片是不是越多越好？　　不是</p>
+<p>分片多有什么影响？　　分片多浪费存储空间、占用资源、影响性能</p>
+<ul>
+<li>分片过多的影响 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">每个分片本质上就是一个Lucene索引, 因此会消耗相应的文件句柄, 内存和CPU资源。</span><br><span class="line">每个搜索请求会调度到索引的每个分片中. 如果分片分散在不同的节点倒是问题不太. 但当分片开始竞争相同的硬件资源时, 性能便会逐步下降。</span><br><span class="line">ES使用词频统计来计算相关性. 当然这些统计也会分配到各个分片上. 如果在大量分片上只维护了很少的数据, 则将导致最终的文档相关性较差。</span><br></pre></td></tr></table></figure></li>
+<li>分片设置的可参考原则 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ElasticSearch推荐的最大JVM堆空间是30~32G, 所以把你的分片最大容量限制为30GB, 然后再对分片数量做合理估算. 例如, 你认为你的数据能达到200GB, 推荐你最多分配7到8个分片。</span><br><span class="line">在开始阶段, 一个好的方案是根据你的节点数量按照1.5~3倍的原则来创建分片. 例如,如果你有3个节点, 则推荐你创建的分片数最多不超过9(3x3)个。当性能下降时，增加节点，ES会平衡分片的放置。</span><br><span class="line">对于基于日期的索引需求, 并且对索引数据的搜索场景非常少. 也许这些索引量将达到成百上千, 但每个索引的数据量只有1GB甚至更小. 对于这种类似场景, 建议只需要为索引分配1个分片。如日志管理就是一个日期的索引需求，日期索引会很多，但每个索引存放的日志数据量就很少。</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h2 id="分片应该设置几个副本"><a href="#分片应该设置几个副本" class="headerlink" title="分片应该设置几个副本"></a>分片应该设置几个副本</h2><p>说明：副本数是可以随时调整的！</p>
+<p>思考：</p>
+<p>副本的用途是什么？备份数据保证高可用数据不丢失，高并发的时候参与数据查询</p>
+<p>针对它的用途，我们该如何设置它的副本数？　一般一个分片有1-2个副本即可保证高可用</p>
+<p>集群规模没变的情况下副本过多会有什么影响？　　副本多浪费存储空间、占用资源、影响性能</p>
+<p>** 副本设置基本原则**</p>
+<p>为保证高可用，副本数设置为2即可。要求集群至少要有3个节点，来分开存放主分片、副本。如发现并发量大时，查询性能会下降，可增加副本数，来提升并发查询能力。</p>
+<p>注意：新增副本时主节点会自动协调，然后拷贝数据到新增的副本节点</p>
+<h1 id="集群搭建"><a href="#集群搭建" class="headerlink" title="集群搭建"></a>集群搭建</h1><h2 id="利用docker容器搭建伪集群"><a href="#利用docker容器搭建伪集群" class="headerlink" title="利用docker容器搭建伪集群"></a>利用docker容器搭建伪集群</h2><p>在Linux中创建目录，并且配置好：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">|-- node1</span><br><span class="line">|   |-- config</span><br><span class="line">|   |   &#96;-- es1.yml</span><br><span class="line">|   |-- data</span><br><span class="line">|   &#96;-- plugins</span><br><span class="line">|-- node2</span><br><span class="line">|   |-- config</span><br><span class="line">|   |   &#96;-- es1.yml</span><br><span class="line">|   |-- data</span><br><span class="line">|   &#96;-- plugins</span><br><span class="line">&#96;-- node3</span><br><span class="line">    |-- config</span><br><span class="line">    |   &#96;-- es1.yml</span><br><span class="line">    |-- data</span><br><span class="line">    &#96;-- plugins</span><br></pre></td></tr></table></figure>
+<p>目录文件： 是用来挂载用的，同步配置文件。容器的和外部的同步。</p>
+<p>开启防火墙（9300、9301、9302）：firewall-cmd –add-port=9301/tcp</p>
+<p>分别配置好配置文件：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">cluster.name: elasticsearch-cluster</span><br><span class="line">node.name: es-node3</span><br><span class="line">network.bind_host: 0.0.0.0</span><br><span class="line">network.publish_host: 172.17.0.13</span><br><span class="line">http.port: 9202</span><br><span class="line">transport.tcp.port: 9302</span><br><span class="line">http.cors.enabled: true</span><br><span class="line">http.cors.allow-origin: &quot;*&quot;</span><br><span class="line">node.master: true </span><br><span class="line">node.data: true  </span><br><span class="line">discovery.zen.ping.unicast.hosts: [&quot;172.17.0.11:9300&quot;,&quot;172.17.0.12:9301&quot;,&quot;172.17.0.13:9302&quot;]</span><br><span class="line">discovery.zen.minimum_master_nodes: 2</span><br></pre></td></tr></table></figure>
+<p>discovery.zen.minimum_master_nodes: 1  master节点有1个   # discovery.zen.minimum_master_nodes—节点总数/2+1</p>
+<p>说明：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">cluster.name：用于唯一标识一个集群，默认值是：elasticsearch。</span><br><span class="line">node.name：节点名，默认随机指定一个name列表中名字。集群中node名字不能重复</span><br><span class="line"></span><br><span class="line">index.number_of_shards: 默认的配置是把索引分为5个分片</span><br><span class="line">index.number_of_replicas:设置每个index的默认的冗余备份的分片数，默认是1</span><br><span class="line"></span><br><span class="line">通过 index.number_of_shards，index.number_of_replicas默认设置索引将分为5个分片，每个分片1个副本，共10个结点。</span><br><span class="line"></span><br><span class="line">bootstrap.memory_lock: true 当JVM做分页切换（swapping）时，ElasticSearch执行的效率会降低，推荐把ES_MIN_MEM和ES_MAX_MEM两个环境变量设置成同一个值，并且保证机器有足够的物理内存分配给ES，同时允许ElasticSearch进程锁住内存</span><br><span class="line"></span><br><span class="line">network.bind_host: 设置可以访问的ip,可以是ipv4或ipv6的，默认为0.0.0.0，这里全部设置通过</span><br><span class="line"></span><br><span class="line">network.publish_host:设置其它结点和该结点交互的ip地址，如果不设置它会自动判断，值必须是个真实的ip地址</span><br><span class="line"></span><br><span class="line">同时设置bind_host和publish_host两个参数可以替换成network.host</span><br><span class="line">network.bind_host: 172.17.0.11</span><br><span class="line">network.publish_host: 172.17.0.11</span><br><span class="line">&#x3D;&gt;network.host: 172.17.0.11</span><br><span class="line"></span><br><span class="line">http.port:设置对外服务的http端口，默认为9200</span><br><span class="line"></span><br><span class="line">transport.tcp.port: 设置节点之间交互的tcp端口，默认是9300</span><br><span class="line"></span><br><span class="line">http.cors.enabled: 是否允许跨域REST请求</span><br><span class="line"></span><br><span class="line">http.cors.allow-origin: 允许 REST 请求来自何处</span><br><span class="line"></span><br><span class="line">node.master: true 配置该结点有资格被选举为主结点（候选主结点），用于处理请求和管理集群，false为不具有选举的资格。</span><br><span class="line"></span><br><span class="line">node.data: true 配置该结点是数据结点，用于保存数据，执行数据相关的操作（CRUD，Aggregation）；</span><br><span class="line"></span><br><span class="line">discovery.zen.minimum_master_nodes: </span><br><span class="line">自动发现master节点的最小数，如果这个集群中配置进来的master节点少于这个数目，es的日志会一直报master节点数目不足，默认为1。</span><br><span class="line">为了避免脑裂，个数请遵从该公式 &#x3D;&gt; (totalnumber of master-eligible nodes &#x2F; 2 + 1)。 </span><br><span class="line">脑裂是指在主备切换时，由于切换不彻底或其他原因，导致客户端和Slave误以为出现两个active master，最终使得整个集群处于混乱状态。</span><br><span class="line"></span><br><span class="line">discovery.zen.ping.unicast.hosts： 集群个节点IP地址，也可以使用es-node等名称，需要各节点能够解析</span><br></pre></td></tr></table></figure>
+
+<p>分别启动：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">docker run -d -p 9200:9200 -p 9300:9300 -v &#x2F;root&#x2F;es-cluster&#x2F;node1&#x2F;config&#x2F;es1.yml:&#x2F;usr&#x2F;share&#x2F;elasticsearch&#x2F;config&#x2F;elasticsearch.yml -v &#x2F;root&#x2F;es-cluster&#x2F;node1&#x2F;plugins:&#x2F;usr&#x2F;share&#x2F;elasticsearch&#x2F;plugins -v &#x2F;root&#x2F;es-cluster&#x2F;node1&#x2F;data:&#x2F;usr&#x2F;share&#x2F;elasticsearch&#x2F;data -e ES_JAVA_OPTS&#x3D;&quot;-Xms512m -Xmx512m&quot; --name es-node1 bdaab402b220</span><br><span class="line"></span><br><span class="line">或：</span><br><span class="line"></span><br><span class="line">docker run -d -e ES_JAVA_OPTS&#x3D;&quot;-Xms512m -Xmx512m&quot; -p 9200:9200 -p 9300:9300 --mount type&#x3D;bind,source&#x3D;&#x2F;root&#x2F;es-cluster&#x2F;node1&#x2F;config&#x2F;es1.yml,target&#x3D;&#x2F;usr&#x2F;share&#x2F;elasticsearch&#x2F;config&#x2F;elasticsearch.yml --mount type&#x3D;bind,source&#x3D;&#x2F;root&#x2F;es-cluster&#x2F;node1&#x2F;plugins,target&#x3D;&#x2F;usr&#x2F;share&#x2F;elasticsearch&#x2F;plugins --mount type&#x3D;bind,source&#x3D;&#x2F;root&#x2F;es-cluster&#x2F;node1&#x2F;data,target&#x3D;&#x2F;usr&#x2F;share&#x2F;elasticsearch&#x2F;data --name es-node1 bdaab402b220</span><br></pre></td></tr></table></figure>
+<p>docker run -d -e ES_JAVA_OPTS=”-Xms512m -Xmx512m” -p 9201:9201 -p 9301:9301 -v /root/es-cluster/node2/config/es1.yml:/usr/share/elasticsearch/config/elasticsearch.yml -v /root/es-cluster/node2/plugins:/usr/share/elasticsearch/plugins -v /root/es-cluster/node2/data:/usr/share/elasticsearch/data –name es-node2 bdaab402b220</p>
+<p>docker run -d -e ES_JAVA_OPTS=”-Xms512m -Xmx512m” -p 9202:9202 -p 9302:9302 -v /root/es-cluster/node3/config/es1.yml:/usr/share/elasticsearch/config/elasticsearch.yml -v /root/es-cluster/node3/plugins:/usr/share/elasticsearch/plugins -v /root/es-cluster/node3/data:/usr/share/elasticsearch/data –name es-node3 bdaab402b220</p>
+<p>出现的问题：</p>
+<p>1、Java HotSpot(TM) 64-Bit Server VM warning: INFO: os::commit_memory(0x00000000c5330000, 986513408, 0) failed; error=’Cannot allocate memory’ (errno=12)</p>
+<p>解决办法是，运行的时间添加设定每个容器的 ES_JAVA_OPTS=”-Xms256m -Xmx256m”  </p>
+<p>2、bootstrap checks failed max virtual memory areas vm.max_map_count [65530] likely too low, increase to at least [262144]</p>
+<p>** 调高JVM线程数限制数量 **</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">在centos窗口中，修改配置sysctl.conf</span><br><span class="line">vim &#x2F;etc&#x2F;sysctl.conf</span><br><span class="line"></span><br><span class="line">加入如下内容：</span><br><span class="line">vm.max_map_count&#x3D;262144 </span><br><span class="line"></span><br><span class="line">启用配置：sysctl -p</span><br></pre></td></tr></table></figure>
+<p>3、OpenJDK 64-Bit Server VM warning: Option UseConcMarkSweepGC was deprecated in version 9.0 and will likely be removed in a future release.</p>
+<p>增加data权限 ,如果有can not run elasticsearch as root则需要使用切换普通用户操作。；</p>
+<p>4、docker WARNING: IPv4 forwarding is disabled</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">在宿主机上面执行：</span><br><span class="line">net.ipv4.ip_forward&#x3D;1 &gt;&gt; &#x2F;usr&#x2F;lib&#x2F;sysctl.d&#x2F;00-system.conf</span><br><span class="line">重启network和docker服务</span><br><span class="line">systemctl restart network &amp;&amp; systemctl restart docker</span><br></pre></td></tr></table></figure>
+<p>5、Caused by: java.io.IOException: No route to host</p>
+<p>data文件中的节点数据，需要把示例二data文件下的文件清空。rm -rf  ./node<em>/data/</em></p>
+<h2 id="正式集群"><a href="#正式集群" class="headerlink" title="正式集群"></a>正式集群</h2><ol>
+<li><p>准备3台虚拟机：</p>
+</li>
+<li><p>168.152.128 、192.168.152.129、192.168.152.130</p>
+</li>
+<li><p>在3台虚拟机里面都安装好elasticsearch<br>安装教程参考我之前写的文章的ES的安装和配置部分：</p>
+</li>
+</ol>
+<p><a href="https://www.cnblogs.com/leeSmall/p/9189078.html" target="_blank" rel="noopener">https://www.cnblogs.com/leeSmall/p/9189078.html</a></p>
+<ol start="3">
+<li>修改3台虚拟机下ES的配置，使得它们组成一个集群<br>进入elasticsearch的config目录，修改elasticsearch.yml的配置</li>
+</ol>
+<p>3.1. IP访问限制、默认端口修改9200<br>这里有两个需要提醒下，第一个就是IP访问限制，第二个就是es实例的默认端口号9200。IP访问限制可以限定具体的IP访问服务器，这有一定的安全过滤作用。</p>
+<p>#Set the bind address to a specific IP (IPv4 or IPv6): </p>
+<h1 id=""><a href="#" class="headerlink" title=""></a></h1><p>network.host: 192.168.152.128<br>如果设置成0.0.0.0则是不限制任何IP访问。一般在生产的服务器可能会限定几台IP，通常用于管理使用。</p>
+<p>默认的端口9200在一般情况下也有点风险，可以将默认的端口修改成另外一个，这还有一个原因就是怕开发人员误操作，连接上集群。当然，如果你的公司网络隔离做的很好也无所谓。</p>
+<h1 id="-1"><a href="#-1" class="headerlink" title=""></a></h1><p>#Set a custom port for HTTP: </p>
+<h1 id="-2"><a href="#-2" class="headerlink" title=""></a></h1><p>http.port: 9200<br>transport.tcp.port: 9300<br>这里的9300是集群内部通讯使用的端口，这个也可以修改掉。因为连接集群的方式有两种，通过扮演集群node也是可以进入集群的，所以还是安全起见，修改掉默认的端口。</p>
+<p>说明：记得修改安装了ES的3台虚拟机（三个节点）的相同配置，要不然节点之间无法建立连接工作，也会报错。</p>
+<p>3.2 集群发现IP列表、node、cluster名称<br>紧接着修改集群节点IP地址，这样可以让集群在规定的几个节点之间工作。elasticsearch，默认是使用自动发现IP机制。就是在当前网段内，只要能被自动感知到的IP就能自动加入到集群中。这有好处也有坏处。好处就是自动化了，当你的es集群需要云化的时候就会非常方便。但是也会带来一些不稳定的情况，如，master的选举问题、数据复制问题。</p>
+<p>导致master选举的因素之一就是集群有节点进入。当数据复制发生的时候也会影响集群，因为要做数据平衡复制和冗余。这里面可以独立master集群，剔除master集群的数据节点能力。</p>
+<p>固定列表的IP发现有两种配置方式，一种是互相依赖发现，一种是全量发现。各有优势吧，我是使用的依赖发现来做的。这有个很重要的参考标准，就是你的集群扩展速度有多快。因为这有个问题就是，当全量发现的时候，如果是初始化集群会有很大的问题，就是master全局会很长，然后节点之间的启动速度各不一样。所以我采用了靠谱点的依赖发现。</p>
+<p>你需要在192.168.152.128的elasticsearch中配置成：</p>
+<p>#——————————— Discovery ———————————- </p>
+<h1 id="-3"><a href="#-3" class="headerlink" title=""></a></h1><p>#Pass an initial list of hosts to perform discovery when new node is started:<br>#The default list of hosts is [“127.0.0.1”, “[::1]”] </p>
+<h1 id="-4"><a href="#-4" class="headerlink" title=""></a></h1><p>discovery.zen.ping.unicast.hosts: [ “192.168.152.129:9300”,”192.168.152.130:9300” ]<br>让他去发现129，130的机器，以此内推，完成剩下的129和130机器的配置。</p>
+<p>然后你需要配置下集群名称，就是你当前节点所在集群的名称，这有助于你规划你的集群。集群中的所有节点的集群名称必须一样，只有集群名称一样才能组成一个逻辑集群。</p>
+<p>#———————————- Cluster ———————————– </p>
+<h1 id="-5"><a href="#-5" class="headerlink" title=""></a></h1><p>#Use a descriptive name for your cluster: </p>
+<h1 id="-6"><a href="#-6" class="headerlink" title=""></a></h1><p>cluster.name: mycluster<br>配置你当前节点的名称</p>
+<h1 id="-7"><a href="#-7" class="headerlink" title=""></a></h1><p>#———————————— Node ———————————— </p>
+<h1 id="-8"><a href="#-8" class="headerlink" title=""></a></h1><p>#Use a descriptive name for the node: </p>
+<h1 id="-9"><a href="#-9" class="headerlink" title=""></a></h1><p>node.name: node-1<br>以此类推，完成另外两个节点的配置。cluster.name的名称必须保持一样。然后分别设置node.name。</p>
+<p>说明：</p>
+<p>这里搭建的是一个简单的集群，没有做集群节点角色的区分，所以3个节点默认的角色有主节点、数据节点、协调节点</p>
+<p>选举ES主节点的逻辑：</p>
+<p>选举的大概逻辑，它会根据分片的数据的前后新鲜程度来作为选举的一个重要逻辑。（日志、数据、时间都会作为集群master全局的重要指标）</p>
+<p>因为考虑到数据一致性问题，当然是用最新的数据节点作为master，然后进行新数据的复制和刷新其他node。</p>
+<p>2、[WARN ][o.e.b.ElasticsearchUncaughtExceptionHandler] [] uncaught exception in thread [main] org.elasticsearch.bootstrap.StartupException: java.lang.RuntimeException: can not run elasticsearch as root</p>
+<p>新的版本安全级别 提高了，不允许采用root启动，我们需要添加一个新的用户。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">1、创建elasticsearch用户组：[root@localhost &#x2F;]# groupadd elasticsearch</span><br><span class="line">2、创建elasticsearch用户:[root@localhost elasticsearch-6.1.1]# useradd elasticsearch -g elasticsearch -p elasticsearch</span><br><span class="line">3、更改 elasticsearch-6.1.1文件夹下所有文件的所属用户和组分别为elasticsearch、elasticsearch。命令: chown -R elasticsearch.elasticsearch *(chown将指定文件的拥有者，-R代表处理指定目录以及子目录下的所有文件)</span><br><span class="line">4、给elasticsearch用户分配读写“&#x2F;usr&#x2F;local&#x2F;fast&#x2F;elasticsearch-6.1.1&#x2F;data”的权限 命令：chown -R elasticsearch:elasticsearch elasticsearch-6.1.1</span><br><span class="line">[1]: max file descriptors [4096] for elasticsearch process is too low, increase to at least [65536]，修改&#x2F;etc&#x2F;security&#x2F;limits.conf，添加如下内容，如果不成功的话可以尝试ulimit -n 65536。</span><br><span class="line">[2]: max number of threads [794] for user [elasticsearch] is too low, increase to at least [4096]，修改&#x2F;etc&#x2F;security&#x2F;limits.d&#x2F;20-nproc.conf和&#x2F;etc&#x2F;security&#x2F;limits.conf。</span><br><span class="line">[3]: max virtual memory areas vm.max_map_count [65530] is too low, increase to at least [262144]，修改&#x2F;etc&#x2F;sysctl.conf文件，具体如下。修改完成后，输入sysctl -a 命令。</span><br></pre></td></tr></table></figure>
+
+<h1 id="集群管理"><a href="#集群管理" class="headerlink" title="集群管理"></a>集群管理</h1><ol>
+<li>监控API<br><a href="http://localhost:9200/_cat" target="_blank" rel="noopener">http://localhost:9200/_cat</a></li>
+</ol>
+<p>复制代码<br>GET  /_cat</p>
+<p>/_cat/health<br>/_cat/nodes<br>/_cat/master<br>/_cat/indices<br>/_cat/allocation<br>/_cat/shards<br>/_cat/shards/{index}<br>/_cat/thread_pool<br>/_cat/segments<br>/_cat/segments/{index}<br>复制代码<br>2. x-pack<br>为集群提供安全防护、监控、告警、报告等功能的收费组件；<br>部分免费：<a href="https://www.elastic.co/subscriptions" target="_blank" rel="noopener">https://www.elastic.co/subscriptions</a><br>6.3开始已开源，并并入了elasticsearch核心中。</p>
+<p>官网安装介绍：</p>
+<p><a href="https://www.elastic.co/guide/en/elasticsearch/reference/6.2/installing-xpack-es.html" target="_blank" rel="noopener">https://www.elastic.co/guide/en/elasticsearch/reference/6.2/installing-xpack-es.html</a></p>
+<p>参考文章：</p>
+<p>集群搭建一：<a href="https://www.cnblogs.com/wangiqngpei557/p/5967377.html" target="_blank" rel="noopener">https://www.cnblogs.com/wangiqngpei557/p/5967377.html</a></p>
+<p>集群搭建二：<a href="https://www.cnblogs.com/jstarseven/p/6803054.html" target="_blank" rel="noopener">https://www.cnblogs.com/jstarseven/p/6803054.html</a> 这一篇文章写得比较详细，同时还总结了搭建过程中遇到的问题，搭建ES集群的话强烈推荐</p>
+<h1 id="配置参数"><a href="#配置参数" class="headerlink" title="配置参数"></a>配置参数</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">cluster.name: ES	ES集群名称，同一个集群内的所有节点集群名称必须保持一致</span><br><span class="line">node.name: slave2	ES集群内的节点名称，同一个集群内的节点名称要具备唯一性</span><br><span class="line">node.master: true	允许节点是否可以成为一个master节点，ES是默认集群中的第一台机器成为master，如果这台机器停止就会重新选举</span><br><span class="line">node.data: false	允许该节点存储索引数据（默认开启）</span><br><span class="line">path.data:	ES是搜索引擎，会创建文档，建立索引，此路径是索引的存放目录.可以指定多个存储位置</span><br><span class="line">path.logs:	elasticsearch专门的日志存储位置</span><br><span class="line">bootstrap.memory_lock: true	在ES运行起来后锁定ES所能使用的堆内存大小，锁定内存大小一般为可用内存的一半左右；锁定内存后就不会使用交换分区。如果不打开此项，当系统物理内存空间不足，ES将使用交换分区，ES如果使用交换分区，那么ES的性能将会变得很差</span><br><span class="line">network.host: 0.0.0.0	es的HTTP端口和集群通信端口就会监听在此地址上</span><br><span class="line">network.tcp.no_delay: true	是否启用tcp无延迟，true为启用tcp不延迟，默认为false启用tcp延迟</span><br><span class="line">truenetwork.tcp.keep_alive: true	是否启用TCP保持活动状态，默认为true</span><br><span class="line">network.tcp.reuse_address: true	是否应该重复使用地址。默认true，在Windows机器上默认为false</span><br><span class="line">network.tcp.send_buffer_size: 128mb	tcp发送缓冲区大小，默认不设置</span><br><span class="line">network.tcp.receive_buffer_size: 128mb	tcp接收缓冲区大小，默认不设置</span><br><span class="line">transport.tcp.port: 9301	设置集群节点通信的TCP端口，默认就是9300</span><br><span class="line">transport.tcp.compress: true	设置是否压缩TCP传输时的数据，默认为false</span><br><span class="line">http.max_content_length: 200mb	设置http请求内容的最大容量，默认是100mb</span><br><span class="line">http.cors.enabled: true	是否开启跨域访问</span><br><span class="line">http.cors.allow-origin: &quot;*&quot;	开启跨域访问后的地址限制，*表示无限制</span><br><span class="line">http.port: 9201	定义ES对外调用的http端口，默认是9200</span><br><span class="line">discovery.zen.ping.unicast.hosts: [&quot;127.0.0.1:9301&quot;,&quot;127.0.0.1:9302&quot;,&quot;127.0.0.1:9303&quot;]	在Elasticsearch7.0版本已被移除，配置错误。写入候选主节点的设备地址，来开启服务时就可以被选为主节点。默认主机列表只有127.0.0.1和IPV6的本机回环地址。上面是书写格式，discover意思为发现，zen是判定集群成员的协议，unicast是单播的意思，ES5.0版本之后只支持单播的方式来进行集群间的通信，hosts为主机</span><br><span class="line">discovery.zen.minimum_master_nodes: 2	在Elasticsearch7.0版本已被移除，配置无效，为了避免脑裂，集群的最少节点数量为，集群的总节点数量除以2加一</span><br><span class="line">discovery.zen.fd.ping_timeout: 120s	在Elasticsearch7.0版本已被移除，配置无效。探测超时时间，默认是3秒，我们这里填120秒是为了防止网络不好的时候ES集群发生脑裂现象</span><br><span class="line">discovery.zen.fd.ping_retries: 6	在Elasticsearch7.0版本已被移除，配置无效。探测次数，如果每次探测90秒，连续探测超过六次，则认为节点该节点已脱离集群，默认为3次</span><br><span class="line">discovery.zen.fd.ping_interval: 15s	在Elasticsearch7.0版本已被移除，配置无效。节点每隔15秒向master发送一次心跳，证明自己和master还存活，默认为1秒太频繁</span><br><span class="line">discovery.seed_hosts: [&quot;127.0.0.1:9301&quot;,&quot;127.0.0.1:9302&quot;,&quot;127.0.0.1:9303&quot;]	Elasticsearch7新增参数，写入候选主节点的设备地址，来开启服务时就可以被选为主节点,由discovery.zen.ping.unicast.hosts:参数改变而来</span><br><span class="line">cluster.initial_master_nodes: [&quot;127.0.0.1:9301&quot;,&quot;127.0.0.1:9302&quot;]	Elasticsearch7新增参数，写入候选主节点的设备地址，来开启服务时就可以被选为主节点</span><br><span class="line">cluster.fault_detection.leader_check.interval: 15s	Elasticsearch7新增参数，设置每个节点在选中的主节点的检查之间等待的时间。默认为1秒</span><br><span class="line">discovery.cluster_formation_warning_timeout: 30s	Elasticsearch7新增参数，启动后30秒内，如果集群未形成，那么将会记录一条警告信息，警告信息未master not fount开始，默认为10秒</span><br><span class="line">cluster.join.timeout: 30s	Elasticsearch7新增参数，节点发送请求加入集群后，在认为请求失败后，再次发送请求的等待时间，默认为60秒</span><br><span class="line">cluster.publish.timeout: 90s	Elasticsearch7新增参数，设置主节点等待每个集群状态完全更新后发布到所有节点的时间，默认为30秒</span><br><span class="line">cluster.routing.allocation.cluster_concurrent_rebalance: 32	集群内同时启动的数据任务个数，默认是2个</span><br><span class="line">cluster.routing.allocation.node_concurrent_recoveries: 32	添加或删除节点及负载均衡时并发恢复的线程个数，默认4个</span><br><span class="line">cluster.routing.allocation.node_initial_primaries_recoveries: 32	初始化数据恢复时，并发恢复线程的个数，默认4个</span><br></pre></td></tr></table></figure>
+      
+    </div>
+     <!-- 相关文章推荐 -->
+    
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Elasticsearch/" rel="tag"># Elasticsearch</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/03/17/Elasticsearch%E4%BD%BF%E7%94%A8%E6%93%8D%E4%BD%9C/" rel="next" title="Elasticsearch使用操作">
+                <i class="fa fa-chevron-left"></i> Elasticsearch使用操作
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/03/19/ES%E7%9A%84%E5%9B%A0%E6%9E%9C%E4%BB%8B%E7%BB%8D/" rel="prev" title="ES的因果介绍(转)">
+                ES的因果介绍(转) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+<span class="jiathis_txt">分享到：</span>
+<a class="jiathis_button_fav">收藏夹</a>
+<a class="jiathis_button_copy">复制网址</a>
+<a class="jiathis_button_email">邮件</a>
+<a class="jiathis_button_weixin">微信</a>
+<a class="jiathis_button_qzone">QQ空间</a>
+<a class="jiathis_button_tqq">腾讯微博</a>
+<a class="jiathis_button_douban">豆瓣</a>
+<a class="jiathis_button_share">一键分享</a>
+
+<a href="http://www.jiathis.com/share?uid=2140465" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+<a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+var jiathis_config={
+  data_track_clickback:true,
+  summary:"",
+  shortUrl:false,
+  hideMore:false
+}
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://img.huyunshun.com/img/20200522182348.png"
+                alt="初晨" />
+            
+              <p class="site-author-name" itemprop="name">初晨</p>
+              <p class="site-description motion-element" itemprop="description">永远不要说你知道本质，更别说真相了。</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">249</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">46</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+<!--近期文章版块-->
+            
+                <div class="links-of-blogroll motion-element links-of-blogroll-block">
+                  <div class="links-of-blogroll-title">
+                    <!-- modify icon to fire by szw -->
+                    <i class="fa fa-history fa-" aria-hidden="true"></i>
+                    近期文章
+                  </div>
+                  <ul class="links-of-blogroll-list">
+                    
+                    
+                      <li>
+                        <a href="/2020/05/22/WebSocket%E3%80%81Socket%E3%80%81TCP%E3%80%81HTTP%E5%8C%BA%E5%88%AB/" title="WebSocket、Socket、TCP、HTTP区别" target="_blank">WebSocket、Socket、TCP、HTTP区别</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/19/Springboot%E9%A1%B9%E7%9B%AE%E7%9A%84%E6%8E%A5%E5%8F%A3%E9%98%B2%E5%88%B7/" title="Springboot项目的接口防刷" target="_blank">Springboot项目的接口防刷</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/03/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Volatile%E5%85%B3%E9%94%AE%E5%AD%97%E5%8F%8A%E5%85%B6%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/" title="深入理解Volatile关键字及其实现原理" target="_blank">深入理解Volatile关键字及其实现原理</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/04/20/%E4%BD%BF%E7%94%A8vscode%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0%E7%8E%AF%E5%A2%83/" title="使用vscode搭建个人笔记环境" target="_blank">使用vscode搭建个人笔记环境</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/01/20/HBase%E4%BB%8B%E7%BB%8D%E5%AE%89%E8%A3%85%E4%B8%8E%E6%93%8D%E4%BD%9C/" title="HBase介绍安装与操作" target="_blank">HBase介绍安装与操作</a>
+                      </li>
+                    
+                  </ul>
+                </div>
+            
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#集群规划"><span class="nav-number">1.</span> <span class="nav-text">集群规划</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#我们需要多大规模的集群"><span class="nav-number">1.1.</span> <span class="nav-text">我们需要多大规模的集群</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#集群中的节点角色如何分配"><span class="nav-number">1.2.</span> <span class="nav-text">集群中的节点角色如何分配</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何避免脑裂问题"><span class="nav-number">1.3.</span> <span class="nav-text">如何避免脑裂问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#索引应该设置多少个分片"><span class="nav-number">1.4.</span> <span class="nav-text">索引应该设置多少个分片</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分片应该设置几个副本"><span class="nav-number">1.5.</span> <span class="nav-text">分片应该设置几个副本</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#集群搭建"><span class="nav-number">2.</span> <span class="nav-text">集群搭建</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#利用docker容器搭建伪集群"><span class="nav-number">2.1.</span> <span class="nav-text">利用docker容器搭建伪集群</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#正式集群"><span class="nav-number">2.2.</span> <span class="nav-text">正式集群</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#"><span class="nav-number">3.</span> <span class="nav-text"></span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#-1"><span class="nav-number">4.</span> <span class="nav-text"></span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#-2"><span class="nav-number">5.</span> <span class="nav-text"></span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#-3"><span class="nav-number">6.</span> <span class="nav-text"></span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#-4"><span class="nav-number">7.</span> <span class="nav-text"></span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#-5"><span class="nav-number">8.</span> <span class="nav-text"></span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#-6"><span class="nav-number">9.</span> <span class="nav-text"></span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#-7"><span class="nav-number">10.</span> <span class="nav-text"></span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#-8"><span class="nav-number">11.</span> <span class="nav-text"></span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#-9"><span class="nav-number">12.</span> <span class="nav-text"></span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#集群管理"><span class="nav-number">13.</span> <span class="nav-text">集群管理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#配置参数"><span class="nav-number">14.</span> <span class="nav-text">配置参数</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Copyright</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

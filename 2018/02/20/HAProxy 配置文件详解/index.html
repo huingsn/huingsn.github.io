@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="HAProxy,配置文件," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="haproxy 配置中分成五部分内容，分别如下： global：参数是进程级的，通常是和操作系统相关。这些参数一般只设置一次，如果配置无误，就不需要再次进行修改； defaults：配置默认参数，这些参数可以被用到frontend，backend，Listen组件； frontend：接收请求的前端虚拟节点，Frontend可以更加规则直接指定具体使用后端的backend； backend：后端服">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HAProxy 配置文件详解">
+<meta property="og:url" content="https://huyunshun.com/2018/02/20/HAProxy%20%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E8%AF%A6%E8%A7%A3/index.html">
+<meta property="og:site_name" content="简">
+<meta property="og:description" content="haproxy 配置中分成五部分内容，分别如下： global：参数是进程级的，通常是和操作系统相关。这些参数一般只设置一次，如果配置无误，就不需要再次进行修改； defaults：配置默认参数，这些参数可以被用到frontend，backend，Listen组件； frontend：接收请求的前端虚拟节点，Frontend可以更加规则直接指定具体使用后端的backend； backend：后端服">
+<meta property="article:published_time" content="2018-02-19T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-05-20T10:04:24.688Z">
+<meta property="article:author" content="初晨">
+<meta property="article:tag" content="HAProxy">
+<meta property="article:tag" content="配置文件">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://huyunshun.com/2018/02/20/HAProxy 配置文件详解/"/>
+
+
+
+
+
+  <title>HAProxy 配置文件详解 | 简</title>
+  
+
+
+
+
+
+
+
+
+  <script type="text/javascript" src="/js/src/love.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
+
+  <!-- 看板娘 -->
+    
+        <script async src="/live2d-widget/autoload.js"></script>
+    
+ <!-- 飘动的彩带） -->
+  <script src="/js/src/piao.js" type="text/javascript"></script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">简</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">人生短暂，学海无边，而大道至简。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://huyunshun.com/2018/02/20/HAProxy%20%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E8%AF%A6%E8%A7%A3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="初晨">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://img.huyunshun.com/img/20200522182348.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="简">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">HAProxy 配置文件详解</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-20T00:00:00+08:00">
+                2018-02-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/" itemprop="url" rel="index">
+                    <span itemprop="name">负载均衡</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <pre><code>haproxy 配置中分成五部分内容，分别如下：
+global：参数是进程级的，通常是和操作系统相关。这些参数一般只设置一次，如果配置无误，就不需要再次进行修改；
+defaults：配置默认参数，这些参数可以被用到frontend，backend，Listen组件；
+frontend：接收请求的前端虚拟节点，Frontend可以更加规则直接指定具体使用后端的backend；
+backend：后端服务集群的配置，是真实服务器，一个Backend对应一个或者多个实体服务器；
+Listen Fronted和backend的组合体。
+
+global   # 全局参数的设置
+# log语法：log &lt;address_1&gt;[max_level_1] # 全局的日志配置，使用log关键字，指定使用127.0.0.1上的syslog服务中的local0日志设备，记录日志等级为info的日志
+log 127.0.0.1 local0 info
+# 设置运行haproxy的用户和组，也可使用uid，gid关键字替代之
+user haproxy
+group haproxy
+# 以守护进程的方式运行
+daemon
+    #改变当前工作目录，可以提升 haproxy 的安全级别
+chroot      /usr/share/haproxy  
+    # 设置haproxy启动时的进程数，用于守护进程模式的 haproxy；默认为止启动 1 个进程。该值的设置应该和服务器的CPU核心数一致，即常见的2颗8核心CPU的服务器，即共有16核心，则可以将其值设置为：&lt;=16 ，创建多个进程数，可以减少每个进程的任务队列，但是过多的进程数也可能会导致进程的崩溃。
+nbproc 1
+# 定义每个haproxy进程的最大连接数 ，由于每个连接包括一个客户端和一个服务器端，所以单个进程的TCP会话最大数目将是该值的两倍。
+maxconn 4096
+# 设置最大打开的文件描述符数，该值会自动计算，所以不建议进行设置
+#ulimit -n 65536
+# 定义haproxy的pid
+#pidfile /var/run/haproxy.pid
+    # 定义当前节点的名称，用于 HA 场景中多 haproxy 进程共享同一个 IP        地址时
+    node                 haproxy1                           
+    # 当前实例的描述信息
+    description haproxy1  
+
+defaults # 默认部分的定义
+# mode语法：mode {http|tcp|health} 。http是七层模式，tcp是四层模式，health是健康检测，返回OK
+                    # tcp: 实例运行于纯 tcp 模式，在客户端和服务器端之间将建立一个全双工的连接，且不会对 7 层报文做任何类型的检查，此为默认模式
+                    # http:实例运行于 http 模式，客户端请求在转发至后端服务器之前将被深度分析，所有不与 RFC 模式兼容的请求都会被拒绝
+                    # health：实例运行于 health 模式，其对入站请求仅响应&quot;OK&quot;信息并关闭连接，且不会记录任何日志信息 ，此模式将用于相应外部组件的监控状态检测请求
+    mode http
+# 使用127.0.0.1上的syslog服务的local3设备记录错误信息
+log 127.0.0.1 local3 err
+# 定义连接后端服务器的失败重连次数，连接失败次数超过此值后将会将对应后端服务器标记为不可用
+retries 3
+# 启用日志记录HTTP请求，默认haproxy日志记录是不记录HTTP请求的，只记录&quot;时间[Jan 5 13:23:46] 日志服务器[127.0.0.1] 实例名已经pid[haproxy[25218]] 信息[Proxy http_80_in stopped.]&quot;，日志格式很简单。
+option httplog
+# 当使用了cookie时，haproxy将会将其请求的后端服务器的serverID插入到cookie中，以保证会话的SESSION持久性；而此时，如果后端的服务器宕掉了，但是客户端的cookie是不会刷新的，如果设置此参数，将会将客户的请求强制定向到另外一个后端server上，以保证服务的正常。
+option redispatch
+# 当服务器负载很高的时候，自动结束掉当前队列处理比较久的链接
+option abortonclose
+# 启用该项，日志中将不会记录空连接。所谓空连接就是在上游的负载均衡器或者监控系统为了探测该服务是否存活可用时，需要定期的连接或者获取某一固定的组件或页面，或者探测扫描端口是否在监听或开放等动作被称为空连接；官方文档中标注，如果该服务上游没有其他的负载均衡器的话，建议不要使用该参数，因为互联网上的恶意扫描或其他动作就不会被记录下来
+option dontlognull
+# 每处理完一个request时，haproxy都会去检查http头中的Connection的值，如果该值不是close，haproxy将会将其删除，如果该值为空将会添加为：Connection: close。使每个客户端和服务器端在完成一次传输后都会主动关闭TCP连接。与该参数类似的另外一个参数是&quot;option forceclose&quot;，该参数的作用是强制关闭对外的服务通道，因为有的服务器端收到Connection: close时，也不会自动关闭TCP连接，如果客户端也不关闭，连接就会一直处于打开，直到超时。
+    #每次请求完毕后主动关闭http通道
+#option                 http-server-close                           
+    option httpclose
+    # 前端的最大并发连接数（默认为 2000）
+maxconn         2000                                                                         
+    # 连接超时,设置成功连接到一台服务器的最长等待时间,默认单位是毫秒
+timeout connect 5000ms
+# 客户端超时 设置连接客户端发送数据时的成功连接最长等待时间，默认单位是毫秒
+timeout client 50000ms
+# 服务器超时 设置服务器端回应客户度数据发送的最长等待时间，默认单位是毫秒
+    timeout server 50000ms
+
+listen admin_status # 定义一个名为admin_status的部分,状态信息统计页面
+# 定义监听的套接字
+bind 0.0.0.0:1080
+# 定义为HTTP模式
+mode http
+# 继承global中log的定义
+log global
+# stats是haproxy的一个统计页面的套接字，该参数设置统计页面的刷新间隔为30s
+stats refresh 30s
+# 设置统计页面的uri为/admin?stats
+stats uri /admin?stats
+# 设置统计页面认证时的提示内容
+stats realm Private lands
+# 设置统计页面认证的用户和密码，如果要设置多个，另起一行写入即可
+stats auth admin:password
+# 隐藏统计页面上的haproxy版本信息
+stats hide-version
+    # 启用日志记录 HTTP 请求
+    option httplog
+
+frontend http_80_in # 定义一个名为http_80_in的前端部分
+# http_80_in定义前端部分监听的套接字
+bind 0.0.0.0:80
+# 定义为HTTP模式
+mode http
+# 继承global中log的定义
+log global
+# 启用X-Forwarded-For，在requests头部插入客户端IP发送给后端的server，使后端server获取到客户端的真实IP
+option forwardfor
+
+    # 当请求是以这些结尾的交给url_static处理策略
+    acl    url_static    url_reg /*.(css|jpg|png|jpeg|js|gif)$
+    #或者path_end      /*.(css|jpg|png|jpeg|js|gif)$
+    # 当请求的url末尾是以.jsp结尾的，交给jsp_web策略
+    acl   jsp_web    path_end .jsp
+
+    #如果url_static策略满足，交给static_server
+    use_backend static_server if url_static
+    use_backend jsp_server if jsp_web
+    #其他请求交给my_webserver
+default_backend       my_webserver
+
+#jsp_server的后端部分
+backend jsp_server  
+# 设置为http模式
+mode http
+# 负载均衡调度算法可用于&quot;defaults&quot;、&quot;listen&quot;和&quot;backend&quot;中,默认为轮询方式，有hash，roundrobin 轮询， source 保存session值，支持static-rr，leastconn，first，uri等参数
+balance source
+# 允许向cookie插入SERVERID，每台服务器的SERVERID可在下面使用cookie关键字定义
+cookie SERVERID
+# 开启对后端服务器的健康检测，通过GET /test/index.php来判断后端服务器的健康情况
+option httpchk GET /test/index.php
+    #抵不过一后端server
+server jsp_server_1 192.169.1.111:80 cookie 1 check inter 2000 rise 3 fall 3 weight 1
+server jsp_server_2 192.169.1.112:80 cookie 2 check inter 2000 rise 3 fall 3 weight 1
+# server语法：server &lt;name&gt; &lt;address&gt;[:[port]] [param*]    只能用于 listen 和 backend 区段。
+    #  &lt;name&gt;为此服务器指定的内部名称，其将会出现在日志及警告信息中；后端服务器的IP地址，支持端口映射:[port]；
+    #  [param*]为此 server 设定的一系列参数，均为可选项，参数比较多，下面仅说明几个常用的参数：
+    #  weight：权重，默认为 1，最大值为 256，0 表示不参与负载均衡
+    #  backup：设定为备用服务器，仅在负载均衡场景中的其他 server 均不可以启用此server
+    #  check：启动对此 server 执行监控状态检查
+    #  inter：设定监控状态检查的时间间隔，单位为毫秒，默认为 2000，也可以使用 fastinter 和 downinter 来根据服务器端专题优化此事件延迟
+    #  rise：设置 server 从离线状态转换至正常状态需要检查的次数（不设置的情况下，默认值为 2）
+    #  fall：设置 server 从正常状态转换至离线状态需要检查的次数（不设置的情况下，默认值为 3）
+    # cookie：为指定 server 设定 cookie 值，此处指定的值将会在请求入站时被检查，第一次为此值挑选的 server 将会被后续的请求所选中，其目的在于实现持久连接的功能
+    # maxconn：指定此服务器接受的最大并发连接数，如果发往此服务器的连接数目高于此处指定的值，其将被放置于请求队列，以等待其他连接被释放
+
+#定义static_server
+backend static_server
+mode http
+server static_server_1 127.0.0.1:80 cookie 3 check inter 2000 rise 3 fall 3
+
+#定义my_webserver，名字需要与frontend里面配置项default_backend 值相一致
+backend my_webserver        
+    # 负载均衡算法
+balance     roundrobin                              
+server  web01 192.169.1.33:80  check inter 2000 fall 3 weight 30              #定义的多个后端
+server  web02 192.169.1.34:80  check inter 2000 fall 3 weight 30              #定义的多个后端
+server  web03 192.169.1.35:80  check inter 2000 fall 3 weight 30              #定义的多个后端</code></pre><p>注意：多节点部署时 node 、 description 的值要做相应调整</p>
+
+      
+    </div>
+     <!-- 相关文章推荐 -->
+    
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/HAProxy/" rel="tag"># HAProxy</a>
+          
+            <a href="/tags/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6/" rel="tag"># 配置文件</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/02/20/HAProxy+Keepalived+MyCat+MySQL%E9%AB%98%E5%8F%AF%E7%94%A8%E9%9B%86%E7%BE%A4/" rel="next" title="HAProxy+Keepalived+MyCat+MySQL高可用集群">
+                <i class="fa fa-chevron-left"></i> HAProxy+Keepalived+MyCat+MySQL高可用集群
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/02/20/MySQL+MyCat%20%E5%88%86%E5%BA%93%E5%88%86%E8%A1%A8/" rel="prev" title="MySQL+MyCat 分库分表">
+                MySQL+MyCat 分库分表 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+<span class="jiathis_txt">分享到：</span>
+<a class="jiathis_button_fav">收藏夹</a>
+<a class="jiathis_button_copy">复制网址</a>
+<a class="jiathis_button_email">邮件</a>
+<a class="jiathis_button_weixin">微信</a>
+<a class="jiathis_button_qzone">QQ空间</a>
+<a class="jiathis_button_tqq">腾讯微博</a>
+<a class="jiathis_button_douban">豆瓣</a>
+<a class="jiathis_button_share">一键分享</a>
+
+<a href="http://www.jiathis.com/share?uid=2140465" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+<a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+var jiathis_config={
+  data_track_clickback:true,
+  summary:"",
+  shortUrl:false,
+  hideMore:false
+}
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://img.huyunshun.com/img/20200522182348.png"
+                alt="初晨" />
+            
+              <p class="site-author-name" itemprop="name">初晨</p>
+              <p class="site-description motion-element" itemprop="description">永远不要说你知道本质，更别说真相了。</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">249</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">46</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+<!--近期文章版块-->
+            
+                <div class="links-of-blogroll motion-element links-of-blogroll-block">
+                  <div class="links-of-blogroll-title">
+                    <!-- modify icon to fire by szw -->
+                    <i class="fa fa-history fa-" aria-hidden="true"></i>
+                    近期文章
+                  </div>
+                  <ul class="links-of-blogroll-list">
+                    
+                    
+                      <li>
+                        <a href="/2020/05/22/WebSocket%E3%80%81Socket%E3%80%81TCP%E3%80%81HTTP%E5%8C%BA%E5%88%AB/" title="WebSocket、Socket、TCP、HTTP区别" target="_blank">WebSocket、Socket、TCP、HTTP区别</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/19/Springboot%E9%A1%B9%E7%9B%AE%E7%9A%84%E6%8E%A5%E5%8F%A3%E9%98%B2%E5%88%B7/" title="Springboot项目的接口防刷" target="_blank">Springboot项目的接口防刷</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/03/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Volatile%E5%85%B3%E9%94%AE%E5%AD%97%E5%8F%8A%E5%85%B6%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/" title="深入理解Volatile关键字及其实现原理" target="_blank">深入理解Volatile关键字及其实现原理</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/04/20/%E4%BD%BF%E7%94%A8vscode%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0%E7%8E%AF%E5%A2%83/" title="使用vscode搭建个人笔记环境" target="_blank">使用vscode搭建个人笔记环境</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/01/20/HBase%E4%BB%8B%E7%BB%8D%E5%AE%89%E8%A3%85%E4%B8%8E%E6%93%8D%E4%BD%9C/" title="HBase介绍安装与操作" target="_blank">HBase介绍安装与操作</a>
+                      </li>
+                    
+                  </ul>
+                </div>
+            
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Copyright</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

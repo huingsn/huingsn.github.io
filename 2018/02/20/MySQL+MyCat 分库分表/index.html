@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="mysql,mycat," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="MyCat介绍系统开发中，数据库是非常重要的一个点。除了程序的本身的优化，如：SQL语句优化、代码优化，数据库的处理本身优化也是非常重要的。主从、热备、分表分库等都是系统发展迟早会遇到的技术问题问题。 MyCat是一个开源的分布式数据库系统，是一个实现了MySQL协议的服务器，前端用户可以把它看作是一个数据库代理，用MySQL客户端工具和命令行访问，而其后端可以用MySQL原生协议与多个MySQL">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MySQL+MyCat 分库分表">
+<meta property="og:url" content="https://huyunshun.com/2018/02/20/MySQL+MyCat%20%E5%88%86%E5%BA%93%E5%88%86%E8%A1%A8/index.html">
+<meta property="og:site_name" content="简">
+<meta property="og:description" content="MyCat介绍系统开发中，数据库是非常重要的一个点。除了程序的本身的优化，如：SQL语句优化、代码优化，数据库的处理本身优化也是非常重要的。主从、热备、分表分库等都是系统发展迟早会遇到的技术问题问题。 MyCat是一个开源的分布式数据库系统，是一个实现了MySQL协议的服务器，前端用户可以把它看作是一个数据库代理，用MySQL客户端工具和命令行访问，而其后端可以用MySQL原生协议与多个MySQL">
+<meta property="og:image" content="https://img.huyunshun.com/img/20200420190855.png">
+<meta property="og:image" content="https://img.huyunshun.com/img/20200420190928.png">
+<meta property="og:image" content="https://img.huyunshun.com/img/20200420190612.png">
+<meta property="og:image" content="https://img.huyunshun.com/img/20200420190637.png">
+<meta property="article:published_time" content="2018-02-19T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-05-20T10:04:24.704Z">
+<meta property="article:author" content="初晨">
+<meta property="article:tag" content="mysql">
+<meta property="article:tag" content="mycat">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img.huyunshun.com/img/20200420190855.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://huyunshun.com/2018/02/20/MySQL+MyCat 分库分表/"/>
+
+
+
+
+
+  <title>MySQL+MyCat 分库分表 | 简</title>
+  
+
+
+
+
+
+
+
+
+  <script type="text/javascript" src="/js/src/love.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
+
+  <!-- 看板娘 -->
+    
+        <script async src="/live2d-widget/autoload.js"></script>
+    
+ <!-- 飘动的彩带） -->
+  <script src="/js/src/piao.js" type="text/javascript"></script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">简</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">人生短暂，学海无边，而大道至简。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://huyunshun.com/2018/02/20/MySQL+MyCat%20%E5%88%86%E5%BA%93%E5%88%86%E8%A1%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="初晨">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://img.huyunshun.com/img/20200522182348.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="简">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">MySQL+MyCat 分库分表</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-20T00:00:00+08:00">
+                2018-02-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mysql/" itemprop="url" rel="index">
+                    <span itemprop="name">mysql</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="MyCat介绍"><a href="#MyCat介绍" class="headerlink" title="MyCat介绍"></a>MyCat介绍</h2><p>系统开发中，数据库是非常重要的一个点。除了程序的本身的优化，如：SQL语句优化、代码优化，数据库的处理本身优化也是非常重要的。主从、热备、分表分库等都是系统发展迟早会遇到的技术问题问题。</p>
+<p>MyCat是一个开源的分布式数据库系统，是一个实现了MySQL协议的服务器，前端用户可以把它看作是一个数据库代理，用MySQL客户端工具和命令行访问，而其后端可以用MySQL原生协议与多个MySQL服务器通信，也可以用JDBC协议与大多数主流数据库服务器通信，其核心功能是分表分库，即将一个大表水平分割为N个小表，存储在后端MySQL服务器里或者其他数据库里。</p>
+<p>MyCat发展到目前的版本，已经不是一个单纯的MySQL代理了，它的后端可以支持MySQL、SQL Server、Oracle、DB2、PostgreSQL等主流数据库，也支持MongoDB这种新型NoSQL方式的存储，未来还会支持更多类型的存储。而在最终用户看来，无论是那种存储方式，在MyCat里，都是一个传统的数据库表，支持标准的SQL语句进行数据的操作，这样一来，对前端业务系统来说，可以大幅降低开发难度，提升开发速度。</p>
+<p><img src="https://img.huyunshun.com/img/20200420190855.png" alt="20200420190855"></p>
+<p>MyCat 是使用 Java 编写的数据库中间件，运行在代码应用和 MySQL 数据库之间的应用。它的前身是阿里开发的数据库中间件corba，实现 MySQL 数据库分库分表集群管理的中间件，曾经出现过重大事故而放弃，被部分人员进行二次开发，形成 Mycat，使用 MyCat 之后，编写的所有的 SQL 语句必须严格遵守 SQL 标准规范.<br>使用 MyCat 中间件后的结构图如下：</p>
+<p><img src="https://img.huyunshun.com/img/20200420190928.png" alt="20200420190928"></p>
+<p>当我们的应用只需要一台数据库服务器的时候我们并不需要Mycat，而如果你需要分库甚至分表，这时候应用要面对很多个数据库的时候，这个时候就需要对数据库层做一个抽象，来管理这些数据库，而最上面的应用只需要面对一个数据库层的抽象或者说数据库中间件就好了，这就是Mycat的核心作用。</p>
+<p>所以可以这样理解：数据库是对底层存储文件的抽象，而Mycat是对数据库的抽象。</p>
+<h3 id="数据库切分"><a href="#数据库切分" class="headerlink" title="数据库切分"></a>数据库切分</h3><pre><code>逻辑上的切分，在物理层面，是使用多库[database]，多表[table]实现切分。分为横向和纵向切分；
+横向切分：把一个表切分成多个表，相比纵向切分配置麻烦，无法实现表连接查询. 将一张表的字段，分散到若干张表中，将若干表连接到一起，才是当前表的完整数据。
+纵向切分：把一个数据库切分成多个数据库，配置方便，只能实现两张表的表连接查询，将一张表中的数据，分散到若干个 database 的同结构表中。多个表的数据的集合是当前表格的数据。</code></pre><h3 id="Mycat-中的DB"><a href="#Mycat-中的DB" class="headerlink" title="Mycat 中的DB"></a>Mycat 中的DB</h3><pre><code>Mycat 中定义的 database是逻辑上的，但是物理上未必存在。主要是针对纵向切分提供的概念，访问 MyCat，就是将 MyCat 当做 MySQL 使用。</code></pre><p>db 数据库是 MyCat 中定义的 database。通过 SQL 访问 MyCat 中的 db 库的时候，对应的是 MySQL 中的 db1，db2，db3 三个库。物理上的 database 是 db1，db2，db3.逻辑上的<br>database 就是 db。</p>
+<h3 id="Mycat-中的表"><a href="#Mycat-中的表" class="headerlink" title="Mycat 中的表"></a>Mycat 中的表</h3><p>逻辑意义上的表，一个MaCat的table可以对应物理库上的多个表。</p>
+<p>Mycat 默认端口：8066</p>
+<pre><code>数据主机：dataHost
+
+物理 MySQL 存放的主机地址，可以使用主机名、IP、域名定义。
+数据节点：dataNode 物理的 database 是什么，数据保存的物理节点就是 database。
+分片规则：当控制数据的时候，如何访问物理 database 和 table， 就是访问 dataHost 和 dataNode 的算法。
+在 Mycat 处理具体的数据 CRUD 的时候，如何访问 dataHost 和 dataNode 的算法.如:哈希算法,crc16 算法等</code></pre><h2 id="MyCat实现分库分表读写分离"><a href="#MyCat实现分库分表读写分离" class="headerlink" title="MyCat实现分库分表读写分离"></a>MyCat实现分库分表读写分离</h2><h3 id="一、搭建准备"><a href="#一、搭建准备" class="headerlink" title="一、搭建准备"></a>一、搭建准备</h3><pre><code>MyCat：192.168.1.105
+MySQL master：192.168.1.103
+MySQL slave：192.168.1.104
+
+在需要搭建环境的机器上安装jdk，MySQL。这里使用上个例子的节点，关闭MySQL-Proxy功能，在原有的MySQL-Proxy机器上安装MyCat。
+两台数据库上设置可供mycat访问的用户密码
+mysql&gt; grant all privileges on *.* to &apos;mycat&apos;@&apos;%&apos; identified by &apos;mycat&apos; with grant option;
+mysql&gt; flush privileges;</code></pre><h3 id="二、安装配置MyCat"><a href="#二、安装配置MyCat" class="headerlink" title="二、安装配置MyCat"></a>二、安装配置MyCat</h3><h4 id="1、下载Mycat官网：http-www-mycat-io"><a href="#1、下载Mycat官网：http-www-mycat-io" class="headerlink" title="1、下载Mycat官网：http://www.mycat.io/"></a>1、下载Mycat官网：<a href="http://www.mycat.io/" target="_blank" rel="noopener">http://www.mycat.io/</a></h4><pre><code>下载Mycat-server-1.6.6.1-release-20181031195535-linux.tar.gz到Linux并解压到/usr/local/mycat
+bin        mycat命令，启动、重启、停止等
+catlet        catlet为Mycat的一个扩展功能
+conf        Mycat 配置信息,重点关注
+lib        Mycat引用的jar包，Mycat是java开发的
+logs        日志文件，包括Mycat启动的日志和运行的日志。
+直接运行测试一下：
+[root@localhost mycat]# bin/mycat start
+Starting Mycat-server...
+[root@localhost mycat]# bin/mycat status
+Mycat-server is running (20038).
+远程登录看一下
+[root@localhost mysql-proxy]# mysql -uroot -p123456 -h192.168.1.105 -P8066
+mysql&gt; show databases;
++----------+
+| DATABASE |
++----------+
+| TESTDB   |
++----------+
+mysql&gt; use TESTDB;
+mysql&gt; show tables;
++------------------+
+| Tables in TESTDB |
++------------------+
+| company          |
+| customer         |
+| customer_addr    |
+| employee         |
+| goods            |
+| hotnews          |
+| orders           |
+| order_items      |
+| travelrecord     |
++------------------+</code></pre><p>初步测试MyCat没问题，配置文件中配置的逻辑表和库都能查到，但是不能查看数据，因为数据永远在物理库中，并且默认也米有配置对应真实的物理库。</p>
+<h4 id="2、配置示例测试"><a href="#2、配置示例测试" class="headerlink" title="2、配置示例测试"></a>2、配置示例测试</h4><p>示例、配置分库，比如一个库demo的user表中有20w数据，现在进行分3个库，表结构一样，大概分别存6w左右数据。</p>
+<p>第一步，创建好分库，表可以先不用创建。分别为demo1，demo2，demo3。</p>
+<pre><code>schema.xml配置如下：需要分库的数据库也放进来。</code></pre><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0"?&gt;</span></span><br><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">mycat</span>:schema <span class="meta-keyword">SYSTEM</span> <span class="meta-string">"schema.dtd"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">mycat:schema</span> <span class="attr">xmlns:mycat</span>=<span class="string">"http://io.mycat/"</span>&gt;</span></span><br><span class="line">       <span class="comment">&lt;!--逻辑库表创建--&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">schema</span> <span class="attr">name</span>=<span class="string">"demo"</span> <span class="attr">checkSQLschema</span>=<span class="string">"false"</span> <span class="attr">sqlMaxLimit</span>=<span class="string">"100"</span>&gt;</span></span><br><span class="line">               <span class="tag">&lt;<span class="name">table</span> <span class="attr">name</span>=<span class="string">"user"</span> <span class="attr">dataNode</span>=<span class="string">"demo1,demo2,demo3"</span> <span class="attr">rule</span>=<span class="string">"crc32slot"</span> /&gt;</span></span><br><span class="line">       <span class="tag">&lt;/<span class="name">schema</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">schema</span> <span class="attr">name</span>=<span class="string">"olddemo"</span> <span class="attr">checkSQLschema</span>=<span class="string">"false"</span> <span class="attr">sqlMaxLimit</span>=<span class="string">"100"</span>&gt;</span></span><br><span class="line">               <span class="tag">&lt;<span class="name">table</span> <span class="attr">name</span>=<span class="string">"user"</span> <span class="attr">dataNode</span>=<span class="string">"demo_old"</span>/&gt;</span></span><br><span class="line">       <span class="tag">&lt;/<span class="name">schema</span>&gt;</span></span><br><span class="line">       </span><br><span class="line">       <span class="comment">&lt;!--逻辑节点，对应物理库--&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">dataNode</span> <span class="attr">name</span>=<span class="string">"demo1"</span> <span class="attr">dataHost</span>=<span class="string">"host103"</span> <span class="attr">database</span>=<span class="string">"demo1"</span> /&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">dataNode</span> <span class="attr">name</span>=<span class="string">"demo2"</span> <span class="attr">dataHost</span>=<span class="string">"host103"</span> <span class="attr">database</span>=<span class="string">"demo2"</span> /&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">dataNode</span> <span class="attr">name</span>=<span class="string">"demo3"</span> <span class="attr">dataHost</span>=<span class="string">"host103"</span> <span class="attr">database</span>=<span class="string">"demo3"</span> /&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">dataNode</span> <span class="attr">name</span>=<span class="string">"demo_old"</span> <span class="attr">dataHost</span>=<span class="string">"host103"</span> <span class="attr">database</span>=<span class="string">"demo"</span> /&gt;</span></span><br><span class="line">       </span><br><span class="line">       <span class="comment">&lt;!--物理库配置--&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">dataHost</span> <span class="attr">name</span>=<span class="string">"host103"</span> <span class="attr">maxCon</span>=<span class="string">"1000"</span> <span class="attr">minCon</span>=<span class="string">"10"</span> <span class="attr">balance</span>=<span class="string">"0"</span> <span class="attr">writeType</span>=<span class="string">"0"</span> <span class="attr">dbType</span>=<span class="string">"mysql"</span> <span class="attr">dbDriver</span>=<span class="string">"native"</span> <span class="attr">switchType</span>=<span class="string">"1"</span> <span class="attr">slaveThreshold</span>=<span class="string">"100"</span>&gt;</span></span><br><span class="line">               <span class="tag">&lt;<span class="name">heartbeat</span>&gt;</span>select user()<span class="tag">&lt;/<span class="name">heartbeat</span>&gt;</span></span><br><span class="line">               <span class="tag">&lt;<span class="name">writeHost</span> <span class="attr">host</span>=<span class="string">"hostM1"</span> <span class="attr">url</span>=<span class="string">"192.168.1.103:3306"</span> <span class="attr">user</span>=<span class="string">"mycat"</span> <span class="attr">password</span>=<span class="string">"mycat"</span>&gt;</span></span><br><span class="line">                       <span class="tag">&lt;<span class="name">readHost</span> <span class="attr">host</span>=<span class="string">"hostS1"</span> <span class="attr">url</span>=<span class="string">"192.168.1.104:3306"</span> <span class="attr">user</span>=<span class="string">"mycat"</span> <span class="attr">password</span>=<span class="string">"mycat"</span> /&gt;</span></span><br><span class="line">               <span class="tag">&lt;/<span class="name">writeHost</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;/<span class="name">dataHost</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">mycat:schema</span>&gt;</span></span><br><span class="line">               rule.xml中修改，因为使用crc32slot分片规则，这个规要配置分片的数据库节点数量</span><br><span class="line">                       <span class="tag">&lt;<span class="name">function</span> <span class="attr">name</span>=<span class="string">"crc32slot"</span> <span class="attr">class</span>=<span class="string">"io.mycat.route.function.PartitionByCRC32PreSlot"</span>&gt;</span></span><br><span class="line">               <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"count"</span>&gt;</span>3<span class="tag">&lt;/<span class="name">property</span>&gt;</span><span class="comment">&lt;!-- 要分片的数据库节点数量，必须指定，否则没法分片 --&gt;</span></span><br><span class="line">       <span class="tag">&lt;/<span class="name">function</span>&gt;</span></span><br><span class="line">               server.xml配置用户和该用户使用规则</span><br><span class="line">                       <span class="tag">&lt;<span class="name">user</span> <span class="attr">name</span>=<span class="string">"root"</span> <span class="attr">defaultAccount</span>=<span class="string">"true"</span>&gt;</span></span><br><span class="line">               <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"password"</span>&gt;</span>123456<span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">               <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"schemas"</span>&gt;</span>demo,olddemo<span class="tag">&lt;/<span class="name">property</span>&gt;</span><span class="comment">&lt;!---可以访问哪些逻辑库----&gt;</span></span><br><span class="line">               </span><br><span class="line">               <span class="comment">&lt;!-- 表级 DML 权限设置 --&gt;</span></span><br><span class="line">               <span class="comment">&lt;!--                 </span></span><br><span class="line"><span class="comment">               &lt;privileges check="false"&gt;</span></span><br><span class="line"><span class="comment">                       &lt;schema name="TESTDB" dml="0110" &gt;</span></span><br><span class="line"><span class="comment">                               &lt;table name="tb01" dml="0000"&gt;&lt;/table&gt;</span></span><br><span class="line"><span class="comment">                               &lt;table name="tb02" dml="1111"&gt;&lt;/table&gt;</span></span><br><span class="line"><span class="comment">                       &lt;/schema&gt;</span></span><br><span class="line"><span class="comment">               &lt;/privileges&gt;                </span></span><br><span class="line"><span class="comment">                --&gt;</span></span><br><span class="line">       <span class="tag">&lt;/<span class="name">user</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p> 第二步：创建表，直接在MyCat里创建，都会分别同步到demo123库中</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="string">`user`</span> (</span><br><span class="line"> <span class="string">`id`</span> <span class="built_in">int</span>(<span class="number">10</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span>,</span><br><span class="line"> <span class="string">`name`</span> <span class="built_in">varchar</span>(<span class="number">20</span>) <span class="keyword">DEFAULT</span> <span class="literal">NULL</span>,</span><br><span class="line"> PRIMARY <span class="keyword">KEY</span> (<span class="string">`id`</span>)</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<p>在三个库查看表结构，都ok，slave节点也查看。</p>
+<pre><code>mysql&gt; show tables from demo3;
++-----------------+
+| Tables_in_demo3 |
++-----------------+
+| user            |
++-----------------+
+
+mysql&gt; desc demo1.user;
++-------+-------------+------+-----+---------+-------+
+| Field | Type        | Null | Key | Default | Extra |
++-------+-------------+------+-----+---------+-------+
+| id    | int(10)     | NO   | PRI | NULL    |       |
+| name  | varchar(20) | YES  |     | NULL    |       |
+| _slot | int(11)     | YES  |     | NULL    |       |
++-------+-------------+------+-----+---------+-------+
+3 rows in set (0.00 sec)</code></pre><p>发现多了一个_slot字段，这是因为使用了crc32slot分片规则得到的hash值。、</p>
+<p>通过写脚本或者其他方式把源数据通过到新库。</p>
+<h4 id="读写分离设置"><a href="#读写分离设置" class="headerlink" title="读写分离设置"></a>读写分离设置</h4><p>balance=”1”，全部的 readHost 与 stand by writeHost 参与 select 语句的负载均衡，简单的说，当双主双从模式(M1-&gt;S1，M2-&gt;S2，并且 M1 与 M2 互为主备)，正常情况下，M2,S1,S2 都参与 select 语句的负载均衡。</p>
+<p>balance=”3”，所有读请求随机的分发到 wiriterHost 对应的 readhost 执行，writerHost 不负担读压力，注意 balance=3 只在 1.4 及其以后版本有，1.3 没有。</p>
+<p>示例：分表，单裤分表</p>
+<p>场景：demo库中t_user表分成两个库t_users1/t_users2</p>
+<p> 核心配置：<br> <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">schema</span> <span class="attr">name</span>=<span class="string">"olddemo"</span> <span class="attr">checkSQLschema</span>=<span class="string">"false"</span> <span class="attr">sqlMaxLimit</span>=<span class="string">"1000000"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">table</span> <span class="attr">name</span>=<span class="string">"user"</span> <span class="attr">dataNode</span>=<span class="string">"demo_old"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">table</span> <span class="attr">name</span>=<span class="string">"t_users"</span> <span class="attr">subTables</span>=<span class="string">"t_users$1-2"</span> <span class="attr">primaryKey</span>=<span class="string">"id"</span> <span class="attr">dataNode</span>=<span class="string">"demo_old"</span> <span class="attr">rule</span>=<span class="string">"mod-long"</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">schema</span>&gt;</span></span><br><span class="line">               rule：</span><br><span class="line">                 <span class="tag">&lt;<span class="name">function</span> <span class="attr">name</span>=<span class="string">"mod-long"</span> <span class="attr">class</span>=<span class="string">"io.mycat.route.function.PartitionByMod"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"count"</span>&gt;</span>2<span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">function</span>&gt;</span></span><br></pre></td></tr></table></figure><br>在数据库分别创建好t_users1/t_users2</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="string">`t_users1`</span> (</span><br><span class="line"> <span class="string">`id`</span> <span class="built_in">int</span>(<span class="number">10</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span>,</span><br><span class="line"> <span class="string">`name`</span> <span class="built_in">varchar</span>(<span class="number">20</span>) <span class="keyword">DEFAULT</span> <span class="literal">NULL</span>,</span><br><span class="line"> PRIMARY <span class="keyword">KEY</span> (<span class="string">`id`</span>)</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<p>启动并连接到MyCat：把老表中的数据通过MyCat复制到新表，在、查看数据，可以看出，根据mod-long规则每条数据交替存储到新表。</p>
+<p>查询分析可以看出去两个物理表中查询数据：</p>
+<p><img src="https://img.huyunshun.com/img/20200420190612.png" alt="20200420190612"></p>
+<p>查询结果是把两个表结果合并起来：</p>
+<p><img src="https://img.huyunshun.com/img/20200420190637.png" alt="20200420190637"></p>
+<pre><code>bin/mycat console 启动不成功可以通过这个命令查看原因
+logs/wrapper.log   日志中记录的是所有的 mycat 操作. 查看的时候主要看异常信息 caused by 信息    </code></pre><p> 注：<strong>使用分片规则，MyCat启动后会在conf目录中创建一个ruledata下有使用规则信息分配的一个缓存文件，如果修改的分配规则，再次重启MyCat发现运用这个规则的缓存文件在就不会去重新生成，可能就得不到预计结果，所以，在重启前把这个目录对应的文件删除，让MyCat重新生成。</strong></p>
+<pre><code>不能创建未在 schema.xml 中配置的逻辑表            </code></pre><p>注意：如何部署</p>
+<pre><code>1、停机部署法：大致思路就是半夜停机升级，服务停了，跑数据迁移程序，进行数据迁移。
+        写一个迁移程序，读db-old数据库，通过中间件写入新库db-new1和db-new2。
+        校验迁移前后一致性，没问题就切该部分业务到新库
+缺点：只能是访问量不高的，而且部署或有问题，没部署好，早上又要把数据切回去，晚上有的忙，身心累。
+
+2、双写部署1
+        上线一段代码：和表有关业务之前加一段代码，同时往老新库写。
+                历史数据：在该次部署前，数据库表test_tb的有关数据，我们称之为历史数据。
+                增量数据：在该次部署后，数据库表test_tb的新产生的数据，我们称之为增量数据。
+        多加一条往消息队列中发消息的代码，只是写的sql。
+        等到db-old中的历史数据迁移完毕，则开始迁移增量数据，也就是在消息队列里的数据。将迁移程序下线，写一段订阅程序订阅消息队列中的数据，订阅程序将订阅到到数据，通过中间件写入新库，新老库一致性验证，去除代码中的双写代码，将涉及到test_tb表的读写操作，指向新库。
+3、双写部署2
+        上面方式造成了严重的代码入侵。将非业务代码嵌入业务代码。
+        替代办法是，记录日志。往消息队列里发的消息，都是写操作的消息。而binlog日志记录的也是写操作。所以订阅该日志，也能满足我们的需求。
+        打开binlog日志，迁移好历史数据后，写一个订阅程序，订阅binlog(mysql中有canal)。然后将订阅到的数据通过中间件，写入新库。</code></pre><h2 id="MyCat配置文件介绍"><a href="#MyCat配置文件介绍" class="headerlink" title="MyCat配置文件介绍"></a>MyCat配置文件介绍</h2><p>Mycat的配置文件都在conf目录里面，这里介绍几个常用的文件：</p>
+<pre><code>server.xml        Mycat的配置文件，设置账号、参数等
+schema.xml        Mycat对应的物理数据库和数据库表的配置
+rule.xml        Mycat分片（分库分表）规则</code></pre><h3 id="server-xml"><a href="#server-xml" class="headerlink" title="server.xml"></a>server.xml</h3><p>配置 Mycat 服务信息，如: Mycat中的用户，用户可以访问的逻辑库/表，服务的端口号等等。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">mycat:server</span> <span class="attr">xmlns:mycat</span>=<span class="string">"http://io.mycat/"</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">system</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"nonePasswordLogin"</span>&gt;</span>0<span class="tag">&lt;/<span class="name">property</span>&gt;</span> <span class="comment">&lt;!-- 0为需要密码登陆、1为不需要密码登陆 ,默认为0，设置为1则需要指定默认账户--&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"useHandshakeV10"</span>&gt;</span>1<span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"useSqlStat"</span>&gt;</span>0<span class="tag">&lt;/<span class="name">property</span>&gt;</span>  <span class="comment">&lt;!-- 1为开启实时统计、0为关闭 --&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"useGlobleTableCheck"</span>&gt;</span>0<span class="tag">&lt;/<span class="name">property</span>&gt;</span>  <span class="comment">&lt;!-- 1为开启全加班一致性检测、0为关闭 --&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"sequnceHandlerType"</span>&gt;</span>2<span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"subqueryRelationshipCheck"</span>&gt;</span>false<span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">           <span class="comment">&lt;!-- 子查询中存在关联查询的情况下,检查关联字段中是否有分片字段 .默认 false --&gt;</span></span><br><span class="line">         <span class="comment">&lt;!--&lt;property name="useCompression"&gt;1&lt;/property&gt;--&gt;</span> <span class="comment">&lt;!--1为开启mysql压缩协议--&gt;</span></span><br><span class="line">        <span class="comment">&lt;!--&lt;property name="fakeMySQLVersion"&gt;5.6.20&lt;/property&gt;--&gt;</span> <span class="comment">&lt;!--设置模拟的MySQL版本号--&gt;</span></span><br><span class="line">           <span class="comment">&lt;!--&lt;property name="processorBufferChunk"&gt;40960&lt;/property&gt; --&gt;</span></span><br><span class="line">           <span class="comment">&lt;!--&lt;property name="processors"&gt;1&lt;/property&gt;</span></span><br><span class="line"><span class="comment">           &lt;property name="processorExecutor"&gt;32&lt;/property&gt; --&gt;</span></span><br><span class="line">        <span class="comment">&lt;!--默认为type 0: DirectByteBufferPool | type 1 ByteBufferArena | type 2 NettyBufferPool --&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"processorBufferPoolType"</span>&gt;</span>0<span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">           <span class="comment">&lt;!--默认是65535 64K 用于sql解析时最大文本长度 --&gt;</span></span><br><span class="line">           <span class="comment">&lt;!--&lt;property name="maxStringLiteralLength"&gt;65535&lt;/property&gt;--&gt;</span></span><br><span class="line">           <span class="comment">&lt;!--&lt;property name="sequnceHandlerType"&gt;0&lt;/property&gt;--&gt;</span></span><br><span class="line">           <span class="comment">&lt;!--&lt;property name="backSocketNoDelay"&gt;1&lt;/property&gt;--&gt;</span></span><br><span class="line">           <span class="comment">&lt;!--&lt;property name="frontSocketNoDelay"&gt;1&lt;/property&gt;--&gt;</span></span><br><span class="line">           <span class="comment">&lt;!--&lt;property name="processorExecutor"&gt;16&lt;/property&gt;--&gt;</span></span><br><span class="line">           <span class="comment">&lt;!--</span></span><br><span class="line"><span class="comment">           &lt;property name="serverPort"&gt;8066&lt;/property&gt;</span></span><br><span class="line"><span class="comment">           &lt;property name="managerPort"&gt;9066&lt;/property&gt;</span></span><br><span class="line"><span class="comment">           &lt;property name="idleTimeout"&gt;300000&lt;/property&gt;</span></span><br><span class="line"><span class="comment">           &lt;property name="bindIp"&gt;0.0.0.0&lt;/property&gt;</span></span><br><span class="line"><span class="comment">           &lt;property name="frontWriteQueueSize"&gt;4096&lt;/property&gt;</span></span><br><span class="line"><span class="comment">           &lt;property name="processors"&gt;32&lt;/property&gt; --&gt;</span></span><br><span class="line">           <span class="comment">&lt;!--分布式事务开关，0为不过滤分布式事务，</span></span><br><span class="line"><span class="comment">                                           1为过滤分布式事务（如果分布式事务内只涉及全局表，则不过滤），</span></span><br><span class="line"><span class="comment">                                           2为不过滤分布式事务,但是记录分布式事务日志--&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"handleDistributedTransactions"</span>&gt;</span>0<span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">           <span class="comment">&lt;!--off heap for merge/order/group/limit      1开启   0关闭--&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"useOffHeapForMerge"</span>&gt;</span>1<span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">           <span class="comment">&lt;!--单位为m--&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"memoryPageSize"</span>&gt;</span>64k<span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">           <span class="comment">&lt;!--单位为k--&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"spillsFileBufferSize"</span>&gt;</span>1k<span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"useStreamOutput"</span>&gt;</span>0<span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">           <span class="comment">&lt;!--单位为m--&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"systemReserveMemorySize"</span>&gt;</span>384m<span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">           <span class="comment">&lt;!--是否采用zookeeper协调切换  --&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"useZKSwitch"</span>&gt;</span>false<span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">           <span class="comment">&lt;!-- XA Recovery Log日志路径 --&gt;</span></span><br><span class="line">           <span class="comment">&lt;!--&lt;property name="XARecoveryLogBaseDir"&gt;./&lt;/property&gt;--&gt;</span></span><br><span class="line">           <span class="comment">&lt;!-- XA Recovery Log日志名称 --&gt;</span></span><br><span class="line">           <span class="comment">&lt;!--&lt;property name="XARecoveryLogBaseName"&gt;tmlog&lt;/property&gt;--&gt;</span></span><br><span class="line">           <span class="comment">&lt;!--如果为 true的话 严格遵守隔离级别,不会在仅仅只有select语句的时候在事务中切换连接--&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"strictTxIsolation"</span>&gt;</span>false<span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"useZKSwitch"</span>&gt;</span>true<span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;/<span class="name">system</span>&gt;</span>       </span><br><span class="line">   <span class="comment">&lt;!-- 全局SQL防火墙设置 --&gt;</span></span><br><span class="line">   <span class="comment">&lt;!--白名单可以使用通配符%或着*--&gt;</span></span><br><span class="line">   <span class="comment">&lt;!--例如&lt;host host="127.0.0.*" user="root"/&gt;--&gt;</span></span><br><span class="line">   <span class="comment">&lt;!--例如&lt;host host="127.0.*" user="root"/&gt;--&gt;</span></span><br><span class="line">   <span class="comment">&lt;!--例如&lt;host host="127.*" user="root"/&gt;--&gt;</span></span><br><span class="line">   <span class="comment">&lt;!--例如&lt;host host="1*7.*" user="root"/&gt;--&gt;</span></span><br><span class="line">   <span class="comment">&lt;!--这些配置情况下对于127.0.0.1都能以root账户登录--&gt;</span></span><br><span class="line">   <span class="comment">&lt;!--</span></span><br><span class="line"><span class="comment">   &lt;firewall&gt;</span></span><br><span class="line"><span class="comment">          &lt;whitehost&gt;</span></span><br><span class="line"><span class="comment">                 &lt;host host="1*7.0.0.*" user="root"/&gt;</span></span><br><span class="line"><span class="comment">          &lt;/whitehost&gt;</span></span><br><span class="line"><span class="comment">  &lt;blacklist check="false"&gt;</span></span><br><span class="line"><span class="comment">  &lt;/blacklist&gt;</span></span><br><span class="line"><span class="comment">   &lt;/firewall&gt;</span></span><br><span class="line"><span class="comment">   --&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">user</span> <span class="attr">name</span>=<span class="string">"root"</span> <span class="attr">defaultAccount</span>=<span class="string">"true"</span>&gt;</span><span class="comment">&lt;!--user--&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"password"</span>&gt;</span>123456<span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"schemas"</span>&gt;</span>TESTDB<span class="tag">&lt;/<span class="name">property</span>&gt;</span>               </span><br><span class="line">           <span class="comment">&lt;!-- 表级 DML 权限设置 --&gt;</span></span><br><span class="line">           <span class="comment">&lt;!--               </span></span><br><span class="line"><span class="comment">           &lt;privileges check="false"&gt;</span></span><br><span class="line"><span class="comment">                           &lt;schema name="TESTDB" dml="0110" &gt;</span></span><br><span class="line"><span class="comment">                                           &lt;table name="tb01" dml="0000"&gt;&lt;/table&gt;</span></span><br><span class="line"><span class="comment">                                           &lt;table name="tb02" dml="1111"&gt;&lt;/table&gt;</span></span><br><span class="line"><span class="comment">                           &lt;/schema&gt;</span></span><br><span class="line"><span class="comment">           &lt;/privileges&gt;               </span></span><br><span class="line"><span class="comment">                --&gt;</span></span><br><span class="line">   <span class="tag">&lt;/<span class="name">user</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">user</span> <span class="attr">name</span>=<span class="string">"user"</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"password"</span>&gt;</span>user<span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"schemas"</span>&gt;</span>TESTDB<span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"readOnly"</span>&gt;</span>true<span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;/<span class="name">user</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">mycat:server</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h3 id="rule-xml"><a href="#rule-xml" class="headerlink" title="rule.xml"></a>rule.xml</h3><p>用于定义分片规则的配置文件，主要是查看，很少修改。里边定义了很多分配规则比如：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">tableRule</span> <span class="attr">name</span>=<span class="string">"auto-sharding-long"</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">rule</span>&gt;</span></span><br><span class="line">                   <span class="tag">&lt;<span class="name">columns</span>&gt;</span>id<span class="tag">&lt;/<span class="name">columns</span>&gt;</span></span><br><span class="line">                   <span class="tag">&lt;<span class="name">algorithm</span>&gt;</span>rang-long<span class="tag">&lt;/<span class="name">algorithm</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;/<span class="name">rule</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">tableRule</span>&gt;</span></span><br><span class="line">........</span><br><span class="line"><span class="tag">&lt;<span class="name">tableRule</span> <span class="attr">name</span>=<span class="string">"crc32slot"</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">rule</span>&gt;</span></span><br><span class="line">                           <span class="tag">&lt;<span class="name">columns</span>&gt;</span>id<span class="tag">&lt;/<span class="name">columns</span>&gt;</span></span><br><span class="line">                           <span class="tag">&lt;<span class="name">algorithm</span>&gt;</span>crc32slot<span class="tag">&lt;/<span class="name">algorithm</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;/<span class="name">rule</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">tableRule</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>auto-sharding-long：mycat 默认的分片规则：以 500 万为单位，实现分片规则。逻辑库 A 对应 dataNode - db1 和 db2. 1-500 万保存在 db1 中, 500 万零 1 到 1000 万保存在 db2 中，1000 万零 1 到 1500 万保存在 db1 中，依次类推。<br>crc32slot：在 CRUD 操作时,根据具体数据的 crc32 算法计算,数据应该保存在哪一个dataNode 中. 算法类似模运算。</p>
+<h3 id="server-xml-1"><a href="#server-xml-1" class="headerlink" title="server.xml"></a>server.xml</h3><p>用于定义逻辑库和逻辑表的配置文件.在配置文件中可以定义读写分离,逻辑库,逻辑表,dataHost,dataNode 等信息。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">mycat:schema</span> <span class="attr">xmlns:mycat</span>=<span class="string">"http://io.mycat/"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">schema</span> <span class="attr">name</span>=<span class="string">"TESTDB"</span> <span class="attr">checkSQLschema</span>=<span class="string">"false"</span> <span class="attr">sqlMaxLimit</span>=<span class="string">"100"</span>&gt;</span>               </span><br><span class="line">           <span class="tag">&lt;<span class="name">table</span> <span class="attr">name</span>=<span class="string">"travelrecord"</span> <span class="attr">dataNode</span>=<span class="string">"dn1,dn2,dn3"</span> <span class="attr">rule</span>=<span class="string">"auto-sharding-long"</span> /&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">table</span> <span class="attr">name</span>=<span class="string">"hotnews"</span> <span class="attr">primaryKey</span>=<span class="string">"ID"</span> <span class="attr">autoIncrement</span>=<span class="string">"true"</span> <span class="attr">dataNode</span>=<span class="string">"dn1,dn2,dn3"</span> <span class="attr">rule</span>=<span class="string">"mod-long"</span> /&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">table</span> <span class="attr">name</span>=<span class="string">"dual"</span> <span class="attr">primaryKey</span>=<span class="string">"ID"</span> <span class="attr">dataNode</span>=<span class="string">"dnx,dnoracle2"</span> <span class="attr">type</span>=<span class="string">"global"</span> <span class="attr">needAddLimit</span>=<span class="string">"false"</span>/&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">table</span> <span class="attr">name</span>=<span class="string">"customer"</span> <span class="attr">primaryKey</span>=<span class="string">"ID"</span> <span class="attr">dataNode</span>=<span class="string">"dn1,dn2"</span> <span class="attr">rule</span>=<span class="string">"sharding-by-intfile"</span>&gt;</span></span><br><span class="line">                           <span class="tag">&lt;<span class="name">childTable</span> <span class="attr">name</span>=<span class="string">"orders"</span> <span class="attr">primaryKey</span>=<span class="string">"ID"</span> <span class="attr">joinKey</span>=<span class="string">"customer_id"</span> <span class="attr">parentKey</span>=<span class="string">"id"</span>&gt;</span></span><br><span class="line">                                           <span class="tag">&lt;<span class="name">childTable</span> <span class="attr">name</span>=<span class="string">"order_items"</span> <span class="attr">joinKey</span>=<span class="string">"order_id"</span> <span class="attr">parentKey</span>=<span class="string">"id"</span> /&gt;</span></span><br><span class="line">                           <span class="tag">&lt;/<span class="name">childTable</span>&gt;</span></span><br><span class="line">                           <span class="tag">&lt;<span class="name">childTable</span> <span class="attr">name</span>=<span class="string">"customer_addr"</span> <span class="attr">primaryKey</span>=<span class="string">"ID"</span> <span class="attr">joinKey</span>=<span class="string">"customer_id"</span> <span class="attr">parentKey</span>=<span class="string">"id"</span> /&gt;</span></span><br><span class="line">           <span class="tag">&lt;/<span class="name">table</span>&gt;</span>               </span><br><span class="line"><span class="tag">&lt;/<span class="name">schema</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dataNode</span> <span class="attr">name</span>=<span class="string">"dn1$0-743"</span> <span class="attr">dataHost</span>=<span class="string">"localhost1"</span> <span class="attr">database</span>=<span class="string">"db$0-743"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dataHost</span> <span class="attr">name</span>=<span class="string">"localhost1"</span> <span class="attr">maxCon</span>=<span class="string">"1000"</span> <span class="attr">minCon</span>=<span class="string">"10"</span> <span class="attr">balance</span>=<span class="string">"0"</span> <span class="attr">writeType</span>=<span class="string">"0"</span> <span class="attr">dbType</span>=<span class="string">"mysql"</span> <span class="attr">dbDriver</span>=<span class="string">"native"</span> <span class="attr">switchType</span>=<span class="string">"1"</span>  <span class="attr">slaveThreshold</span>=<span class="string">"100"</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">heartbeat</span>&gt;</span>select user()<span class="tag">&lt;/<span class="name">heartbeat</span>&gt;</span>               </span><br><span class="line">           <span class="tag">&lt;<span class="name">writeHost</span> <span class="attr">host</span>=<span class="string">"hostM1"</span> <span class="attr">url</span>=<span class="string">"localhost:3306"</span> <span class="attr">user</span>=<span class="string">"root"</span>  <span class="attr">password</span>=<span class="string">"123456"</span>&gt;</span></span><br><span class="line">                           <span class="tag">&lt;<span class="name">readHost</span> <span class="attr">host</span>=<span class="string">"hostS2"</span> <span class="attr">url</span>=<span class="string">"192.168.1.200:3306"</span> <span class="attr">user</span>=<span class="string">"root"</span> <span class="attr">password</span>=<span class="string">"xxx"</span> /&gt;</span></span><br><span class="line">           <span class="tag">&lt;/<span class="name">writeHost</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">writeHost</span> <span class="attr">host</span>=<span class="string">"hostS1"</span> <span class="attr">url</span>=<span class="string">"localhost:3316"</span> <span class="attr">user</span>=<span class="string">"root"</span> <span class="attr">password</span>=<span class="string">"123456"</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dataHost</span>&gt;</span>       </span><br><span class="line"><span class="tag">&lt;/<span class="name">mycat:schema</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h3 id="配置解释"><a href="#配置解释" class="headerlink" title="配置解释"></a>配置解释</h3><pre><code>schema：数据库设置，此数据库为逻辑数据库
+name        逻辑数据库名，与server.xml中的schema对应
+checkSQLschema        数据库前缀相关设置，是否检测SQL语法的schema信息，比如逻辑库名称是D，SQL：select * from D.table 当为true时：mycat发送到数据库的sql是select * from table;false时：发送的是select * from A.table
+
+sqlMaxLimit select 时默认的limit，Mycat 在执行 SQL 的时候,如果 SQL 语法中没有 limit 子句.自动增加 limit 子句.避免查询全表
+
+table标签：定义逻辑表，要求逻辑表和物理表的名字一致。
+name        表名，物理数据库中表名
+dataNode        表存储到哪些节点，多个节点用逗号分隔。节点为下文dataNode设置的name，多个也就分库了
+primaryKey        主键字段名，自动生成主键时需要设置
+autoIncrement          是否自增
+rule        使用分片规则名，规则都在rule.xml。SQL 语句发送到 Mycat 中后，Mycat 如何计算，应该将当期的 SQL 发送到哪一个物理数
+              据库管理系统或物理 database 中
+ruleRequired    表是否绑定分片规则，如果配置为 true，但没有配置具体 rule 的话 ，程序会报错。
+type   逻辑表的类型，目前逻辑表只有&quot;全局表&quot;和&quot;普通表&quot;两种类型。全局表：global。
+       childTable 标签
+       name 定义子表的表名。
+       joinKey 插入子表的时候会使用这个列的值查找父表存储的数据节点。
+parentKey 属性指定的值一般为与父表建立关联关系的列名。程序首先获取 joinkey 的值，再通过 parentKey 属性指定的列名产生查询语句，通过执行该语句得到父表存储在哪个分片上。从而确定子表存储的位置。
+
+dataNode   分片信息，也就是分库相关配置
+name        节点名，定义的逻辑名称,对应具体的物理数据库 database
+datahost        物理数据库名，代表使用的物理数据库所在位置和配置信息，与datahost中name对应
+database        物理数据库中数据库名
+
+dataHost   物理数据库，真正存储数据的数据库
+name        物理数据库名，与dataNode中dataHost对应
+balance        均衡负载的方式
+       balance=&quot;0&quot;, 不开启读写分离机制，所有读操作都发送到当前可用的 writeHost 上。
+       balance=&quot;1&quot;，全部的 readHost 与 stand by writeHost 参与 select 语句的负载均衡，简单的说，当双   主双从模式(M1-&gt;S1，M2-&gt;S2，并且 M1 与 M2 互为主备)，正常情况下，M2,S1,S2 都参与 select 语句的负载均衡。
+       balance=&quot;2&quot;，所有读操作都随机的在 writeHost、readhost 上分发。
+       balance=&quot;3&quot;，所有读请求随机的分发到 wiriterHost 对应的 readhost 执行，writerHost 不负担读压力，注意 balance=3 只在 1.4 及其以后版本有，1.3 没有。
+
+maxCon/minCon  最大最小连接数
+writeType        负载均衡类型，目前的取值有 3 种：
+
+1. writeType=&quot;0&quot;, 所有写操作发送到配置的第一个 writeHost，第一个挂了切到还生存的第二个writeHost，重新启动后已切换后的为准，切换记录在配置文件中:dnindex.properties .
+2. writeType=&quot;1&quot;，所有写操作都随机的发送到配置的 writeHost，1.5 以后废弃不推荐。
+
+dbType        数据库类型
+dbDriver     数据库驱动类型,，native,使用 mycat 提供的本地驱动
+switchType         
+       -1 表示不自动切换
+       1 默认值，自动切换 可能有IO延迟问题
+       2 基于 MySQL 主从同步的状态决定是否切换   心跳语句为 show slave status
+       3 基于 MySQL galary cluster 的切换机制（适合集群） 心跳语句为 show status like &apos;wsrep%&apos;
+heartbeat        心跳检测语句，注意语句结尾的分号要加。
+       子标签 writeHost：写数据的数据库定义标签. 实现读写分离操作，下面的readHost表示只读
+host 数据库命名
+url  数据库访问路径
+user  数据库访问用户名
+password  密码</code></pre>
+      
+    </div>
+     <!-- 相关文章推荐 -->
+    
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/mysql/" rel="tag"># mysql</a>
+          
+            <a href="/tags/mycat/" rel="tag"># mycat</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/02/20/HAProxy%20%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E8%AF%A6%E8%A7%A3/" rel="next" title="HAProxy 配置文件详解">
+                <i class="fa fa-chevron-left"></i> HAProxy 配置文件详解
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/02/21/shiro%E4%BB%8B%E7%BB%8D%E5%92%8C%E8%BF%90%E8%A1%8C/" rel="prev" title="shiro介绍和使用">
+                shiro介绍和使用 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+<span class="jiathis_txt">分享到：</span>
+<a class="jiathis_button_fav">收藏夹</a>
+<a class="jiathis_button_copy">复制网址</a>
+<a class="jiathis_button_email">邮件</a>
+<a class="jiathis_button_weixin">微信</a>
+<a class="jiathis_button_qzone">QQ空间</a>
+<a class="jiathis_button_tqq">腾讯微博</a>
+<a class="jiathis_button_douban">豆瓣</a>
+<a class="jiathis_button_share">一键分享</a>
+
+<a href="http://www.jiathis.com/share?uid=2140465" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+<a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+var jiathis_config={
+  data_track_clickback:true,
+  summary:"",
+  shortUrl:false,
+  hideMore:false
+}
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://img.huyunshun.com/img/20200522182348.png"
+                alt="初晨" />
+            
+              <p class="site-author-name" itemprop="name">初晨</p>
+              <p class="site-description motion-element" itemprop="description">永远不要说你知道本质，更别说真相了。</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">249</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">46</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+<!--近期文章版块-->
+            
+                <div class="links-of-blogroll motion-element links-of-blogroll-block">
+                  <div class="links-of-blogroll-title">
+                    <!-- modify icon to fire by szw -->
+                    <i class="fa fa-history fa-" aria-hidden="true"></i>
+                    近期文章
+                  </div>
+                  <ul class="links-of-blogroll-list">
+                    
+                    
+                      <li>
+                        <a href="/2020/05/22/WebSocket%E3%80%81Socket%E3%80%81TCP%E3%80%81HTTP%E5%8C%BA%E5%88%AB/" title="WebSocket、Socket、TCP、HTTP区别" target="_blank">WebSocket、Socket、TCP、HTTP区别</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/19/Springboot%E9%A1%B9%E7%9B%AE%E7%9A%84%E6%8E%A5%E5%8F%A3%E9%98%B2%E5%88%B7/" title="Springboot项目的接口防刷" target="_blank">Springboot项目的接口防刷</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/03/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Volatile%E5%85%B3%E9%94%AE%E5%AD%97%E5%8F%8A%E5%85%B6%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/" title="深入理解Volatile关键字及其实现原理" target="_blank">深入理解Volatile关键字及其实现原理</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/04/20/%E4%BD%BF%E7%94%A8vscode%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0%E7%8E%AF%E5%A2%83/" title="使用vscode搭建个人笔记环境" target="_blank">使用vscode搭建个人笔记环境</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/01/20/HBase%E4%BB%8B%E7%BB%8D%E5%AE%89%E8%A3%85%E4%B8%8E%E6%93%8D%E4%BD%9C/" title="HBase介绍安装与操作" target="_blank">HBase介绍安装与操作</a>
+                      </li>
+                    
+                  </ul>
+                </div>
+            
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#MyCat介绍"><span class="nav-number">1.</span> <span class="nav-text">MyCat介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#数据库切分"><span class="nav-number">1.1.</span> <span class="nav-text">数据库切分</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Mycat-中的DB"><span class="nav-number">1.2.</span> <span class="nav-text">Mycat 中的DB</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Mycat-中的表"><span class="nav-number">1.3.</span> <span class="nav-text">Mycat 中的表</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MyCat实现分库分表读写分离"><span class="nav-number">2.</span> <span class="nav-text">MyCat实现分库分表读写分离</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#一、搭建准备"><span class="nav-number">2.1.</span> <span class="nav-text">一、搭建准备</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#二、安装配置MyCat"><span class="nav-number">2.2.</span> <span class="nav-text">二、安装配置MyCat</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1、下载Mycat官网：http-www-mycat-io"><span class="nav-number">2.2.1.</span> <span class="nav-text">1、下载Mycat官网：http:&#x2F;&#x2F;www.mycat.io&#x2F;</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2、配置示例测试"><span class="nav-number">2.2.2.</span> <span class="nav-text">2、配置示例测试</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#读写分离设置"><span class="nav-number">2.2.3.</span> <span class="nav-text">读写分离设置</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MyCat配置文件介绍"><span class="nav-number">3.</span> <span class="nav-text">MyCat配置文件介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#server-xml"><span class="nav-number">3.1.</span> <span class="nav-text">server.xml</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#rule-xml"><span class="nav-number">3.2.</span> <span class="nav-text">rule.xml</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#server-xml-1"><span class="nav-number">3.3.</span> <span class="nav-text">server.xml</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置解释"><span class="nav-number">3.4.</span> <span class="nav-text">配置解释</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Copyright</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

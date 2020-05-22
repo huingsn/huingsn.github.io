@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="mysql,mycat,集群," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="1、集群环境分配由于硬件有限，安装了6台Linux虚拟机，做如下分配： MySQL master1：192.168.1.103 MySQL slave1：192.168.1.104 MySQL master2&#x2F;MyCat1：192.168.1.105 MySQL slave2&#x2F;MyCat2：192.168.1.106 HAProxy1：192.168.1.107 HAProxy2：192.168.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HAProxy+Keepalived+MyCat+MySQL高可用集群">
+<meta property="og:url" content="https://huyunshun.com/2018/02/20/HAProxy+Keepalived+MyCat+MySQL%E9%AB%98%E5%8F%AF%E7%94%A8%E9%9B%86%E7%BE%A4/index.html">
+<meta property="og:site_name" content="简">
+<meta property="og:description" content="1、集群环境分配由于硬件有限，安装了6台Linux虚拟机，做如下分配： MySQL master1：192.168.1.103 MySQL slave1：192.168.1.104 MySQL master2&#x2F;MyCat1：192.168.1.105 MySQL slave2&#x2F;MyCat2：192.168.1.106 HAProxy1：192.168.1.107 HAProxy2：192.168.">
+<meta property="og:image" content="https://img.huyunshun.com/img/20200420192551.png">
+<meta property="og:image" content="https://img.huyunshun.com/img/20200420192826.png">
+<meta property="og:image" content="https://img.huyunshun.com/img/20200420192848.png">
+<meta property="og:image" content="https://img.huyunshun.com/img/20200421123303.png">
+<meta property="og:image" content="https://img.huyunshun.com/img/20200421123317.png">
+<meta property="og:image" content="https://img.huyunshun.com/img/20200421123334.png">
+<meta property="article:published_time" content="2018-02-19T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-05-20T10:04:24.704Z">
+<meta property="article:author" content="初晨">
+<meta property="article:tag" content="mysql">
+<meta property="article:tag" content="mycat">
+<meta property="article:tag" content="集群">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img.huyunshun.com/img/20200420192551.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://huyunshun.com/2018/02/20/HAProxy+Keepalived+MyCat+MySQL高可用集群/"/>
+
+
+
+
+
+  <title>HAProxy+Keepalived+MyCat+MySQL高可用集群 | 简</title>
+  
+
+
+
+
+
+
+
+
+  <script type="text/javascript" src="/js/src/love.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
+
+  <!-- 看板娘 -->
+    
+        <script async src="/live2d-widget/autoload.js"></script>
+    
+ <!-- 飘动的彩带） -->
+  <script src="/js/src/piao.js" type="text/javascript"></script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">简</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">人生短暂，学海无边，而大道至简。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://huyunshun.com/2018/02/20/HAProxy+Keepalived+MyCat+MySQL%E9%AB%98%E5%8F%AF%E7%94%A8%E9%9B%86%E7%BE%A4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="初晨">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://img.huyunshun.com/img/20200522182348.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="简">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">HAProxy+Keepalived+MyCat+MySQL高可用集群</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-20T00:00:00+08:00">
+                2018-02-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/" itemprop="url" rel="index">
+                    <span itemprop="name">负载均衡</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="1、集群环境分配"><a href="#1、集群环境分配" class="headerlink" title="1、集群环境分配"></a>1、集群环境分配</h2><pre><code>由于硬件有限，安装了6台Linux虚拟机，做如下分配：
+MySQL master1：192.168.1.103
+MySQL slave1：192.168.1.104
+MySQL master2/MyCat1：192.168.1.105
+MySQL slave2/MyCat2：192.168.1.106
+HAProxy1：192.168.1.107
+HAProxy2：192.168.1.108
+        VIP：192.168.1.8
+使用软件：
+        haproxy-1.7.1.tar.gz
+        keepalived-1.2.18.tar.gz
+        Mycat-server-1.6.6.1-release-20181031195535-linux.tar.gz
+MySQL在最初的时候就安装好，每台机器克隆后都有MySQL，需要说明的是，把需要使用MySQL的uuid修改，因为都是克隆的，所以这个值是一样的[root@localhost ~]# cat /usr/local/mysql-5.6.31/data/auto.cnf 修改文件里边，随机改一下就即可。
+其他文件，分别对应上传到服务器。</code></pre><h2 id="2、配置MySQL主从和主主"><a href="#2、配置MySQL主从和主主" class="headerlink" title="2、配置MySQL主从和主主"></a>2、配置MySQL主从和主主</h2><pre><code>在103和105配置主库，分别执行如下操作，其中105的auto_increment_offset=2
+ vim /etc/my.cnf 修改配置
+ [client]
+ port = 3306 #客户端端口
+ default-character-set = utf8mb4  #客户端默认字符集
+ [mysqld]
+ default_storage_engine = InnoDB #默认数据库引擎
+ port = 3306
+ character_set_server=utf8
+ log_bin=master_bin #开启二进制日志
+ server_id=1 #设置server_id
+ #步进值，一般有n台主MySQL就填n
+ auto_increment_increment=2  
+ #起始值，一般填第n台主MySQL。
+ auto_increment_offset=1  
+ # 做为从库时，数据库的修改也会写到bin-log里
+ log-slave-updates  
+ # 表示自动删除5天以前的binlog，可选
+ expire_logs_days=5
+ #忽略mysql库
+ #binlog-ignore=mysql  
+ #忽略information_schema库
+ #binlog-ignore=information_schema  
+ #要同步的数据库，默认所有库
+ #replicate-do-db=demo
+
+ 103/104/105/106的server_id分别是1/3/2/4
+
+ 在104和106配置从库，分别执行如下操作：
+ vim /etc/my.cnf 修改配置
+ [client]
+ port = 3306 #客户端端口
+ default-character-set = utf8mb4  #客户端默认字符集
+ [mysqld]
+ default_storage_engine = InnoDB #默认数据库引擎
+ port = 3306
+ character_set_server=utf8
+ server_id=3 #设置server_id
+
+ 分别启动两台master，在两台master中的MySQL中创建用户供Slave使用
+ mysql&gt; grant all privileges on *.* to &apos;slave&apos;@&apos;192.168.1.%&apos; identified by &apos;slave&apos; with grant option;
+ mysql&gt; flush privileges;</code></pre><p>查看master状态，记录文件名</p>
+<p>SHOW MASTER STATUS;</p>
+<p>分别启动Slave，配置Slave，登录MySQL，先停止stop slave;再执行Slave配置，执行代码如下：</p>
+<pre><code>103：CHANGE MASTER TO MASTER_HOST=&apos;192.168.1.105&apos;,MASTER_USER=&apos;slave&apos;,MASTER_PASSWORD=&apos;slave&apos;,MASTER_LOG_FILE=&apos;master_bin.000001&apos;;
+104：CHANGE MASTER TO MASTER_HOST=&apos;192.168.1.103&apos;,MASTER_USER=&apos;slave&apos;,MASTER_PASSWORD=&apos;slave&apos;,MASTER_LOG_FILE=&apos;master_bin.000001&apos;;
+105：CHANGE MASTER TO MASTER_HOST=&apos;192.168.1.103&apos;,MASTER_USER=&apos;slave&apos;,MASTER_PASSWORD=&apos;slave&apos;,MASTER_LOG_FILE=&apos;master_bin.000001&apos;;  因为两个master互为主从，所以在两边都要配置对方的master
+106：CHANGE MASTER TO MASTER_HOST=&apos;192.168.1.105&apos;,MASTER_USER=&apos;slave&apos;,MASTER_PASSWORD=&apos;slave&apos;,MASTER_LOG_FILE=&apos;master_bin.000001&apos;;</code></pre><p>再次启动start slave</p>
+<p>通过命令 show slave status\G; 查看每个节点信息，主从都是一致的。没问题。数据测试也ok。</p>
+<p>测试双主从：开启日志查询set global general_log = on;，动态监控日志信息tail -f /usr/local/mysql-5.6.31/data/localhost.log</p>
+<pre><code>都不宕机的情况下，不管是从哪一台master修改数据，其他节点都能显示，同步一致性。
+当master1停止MySQL情况下，master2修改了数据，master再次启动也会把master2修改的同步到master1和Slave1。反之亦然没问题。</code></pre><h2 id="3、配置MyCat"><a href="#3、配置MyCat" class="headerlink" title="3、配置MyCat"></a>3、配置MyCat</h2><p>分别在105、106解压MyCat文件到/usr/local/mycat下</p>
+<p>直接运行测试一下：</p>
+<pre><code>[root@localhost mycat]# bin/mycat start</code></pre><p>没问题，配置MyCat逻辑表，进行测试，两个都一致。这里配置只是为了测试用，实际中按照实际需求配置。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0"?&gt;</span></span><br><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">mycat</span>:schema <span class="meta-keyword">SYSTEM</span> <span class="meta-string">"schema.dtd"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">mycat:schema</span> <span class="attr">xmlns:mycat</span>=<span class="string">"http://io.mycat/"</span>&gt;</span></span><br><span class="line">       <span class="comment">&lt;!--逻辑库表创建--&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">schema</span> <span class="attr">name</span>=<span class="string">"demo"</span> <span class="attr">checkSQLschema</span>=<span class="string">"false"</span> <span class="attr">sqlMaxLimit</span>=<span class="string">"100"</span>&gt;</span></span><br><span class="line">               <span class="tag">&lt;<span class="name">table</span> <span class="attr">name</span>=<span class="string">"user"</span> <span class="attr">dataNode</span>=<span class="string">"demo1"</span>/&gt;</span></span><br><span class="line">       <span class="tag">&lt;/<span class="name">schema</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">schema</span> <span class="attr">name</span>=<span class="string">"demo1"</span> <span class="attr">checkSQLschema</span>=<span class="string">"true"</span> <span class="attr">sqlMaxLimit</span>=<span class="string">"100"</span>&gt;</span></span><br><span class="line">               <span class="tag">&lt;<span class="name">table</span> <span class="attr">name</span>=<span class="string">"user"</span> <span class="attr">dataNode</span>=<span class="string">"demo111"</span> /&gt;</span></span><br><span class="line">       <span class="tag">&lt;/<span class="name">schema</span>&gt;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">       <span class="comment">&lt;!--逻辑节点，对应物理库--&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">dataNode</span> <span class="attr">name</span>=<span class="string">"demo1"</span> <span class="attr">dataHost</span>=<span class="string">"host103"</span> <span class="attr">database</span>=<span class="string">"demo"</span> /&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">dataNode</span> <span class="attr">name</span>=<span class="string">"demo2"</span> <span class="attr">dataHost</span>=<span class="string">"host105"</span> <span class="attr">database</span>=<span class="string">"demo"</span> /&gt;</span></span><br><span class="line">               <span class="tag">&lt;<span class="name">dataNode</span> <span class="attr">name</span>=<span class="string">"demo111"</span> <span class="attr">dataHost</span>=<span class="string">"host111"</span> <span class="attr">database</span>=<span class="string">"demo"</span> /&gt;</span></span><br><span class="line"></span><br><span class="line">       <span class="comment">&lt;!--物理库配置--&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">dataHost</span> <span class="attr">name</span>=<span class="string">"host103"</span> <span class="attr">maxCon</span>=<span class="string">"1000"</span> <span class="attr">minCon</span>=<span class="string">"10"</span> <span class="attr">balance</span>=<span class="string">"1"</span> <span class="attr">writeType</span>=<span class="string">"0"</span> <span class="attr">dbType</span>=<span class="string">"mysql"</span> <span class="attr">dbDriver</span>=<span class="string">"native"</span> <span class="attr">switchType</span>=<span class="string">"2"</span> <span class="attr">slaveThreshold</span>=<span class="string">"100"</span>&gt;</span></span><br><span class="line">               <span class="tag">&lt;<span class="name">heartbeat</span>&gt;</span>show slave status<span class="tag">&lt;/<span class="name">heartbeat</span>&gt;</span></span><br><span class="line">               <span class="tag">&lt;<span class="name">writeHost</span> <span class="attr">host</span>=<span class="string">"hostM1"</span> <span class="attr">url</span>=<span class="string">"192.168.1.103:3306"</span> <span class="attr">user</span>=<span class="string">"root"</span> <span class="attr">password</span>=<span class="string">"123456"</span>/&gt;</span></span><br><span class="line">               <span class="tag">&lt;<span class="name">writeHost</span> <span class="attr">host</span>=<span class="string">"hostS1"</span> <span class="attr">url</span>=<span class="string">"192.168.1.104:3306"</span> <span class="attr">user</span>=<span class="string">"root"</span> <span class="attr">password</span>=<span class="string">"123456"</span>/&gt;</span></span><br><span class="line">       <span class="tag">&lt;/<span class="name">dataHost</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">dataHost</span> <span class="attr">name</span>=<span class="string">"host105"</span> <span class="attr">maxCon</span>=<span class="string">"1000"</span> <span class="attr">minCon</span>=<span class="string">"10"</span> <span class="attr">balance</span>=<span class="string">"1"</span> <span class="attr">writeType</span>=<span class="string">"0"</span> <span class="attr">dbType</span>=<span class="string">"mysql"</span> <span class="attr">dbDriver</span>=<span class="string">"native"</span> <span class="attr">switchType</span>=<span class="string">"2"</span> <span class="attr">slaveThreshold</span>=<span class="string">"100"</span>&gt;</span></span><br><span class="line">               <span class="tag">&lt;<span class="name">heartbeat</span>&gt;</span>show slave status<span class="tag">&lt;/<span class="name">heartbeat</span>&gt;</span></span><br><span class="line">               <span class="tag">&lt;<span class="name">writeHost</span> <span class="attr">host</span>=<span class="string">"hostM2"</span> <span class="attr">url</span>=<span class="string">"192.168.1.105:3306"</span> <span class="attr">user</span>=<span class="string">"root"</span> <span class="attr">password</span>=<span class="string">"123456"</span>/&gt;</span></span><br><span class="line">               <span class="tag">&lt;<span class="name">writeHost</span> <span class="attr">host</span>=<span class="string">"hostS2"</span> <span class="attr">url</span>=<span class="string">"192.168.1.106:3306"</span> <span class="attr">user</span>=<span class="string">"root"</span> <span class="attr">password</span>=<span class="string">"123456"</span>/&gt;</span></span><br><span class="line">       <span class="tag">&lt;/<span class="name">dataHost</span>&gt;</span></span><br><span class="line">               <span class="tag">&lt;<span class="name">dataHost</span> <span class="attr">name</span>=<span class="string">"host111"</span> <span class="attr">maxCon</span>=<span class="string">"1000"</span> <span class="attr">minCon</span>=<span class="string">"10"</span> <span class="attr">balance</span>=<span class="string">"1"</span> <span class="attr">writeType</span>=<span class="string">"0"</span> <span class="attr">dbType</span>=<span class="string">"mysql"</span> <span class="attr">dbDriver</span>=<span class="string">"native"</span> <span class="attr">switchType</span>=<span class="string">"2"</span> <span class="attr">slaveThreshold</span>=<span class="string">"100"</span>&gt;</span></span><br><span class="line">               <span class="tag">&lt;<span class="name">heartbeat</span>&gt;</span>show slave status<span class="tag">&lt;/<span class="name">heartbeat</span>&gt;</span></span><br><span class="line">               <span class="tag">&lt;<span class="name">writeHost</span> <span class="attr">host</span>=<span class="string">"hosstM1"</span> <span class="attr">url</span>=<span class="string">"192.168.1.103:3306"</span> <span class="attr">user</span>=<span class="string">"root"</span> <span class="attr">password</span>=<span class="string">"123456"</span>&gt;</span></span><br><span class="line">                                       <span class="tag">&lt;<span class="name">readHost</span> <span class="attr">host</span>=<span class="string">"hostsS1"</span> <span class="attr">url</span>=<span class="string">"192.168.1.104:3306"</span> <span class="attr">user</span>=<span class="string">"root"</span> <span class="attr">password</span>=<span class="string">"123456"</span>/&gt;</span></span><br><span class="line">                               <span class="tag">&lt;/<span class="name">writeHost</span>&gt;</span></span><br><span class="line">                               <span class="tag">&lt;<span class="name">writeHost</span> <span class="attr">host</span>=<span class="string">"hostsM2"</span> <span class="attr">url</span>=<span class="string">"192.168.1.105:3306"</span> <span class="attr">user</span>=<span class="string">"root"</span> <span class="attr">password</span>=<span class="string">"123456"</span>&gt;</span></span><br><span class="line">                                       <span class="tag">&lt;<span class="name">readHost</span> <span class="attr">host</span>=<span class="string">"hostsS2"</span> <span class="attr">url</span>=<span class="string">"192.168.1.106:3306"</span> <span class="attr">user</span>=<span class="string">"root"</span> <span class="attr">password</span>=<span class="string">"123456"</span>/&gt;</span></span><br><span class="line">                               <span class="tag">&lt;/<span class="name">writeHost</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;/<span class="name">dataHost</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">mycat:schema</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>server.xml中增加逻辑库访问。在远程分别访问两台MyCat并测试。</p>
+<pre><code> ①、每个节点都不宕机的情况下测试都没任何问题。
+ ②、如果master1宕机，停止MySQL，在插入数据，日志可以看到往master2插入，salve2同步，再次恢复master1，数据变化将同步回master1
+ ③、读数据，通常都分配到Slave和master2上，只有出现io延迟才会在master1读取。
+两台MyCat搭配MySQL都没问题，下一步：</code></pre><h2 id="4、安装xinetd"><a href="#4、安装xinetd" class="headerlink" title="4、安装xinetd"></a>4、安装xinetd</h2><pre><code>xinetd是新一代的网络守护进程服务程序，又叫超级internet服务器。经常用来托管轻量级服务。
+这里安装xinetd的目的是检测MyCat的服务状态，为HAProxy提供MyCat服务状态的依据。
+A、安装如下：
+        yum install -y xinetd
+        检查/etc/xinetd.conf 的末尾是否有 includedir /etc/xinetd.d ，没有就加上
+        检查 /etc/xinetd.d 目录是否存在，不存在则创建mkdir /etc/xinetd.d/
+
+B、增加 Mycat 存活状态检测服务配置：vim /etc/xinetd.d/mycat_status
+        service mycat_status
+        {
+                flags = REUSE
+                ## 使用该标记的 socket_type 为 stream，需要设置 wait 为 no
+                socket_type = stream ## 封包处理方式，Stream 为 TCP 数据包
+                port = 48700 ## 服务监听端口
+                wait = no ## 表示不需等待，即服务将以多线程的方式运行
+                user = root ## 执行此服务进程的用户
+                server =/usr/local/bin/mycat_status ## 需要启动的服务脚本
+                log_on_failure += USERID ## 登录失败记录的内容
+                disable = no ## 要启动服务，将此参数设置为 no
+        }
+
+C、添加 /usr/local/bin/mycat_status 服务脚本 vim /usr/local/bin/mycat_status
+        #!/bin/bash
+        Mycat=`/usr/local/mycat/bin/mycat status | grep &apos;not running&apos; | wc -l`
+        if [ &quot;$Mycat&quot; = &quot;0&quot; ]; then
+                /bin/echo -e &quot;HTTP/1.1 200 OK\r\n&quot;
+                else
+                /bin/echo -e &quot;HTTP/1.1 503 Service Unavailable\r\n&quot;
+        fi  
+D、脚本赋予可执行权限
+        chmod 755 /usr/local/bin/mycat_status
+
+E、在 /etc/services 中加入 mycat_status 服务
+        vim /etc/services 在末尾加入：
+        mycat_status 48700/tcp # mycat_status
+        保存后，重启 xinetd 服务 service xinetd restart
+
+F、验证 mycat_status 服务是否成功启动
+        netstat -antup|grep 48700
+
+G、测试脚本
+        /usr/local/bin/mycat_status</code></pre><h2 id="5、安装HAProxy"><a href="#5、安装HAProxy" class="headerlink" title="5、安装HAProxy"></a>5、安装HAProxy</h2><pre><code>在107和108中安装HAProxy，解压文件到/usr/local下。
+①、编译安装：
+        依赖yum install -y gcc gcc-c++ pcre pcre-devel zlib zlib-devel openssl openssl-devel
+        编译：make TARGET=linux2628 ARCH=x86_64 USE_PCRE=1 USE_OPENSSL=1 USE_ZLIB=1 PREFIX=/usr/local/haproxy
+                TARGET 是指定内核版本，高于 2.6.28 的建议设置为 linux2628，低于的是多少写多少。内核版本查看命令# uname -r， ARCH 指定系统架构，openssl pcre zlib 这三个包需要安装不然不支持
+        安装：创建安装目录mkdir /usr/local/haproxy
+        执行make install PREFIX=/usr/local/haproxy安装
+②、配置：
+        创建配置文件目录
+                mkdir -p /usr/local/haproxy/conf
+                mkdir -p /etc/haproxy/
+        添加配置文件并创建软连接
+                vi /usr/local/haproxy/conf/haproxy.cfg
+                        # Simple configuration for an HTTP proxy listening on port 80 on all
+                        # interfaces and forwarding requests to a single backend &quot;servers&quot; with a
+                        # single server &quot;server1&quot; listening on 127.0.0.1:8000
+                        global
+                                daemon
+                                maxconn 256
+                                defaults
+                                mode http
+                                timeout connect 5000ms
+                                timeout client 50000ms
+                                timeout server 50000ms
+                                frontend http-in
+                                bind *:80
+                        default_backend servers
+                        backend servers
+                        server server1 127.0.0.1:8000 maxconn 32
+                        # The same configuration defined with a single listen block. Shorter but
+                        # less expressive, especially in HTTP mode. global
+                        daemon
+                        maxconn 256
+                        defaults
+                        mode http
+                        timeout connect 5000ms
+                        timeout client 50000ms
+                        timeout server 50000ms
+                        listen http-in
+                        bind *:80
+                        server server1 127.0.0.1:8000 maxconn 32
+                创建软连接：ln -s /usr/local/haproxy/conf/haproxy.cfg /etc/haproxy/haproxy.cfg
+
+        ③、拷贝错误页面并创建软连接
+                cp -r /usr/local/haproxy-1.7.1/examples/errorfiles /usr/local/haproxy/
+                ln -s /usr/local/haproxy/errorfiles /etc/haproxy/errorfiles
+
+        ④、添加 HAProxy 命令脚本软连接
+                ln -s /usr/local/haproxy/sbin/haproxy /usr/sbin
+        设置自启动（可选）
+                cp /usr/local/haproxy-1.7.1/examples/haproxy.init /etc/rc.d/init.d/haproxy
+                chmod +x /etc/rc.d/init.d/haproxy
+
+                chkconfig --add haproxy
+                chkconfig haproxy on
+        ⑤、配置MyCat负载均衡集群
+                修改配置；vi /usr/local/haproxy/conf/haproxy.cfg
+                107：        
+                        global
+                                log 127.0.0.1 local0 info
+                                chroot /usr/share/haproxy
+                                group haproxy
+                                user haproxy
+                                daemon
+                                nbproc 1
+                                maxconn 4096
+                                node haproxy1
+                                description haproxy1
+                        defaults
+                                log global
+                                mode http
+                                option httplog
+                                retries 3
+                                option redispatch
+                                maxconn 2000
+                                timeout connect 5000ms
+                                timeout client 50000ms
+                                timeout server 50000ms
+                        listen admin_stats
+                                bind :48800
+                                stats uri /admin-status
+                                stats auth admin:admin
+                                mode http
+                                option httplog
+                        listen mycat_servers
+                                bind :3307
+                                mode tcp
+                                option tcplog
+                                option tcpka
+                                option httpchk OPTIONS * HTTP/1.1\r\nHost:\ www
+                                balance roundrobin
+                                server mycat_01 192.168.1.105:8066 check port 48700 inter 2000ms rise 2 fall 3 weight 10
+                                server mycat_02 192.168.1.106:8066 check port 48700 inter 2000ms rise 2 fall 3 weight 10                                
+
+                108：
+                        global
+                                log 127.0.0.1 local0 info
+                                chroot /usr/share/haproxy
+                                group haproxy
+                                user haproxy
+                                daemon
+                                nbproc 1
+                                maxconn 4096
+                                node haproxy2
+                                description haproxy2
+                        defaults
+                                log global
+                                mode http
+                                option httplog
+                                retries 3
+                                option redispatch
+                                maxconn 2000
+                                timeout connect 5000ms
+                                timeout client 50000ms
+                                timeout server 50000ms
+                        listen admin_stats
+                                bind :48800
+                                stats uri /admin-status
+                                stats auth admin:admin
+                                mode http
+                                option httplog
+                        listen mycat_servers
+                                bind :3307
+                                mode tcp
+                                option tcplog
+                                option tcpka
+                                option httpchk OPTIONS * HTTP/1.1\r\nHost:\ www
+                                balance roundrobin
+                                server mycat_01 192.168.1.105:8066 check port 48700 inter 2000ms rise 2 fall 3 weight 10
+                                server mycat_02 192.168.1.106:8066 check port 48700 inter 2000ms rise 2 fall 3 weight 10
+
+        ⑥、为 HAProxy 创建 Linux 系统用户                
+                groupadd haproxy
+                useradd -g haproxy haproxy
+
+        ⑦、创建 chroot 运行的路径mkdir /usr/share/haproxy
+
+        ⑧、开启 rsyslog 的 haproxy 日志记录功能
+                默认情况下 haproxy 是不记录日志的，如果需要记录日志，还需要配置系统的 syslog，在 linux 系统中是 rsyslog 服务。syslog 服务器可以用作一个网络中的日志监控中心，rsyslog是一个开源工具，被广泛用于 Linux 系统以通过 TCP/UDP 协议转发或接收日志消息。安装配置 rsyslog 服务。
+                        yum install -y rsyslog  
+                修改配置：
+                        vi /etc/rsyslog.conf                                
+                                $ModLoad imudp # 模块名，支持 UDP 协议
+                                $UDPServerRun 514  #允许 514 端口接收使用 UDP 和 TCP 协议转发过来的日志，默认端口
+                        确认 #### GLOBAL DIRECTIVES #### 段中是否有 $IncludeConfig /etc/rsyslog.d/*.conf 没有则增加上此配置。rsyslog 服务会来此目录加载配置                                
+                        创建 haproxy 的日志配置文件
+                        vi /etc/rsyslog.d/haproxy.conf
+                                local0.* /var/log/haproxy.log
+                                &amp;~
+                        注：如果不加上&amp;~,除了在/var/log/haproxy.log中写日志之外，也会写入/var/log/massage中
+
+                        保存后重启rsyslog服务service rsyslog restart
+                等到 HAProxy 服务启动后，就能在/var/log/haproxy.log中就会有日志。                                
+        ⑨、配置系统内核IP包转发规则，Linux默认不会转发tcp层的包
+                vi /etc/sysctl.conf
+                                net.ipv4.ip_forward = 1
+                生效： sysctl -p                
+        ⑩、启动HAProxy
+                service haproxy start
+                ps -ef | grep haproxy
+
+
+                测试：查看 HAProxy 提供的 WEB 统计应用
+                        http://192.168.1.107:48800/admin-status
+                        http://192.168.1.108:48800/admin-status</code></pre><p><img src="https://img.huyunshun.com/img/20200420192551.png" alt="20200420192551"></p>
+<h2 id="6、安装Keepalived"><a href="#6、安装Keepalived" class="headerlink" title="6、安装Keepalived"></a>6、安装Keepalived</h2><pre><code> A、安装
+         yum -y install keepalived
+         keepalived相关文件：
+         /etc/keepalived
+         /etc/keepalived/keepalived.conf     #keepalived服务主配置文件
+         /etc/rc.d/init.d/keepalived         #服务启动脚本（centos 7 之前的用init.d 脚本启动，之后的systemd启动）
+         /etc/sysconfig/keepalived
+         /usr/bin/genhash
+         /usr/libexec/keepalived
+         /usr/sbin/keepalived
+ B、配置 /etc/keepalived/keepalived.conf  
+ 192.168.1.107：
+         ! Configuration File for keepalived
+         global_defs {
+                 # keepalived 自带的邮件提醒需要开启 sendmail 服务。建议用独立的监控或第三方SMTP
+                 router_id haproxy1 ## 标识本节点的字符串，通常为 hostname，需要修改/etc/hosts
+         }
+         # keepalived 会定时执行脚本并对脚本执行的结果进行分析，动态调整 vrrp_instance的优先级。
+         # 如果脚本执行结果为 0，并且 weight 配置的值大于 0，则优先级相应的增加。
+         # 如果脚本执行结果非 0，并且 weight 配置的值小于 0，则优先级相应的减少。
+         # 其他情况，维持原本配置的优先级，即配置文件中 priority 对应的值。
+         vrrp_script chk_haproxy {
+                 script &quot;/etc/keepalived/haproxy_check.sh&quot;  # 检测 haproxy 状态的脚本路径
+                 interval 2  # 检测时间间隔
+                 weight 2    # 如果条件成立，权重+2
+         }
+         # 定义虚拟路由， VI_1 为虚拟路由的标示符，自己定义名称
+         vrrp_instance VI_1 {
+                 state BACKUP         # 默认主设备（priority 值大的）和备用设备（priority 值小的）都设置为 BACKUP，通常由priority 来控制同时启动情况下的默认主备，否则先启动的为主设备
+                 interface eth4         # 绑定虚拟 IP 的网络接口，与本机 IP 地址所在的网络接口相同
+                 virtual_router_id 35 # 虚拟路由的 ID 号，两个节点设置必须一样，可选 IP 最后一段使用，相同的 VRID 为一个组，他将决定多播的 MAC 地址
+                 priority 100         # 节点优先级，值范围 0-254， MASTER 要比 BACKUP 高
+                 nopreempt                 # 主设备（priority 值大的）配置一定要加上 nopreempt，否则非抢占也不起作用
+                 advert_int 1         # 组播信息发送间隔，两个节点设置必须一样，默认 1s
+                 # 设置验证信息，两个节点必须一致
+                 authentication {
+                         auth_type PASS
+                         auth_pass 1111  
+                 }
+                 # 将 track_script 块加入 instance 配置块
+                 track_script {
+                         chk_haproxy   # 检查 HAProxy 是否正常运行
+                 }
+                 # 虚拟 IP 池, 两个节点设置必须一样
+                 virtual_ipaddress {
+                         192.168.1.10  # 虚拟 ip，可以定义多个，每行一个
+                 }
+         }
+
+192.168.1.108：
+         ! Configuration File for keepalived
+         global_defs {
+                 # keepalived 自带的邮件提醒需要开启 sendmail 服务。建议用独立的监控或第三方SMTP
+                 router_id haproxy2 ## 标识本节点的字符串，通常为 hostname，需要修改/etc/hosts
+         }
+         # keepalived 会定时执行脚本并对脚本执行的结果进行分析，动态调整 vrrp_instance的优先级。
+         # 如果脚本执行结果为 0，并且 weight 配置的值大于 0，则优先级相应的增加。
+         # 如果脚本执行结果非 0，并且 weight 配置的值小于 0，则优先级相应的减少。
+         # 其他情况，维持原本配置的优先级，即配置文件中 priority 对应的值。
+         vrrp_script chk_haproxy {
+                 script &quot;/etc/keepalived/haproxy_check.sh&quot;  # 检测 haproxy 状态的脚本路径
+                 interval 2  # 检测时间间隔
+                 weight 2    # 如果条件成立，权重+2
+         }
+         # 定义虚拟路由， VI_1 为虚拟路由的标示符，自己定义名称
+         vrrp_instance VI_1 {
+                 state BACKUP         # 默认主设备（priority 值大的）和备用设备（priority 值小的）都设置为 BACKUP，通常由priority 来控制同时启动情况下的默认主备，否则先启动的为主设备
+                 interface eth4         # 绑定虚拟 IP 的网络接口，与本机 IP 地址所在的网络接口相同
+                 virtual_router_id 35 # 虚拟路由的 ID 号，两个节点设置必须一样，可选 IP 最后一段使用，相同的 VRID 为一个组，他将决定多播的 MAC 地址
+                 priority 99         # 节点优先级，值范围 0-254， MASTER 要比 BACKUP 高
+                 advert_int 1         # 组播信息发送间隔，两个节点设置必须一样，默认 1s
+                 # 设置验证信息，两个节点必须一致
+                 authentication {
+                         auth_type PASS
+                         auth_pass 1111  
+                 }
+                 # 将 track_script 块加入 instance 配置块
+                 track_script {
+                         chk_haproxy   # 检查 HAProxy 是否正常运行
+                 }
+                 # 虚拟 IP 池, 两个节点设置必须一样
+                 virtual_ipaddress {
+                         192.168.1.10  # 虚拟 ip，可以定义多个，每行一个
+                 }
+         }
+
+如果非抢占模式不生效， 在 Keepalived 的故障节点恢复后会再次导抢占vip，从而因 vip 切换而闪断带来的风险。
+按以上配置，配置了 Keepalived 非抢占模式， 配置及注意点如下：
+        (1) 主设备、 从设备中的 state 都设置为 BACKUP
+        (2) 主设备、从设备中都不要配置 mcast_src_ip （本机 IP 地址）
+        (3) 默认主设备（priority 值大的 Keepalived 节点） 配置一定要加上 nopreempt，否则非抢占不起作用
+        (4) 防火墙配置允许组播（主、备两台设备上都需要配置， keepalived 使用 224.0.0.18作为 Master 和 Backup 健康检查的通信 IP）
+
+
+ ③、配置检测 haproxy 状态的脚本
+ /etc/keepalived/haproxy_check.sh
+ 创建一个日志，如果发生haproxy异常需要切换，记录到日志中。
+ mkdir -p /usr/share/haproxy/log
+ 脚本如下：如果 haproxy 停止运行，尝试启动，如果无法启动则杀死本机的 keepalived 进程，keepalied 自动将虚拟 ip 绑定到 BACKUP 机器上。
+         #!/bin/bash
+         START_HAPROXY=&quot;/etc/rc.d/init.d/haproxy start&quot;
+         STOP_HAPROXY=&quot;/etc/rc.d/init.d/haproxy stop&quot;
+         LOG_FILE=&quot;/usr/share/haproxy/log/haproxy-check.log&quot;
+         HAPS=`ps -C haproxy --no-header |wc -l`
+         date &quot;+%Y-%m-%d %H:%M:%S&quot; &gt;&gt; $LOG_FILE
+         echo &quot;check haproxy status&quot; &gt;&gt; $LOG_FILE
+         if [ $HAPS -eq 0 ];then
+                 echo $START_HAPROXY &gt;&gt; $LOG_FILE
+                 $START_HAPROXY &gt;&gt; $LOG_FILE 2&gt;&amp;1
+                 sleep 3
+                 if [ `ps -C haproxy --no-header |wc -l` -eq 0 ];then
+                         echo &quot;start haproxy failed, killall keepalived&quot; &gt;&gt; $LOG_FILE
+                         killall keepalived
+                 fi
+         fi
+ 保存赋权：
+ chmod +x /etc/keepalived/haproxy_check.sh
+
+ ④、启动 Keepalived
+ 停止： service keepalived stop
+ 启动： service keepalived start
+ 重启： service keepalived restart
+ 看状态： service keepalived status</code></pre><h2 id="7、测试Keepalived-HAProxy"><a href="#7、测试Keepalived-HAProxy" class="headerlink" title="7、测试Keepalived+HAProxy"></a>7、测试Keepalived+HAProxy</h2><p>两台服务器启动Keepalived+HAProxy，测试：</p>
+<p><img src="https://img.huyunshun.com/img/20200420192826.png" alt="20200420192826"></p>
+<p>此时，keepalived，VIP是在108上，如果停止108的haproxy，如下效果：</p>
+<p><img src="https://img.huyunshun.com/img/20200420192848.png" alt="20200420192848"></p>
+<p>停止108的haproxy，keepalived检测haproxy异常，并且重启haproxy，所以haproxy继续运行且日志中记录重启haproxy记录，这样就实现keepalived对haproxy高可用。</p>
+<p>如果直接停止108keepalived，VIP飘到107：</p>
+<p><img src="https://img.huyunshun.com/img/20200421123303.png" alt="20200421123303"></p>
+<p>如果把107的/usr/local/haproxy/conf/haproxy.cfg配置文件修改错误，让haproxy不能重启，停止haproxy后测试效果如下：</p>
+<p><img src="https://img.huyunshun.com/img/20200421123317.png" alt="20200421123317"></p>
+<p>可以看到，VIP漂移到108，而且107也访问不了haproxy，并且107keepalived状态：keepalived dead but subsys locked。<br>日志中显示启动haproxy报错信息，和杀死keepalived进程信息。</p>
+<p><img src="https://img.huyunshun.com/img/20200421123334.png" alt="20200421123334"></p>
+<h2 id="8、测试HAProxy-Keepalived-MyCat-MySQL高可用集群"><a href="#8、测试HAProxy-Keepalived-MyCat-MySQL高可用集群" class="headerlink" title="8、测试HAProxy+Keepalived+MyCat+MySQL高可用集群"></a>8、测试HAProxy+Keepalived+MyCat+MySQL高可用集群</h2><pre><code>全部机器启动并启动相关服务测试，通过VIP访问到mysql数据库，对数据的操作，没有问题。</code></pre>
+      
+    </div>
+     <!-- 相关文章推荐 -->
+    
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/mysql/" rel="tag"># mysql</a>
+          
+            <a href="/tags/mycat/" rel="tag"># mycat</a>
+          
+            <a href="/tags/%E9%9B%86%E7%BE%A4/" rel="tag"># 集群</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/02/20/MyCat%E9%9B%86%E7%BE%A4%E7%8E%AF%E5%A2%83%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/" rel="next" title="MyCat集群环境负载均衡">
+                <i class="fa fa-chevron-left"></i> MyCat集群环境负载均衡
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/02/20/HAProxy%20%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E8%AF%A6%E8%A7%A3/" rel="prev" title="HAProxy 配置文件详解">
+                HAProxy 配置文件详解 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+<span class="jiathis_txt">分享到：</span>
+<a class="jiathis_button_fav">收藏夹</a>
+<a class="jiathis_button_copy">复制网址</a>
+<a class="jiathis_button_email">邮件</a>
+<a class="jiathis_button_weixin">微信</a>
+<a class="jiathis_button_qzone">QQ空间</a>
+<a class="jiathis_button_tqq">腾讯微博</a>
+<a class="jiathis_button_douban">豆瓣</a>
+<a class="jiathis_button_share">一键分享</a>
+
+<a href="http://www.jiathis.com/share?uid=2140465" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+<a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+var jiathis_config={
+  data_track_clickback:true,
+  summary:"",
+  shortUrl:false,
+  hideMore:false
+}
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://img.huyunshun.com/img/20200522182348.png"
+                alt="初晨" />
+            
+              <p class="site-author-name" itemprop="name">初晨</p>
+              <p class="site-description motion-element" itemprop="description">永远不要说你知道本质，更别说真相了。</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">249</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">46</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+<!--近期文章版块-->
+            
+                <div class="links-of-blogroll motion-element links-of-blogroll-block">
+                  <div class="links-of-blogroll-title">
+                    <!-- modify icon to fire by szw -->
+                    <i class="fa fa-history fa-" aria-hidden="true"></i>
+                    近期文章
+                  </div>
+                  <ul class="links-of-blogroll-list">
+                    
+                    
+                      <li>
+                        <a href="/2020/05/22/WebSocket%E3%80%81Socket%E3%80%81TCP%E3%80%81HTTP%E5%8C%BA%E5%88%AB/" title="WebSocket、Socket、TCP、HTTP区别" target="_blank">WebSocket、Socket、TCP、HTTP区别</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/19/Springboot%E9%A1%B9%E7%9B%AE%E7%9A%84%E6%8E%A5%E5%8F%A3%E9%98%B2%E5%88%B7/" title="Springboot项目的接口防刷" target="_blank">Springboot项目的接口防刷</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/03/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Volatile%E5%85%B3%E9%94%AE%E5%AD%97%E5%8F%8A%E5%85%B6%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/" title="深入理解Volatile关键字及其实现原理" target="_blank">深入理解Volatile关键字及其实现原理</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/04/20/%E4%BD%BF%E7%94%A8vscode%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0%E7%8E%AF%E5%A2%83/" title="使用vscode搭建个人笔记环境" target="_blank">使用vscode搭建个人笔记环境</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/01/20/HBase%E4%BB%8B%E7%BB%8D%E5%AE%89%E8%A3%85%E4%B8%8E%E6%93%8D%E4%BD%9C/" title="HBase介绍安装与操作" target="_blank">HBase介绍安装与操作</a>
+                      </li>
+                    
+                  </ul>
+                </div>
+            
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1、集群环境分配"><span class="nav-number">1.</span> <span class="nav-text">1、集群环境分配</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2、配置MySQL主从和主主"><span class="nav-number">2.</span> <span class="nav-text">2、配置MySQL主从和主主</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3、配置MyCat"><span class="nav-number">3.</span> <span class="nav-text">3、配置MyCat</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4、安装xinetd"><span class="nav-number">4.</span> <span class="nav-text">4、安装xinetd</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5、安装HAProxy"><span class="nav-number">5.</span> <span class="nav-text">5、安装HAProxy</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6、安装Keepalived"><span class="nav-number">6.</span> <span class="nav-text">6、安装Keepalived</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7、测试Keepalived-HAProxy"><span class="nav-number">7.</span> <span class="nav-text">7、测试Keepalived+HAProxy</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8、测试HAProxy-Keepalived-MyCat-MySQL高可用集群"><span class="nav-number">8.</span> <span class="nav-text">8、测试HAProxy+Keepalived+MyCat+MySQL高可用集群</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Copyright</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

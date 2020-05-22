@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="docker," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Etcd 是 CoreOS 团队发起的一个管理配置信息和服务发现（Service Discovery）的项目。 它的目标是构建一个高可用的分布式键值（key-value）数据库，基于 Go 语言实现。在分布式系统中，各种服务的配置信息的管理分享，服务的发现是一个很基本同时也是很重要的问题。CoreOS 项目就希望基于 etcd 来解决这一问题。etcd 目前在 github.com&#x2F;etcd-io">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Docker Etcd项目">
+<meta property="og:url" content="https://huyunshun.com/2019/05/20/Docker_Etcd%E9%A1%B9%E7%9B%AE/index.html">
+<meta property="og:site_name" content="简">
+<meta property="og:description" content="Etcd 是 CoreOS 团队发起的一个管理配置信息和服务发现（Service Discovery）的项目。 它的目标是构建一个高可用的分布式键值（key-value）数据库，基于 Go 语言实现。在分布式系统中，各种服务的配置信息的管理分享，服务的发现是一个很基本同时也是很重要的问题。CoreOS 项目就希望基于 etcd 来解决这一问题。etcd 目前在 github.com&#x2F;etcd-io">
+<meta property="article:published_time" content="2019-05-19T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-05-20T10:04:24.682Z">
+<meta property="article:author" content="初晨">
+<meta property="article:tag" content="docker">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://huyunshun.com/2019/05/20/Docker_Etcd项目/"/>
+
+
+
+
+
+  <title>Docker Etcd项目 | 简</title>
+  
+
+
+
+
+
+
+
+
+  <script type="text/javascript" src="/js/src/love.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
+
+  <!-- 看板娘 -->
+    
+        <script async src="/live2d-widget/autoload.js"></script>
+    
+ <!-- 飘动的彩带） -->
+  <script src="/js/src/piao.js" type="text/javascript"></script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">简</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">人生短暂，学海无边，而大道至简。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://huyunshun.com/2019/05/20/Docker_Etcd%E9%A1%B9%E7%9B%AE/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="初晨">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://img.huyunshun.com/img/20200522182348.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="简">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Docker Etcd项目</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-05-20T00:00:00+08:00">
+                2019-05-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/docker/" itemprop="url" rel="index">
+                    <span itemprop="name">docker</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Etcd 是 CoreOS 团队发起的一个管理配置信息和服务发现（Service Discovery）的项目。</p>
+<p>它的目标是构建一个高可用的分布式键值（key-value）数据库，基于 Go 语言实现。在分布式系统中，各种服务的配置信息的管理分享，服务的发现是一个很基本同时也是很重要的问题。CoreOS 项目就希望基于 etcd 来解决这一问题。etcd 目前在 github.com/etcd-io/etcd 进行维护。</p>
+<p>受到 Apache ZooKeeper 项目和 doozer 项目的启发，etcd 在设计的时候重点考虑了下面四个要素：</p>
+<ul>
+<li><p>简单：具有定义良好、面向用户的 API (gRPC)</p>
+</li>
+<li><p>安全：支持 HTTPS 方式的访问</p>
+</li>
+<li><p>快速：支持并发 10 k/s 的写操作</p>
+</li>
+<li><p>可靠：支持分布式结构，基于 Raft 的一致性算法</p>
+</li>
+<li><p>Apache ZooKeeper 是一套知名的分布式系统中进行同步和一致性管理的工具。</p>
+</li>
+<li><p>doozer 是一个一致性分布式数据库。</p>
+</li>
+<li><p>Raft 是一套通过选举主节点来实现分布式系统一致性的算法，相比于大名鼎鼎的 Paxos 算法，它的过程更容易被人理解，由 Stanford 大学的 Diego Ongaro 和 John Ousterhout 提出。更多细节可以参考 raftconsensus.github.io。</p>
+</li>
+</ul>
+<p>一般情况下，用户使用 etcd 可以在多个节点上启动多个实例，并添加它们为一个集群。同一个集群中的 etcd 实例将会保持彼此信息的一致性。</p>
+<h1 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h1><h2 id="二进制文件方式下载"><a href="#二进制文件方式下载" class="headerlink" title="二进制文件方式下载"></a>二进制文件方式下载</h2><p>编译好的二进制文件都在 github.com/etcd-io/etcd/releases 页面，用户可以选择需要的版本：</p>
+<p>下载解压：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[root@VM_0_3_centos ~]#curl -L https:&#x2F;&#x2F;github.com&#x2F;etcd-io&#x2F;etcd&#x2F;releases&#x2F;download&#x2F;v3.4.0&#x2F;etcd-v3.4.0-linux-amd64.tar.gz -o etcd-v3.4.0-linux-amd64.tar.gz</span><br><span class="line">[root@VM_0_3_centos ~]#tar xzf etcd-v3.4.0-linux-amd64.tar.gz</span><br><span class="line">[root@VM_0_3_centos ~]# ls</span><br><span class="line">dockerfile  etcd-v3.4.0-linux-amd64  etcd-v3.4.0-linux-amd64.tar.gz</span><br><span class="line">[root@VM_0_3_centos ~]# mv etcd-v3.4.0-linux-amd64 &#x2F;usr&#x2F;local&#x2F;etcd3.4&#x2F;</span><br><span class="line"></span><br><span class="line">[root@VM_0_3_centos ~]# ls &#x2F;usr&#x2F;local&#x2F;etcd3.4&#x2F;</span><br><span class="line">Documentation  etcd  etcdctl  README-etcdctl.md  README.md  READMEv2-etcdctl.md</span><br><span class="line">[root@VM_0_3_centos ~]# cd &#x2F;usr&#x2F;local&#x2F;etcd3.4&#x2F;</span><br></pre></td></tr></table></figure>
+<p>复制到目录，并且复制到bin，etcd 是服务主文件，etcdctl 是提供给用户的命令客户端。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@VM_0_3_centos etcd3.4]# cp etcd* &#x2F;usr&#x2F;local&#x2F;bin&#x2F;</span><br><span class="line">[root@VM_0_3_centos etcd3.4]# ls &#x2F;usr&#x2F;local&#x2F;bin&#x2F;</span><br><span class="line">etcd  etcdctl</span><br></pre></td></tr></table></figure>
+<p>启动</p>
+<p>默认 2379 端口处理客户端的请求，2380 端口用于集群各成员间的通信。启动 etcd 显示类似如下的信息：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root@VM_0_3_centos etcd3.4]# etcd</span><br><span class="line">[WARNING] Deprecated &#39;--logger&#x3D;capnslog&#39; flag is set; use &#39;--logger&#x3D;zap&#39; flag instead</span><br><span class="line">2019-11-05 15:19:01.909992 I | etcdmain: etcd Version: 3.4.0</span><br><span class="line">.......</span><br><span class="line">2019-11-05 15:19:02.634795 I | embed: ready to serve client requests</span><br><span class="line">2019-11-05 15:19:02.635348 N | embed: serving insecure client requests on 127.0.0.1:2379, this is strongly discouraged!</span><br></pre></td></tr></table></figure>
+
+<p>测试：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">#使用 etcdctl 命令进行测试，设置和获取键值 testkey: &quot;hello world&quot;，检查 etcd 服务是否启动成功：</span><br><span class="line">[root@VM_0_3_centos ~]# ETCDCTL_API&#x3D;3 etcdctl member list</span><br><span class="line">8e9e05c52164694d, started, default, http:&#x2F;&#x2F;localhost:2380, http:&#x2F;&#x2F;localhost:2379, false</span><br><span class="line">[root@VM_0_3_centos ~]# ETCDCTL_API&#x3D;3 etcdctl put testkey &quot;hello world&quot;</span><br><span class="line">OK</span><br><span class="line">[root@VM_0_3_centos ~]# etcdctl get testkey</span><br><span class="line">testkey</span><br><span class="line">hello world</span><br></pre></td></tr></table></figure>
+<p>也可以通过 HTTP 访问本地 2379 或 4001 端口的方式来进行操作，例如查看 testkey 的值：curl -L <a href="http://localhost:4001/v2/keys/testkey" target="_blank" rel="noopener">http://localhost:4001/v2/keys/testkey</a></p>
+<h2 id="Docker-镜像方式运行"><a href="#Docker-镜像方式运行" class="headerlink" title="Docker 镜像方式运行"></a>Docker 镜像方式运行</h2><p>镜像名称为 quay.io/coreos/etcd，可以通过下面的命令启动 etcd 服务监听到 2379 和 2380 端口。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">$ docker run \</span><br><span class="line">-p 2379:2379 \</span><br><span class="line">-p 2380:2380 \</span><br><span class="line">--mount type&#x3D;bind,source&#x3D;&#x2F;tmp&#x2F;etcd-data.tmp,destination&#x3D;&#x2F;etcd-data \</span><br><span class="line">--name etcd-gcr-v3.4.0 \</span><br><span class="line">quay.io&#x2F;coreos&#x2F;etcd:v3.4.0 \</span><br><span class="line">&#x2F;usr&#x2F;local&#x2F;bin&#x2F;etcd \</span><br><span class="line">--name s1 \</span><br><span class="line">--data-dir &#x2F;etcd-data \</span><br><span class="line">--listen-client-urls http:&#x2F;&#x2F;0.0.0.0:2379 \</span><br><span class="line">--advertise-client-urls http:&#x2F;&#x2F;0.0.0.0:2379 \</span><br><span class="line">--listen-peer-urls http:&#x2F;&#x2F;0.0.0.0:2380 \</span><br><span class="line">--initial-advertise-peer-urls http:&#x2F;&#x2F;0.0.0.0:2380 \</span><br><span class="line">--initial-cluster s1&#x3D;http:&#x2F;&#x2F;0.0.0.0:2380 \</span><br><span class="line">--initial-cluster-token tkn \</span><br><span class="line">--initial-cluster-state new \</span><br><span class="line">--log-level info \</span><br><span class="line">--logger zap \</span><br><span class="line">--log-outputs stderr</span><br></pre></td></tr></table></figure>
+<p>打开新的终端按照上一步的方法测试 etcd 是否成功启动。</p>
+<h2 id="macOS-中运行"><a href="#macOS-中运行" class="headerlink" title="macOS 中运行"></a>macOS 中运行</h2><p>$ brew install etcd</p>
+<p>$ etcd</p>
+<p>$ etcdctl member list</p>
+<h1 id="Etcd-集群"><a href="#Etcd-集群" class="headerlink" title="Etcd 集群"></a>Etcd 集群</h1><p>使用 Docker Compose 模拟启动一个 3 节点的 etcd 集群。</p>
+<p>docker-compose.yml 文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br></pre></td><td class="code"><pre><span class="line">version: &quot;3.6&quot;</span><br><span class="line">services:</span><br><span class="line"></span><br><span class="line">  node1:</span><br><span class="line">    image: quay.io&#x2F;coreos&#x2F;etcd:v3.4.0</span><br><span class="line">    volumes:</span><br><span class="line">      - node1-data:&#x2F;etcd-data</span><br><span class="line">    expose:</span><br><span class="line">      - 2379</span><br><span class="line">      - 2380</span><br><span class="line">    networks:</span><br><span class="line">      cluster_net:</span><br><span class="line">        ipv4_address: 172.16.238.100</span><br><span class="line">    environment:</span><br><span class="line">      - ETCDCTL_API&#x3D;3</span><br><span class="line">    command:</span><br><span class="line">      - &#x2F;usr&#x2F;local&#x2F;bin&#x2F;etcd</span><br><span class="line">      - --data-dir&#x3D;&#x2F;etcd-data</span><br><span class="line">      - --name</span><br><span class="line">      - node1</span><br><span class="line">      - --initial-advertise-peer-urls</span><br><span class="line">      - http:&#x2F;&#x2F;172.16.238.100:2380</span><br><span class="line">      - --listen-peer-urls</span><br><span class="line">      - http:&#x2F;&#x2F;0.0.0.0:2380</span><br><span class="line">      - --advertise-client-urls</span><br><span class="line">      - http:&#x2F;&#x2F;172.16.238.100:2379</span><br><span class="line">      - --listen-client-urls</span><br><span class="line">      - http:&#x2F;&#x2F;0.0.0.0:2379</span><br><span class="line">      - --initial-cluster</span><br><span class="line">      - node1&#x3D;http:&#x2F;&#x2F;172.16.238.100:2380,node2&#x3D;http:&#x2F;&#x2F;172.16.238.101:2380,node3&#x3D;http:&#x2F;&#x2F;172.16.238.102:2380</span><br><span class="line">      - --initial-cluster-state</span><br><span class="line">      - new</span><br><span class="line">      - --initial-cluster-token</span><br><span class="line">      - docker-etcd</span><br><span class="line"></span><br><span class="line">  node2:</span><br><span class="line">    image: quay.io&#x2F;coreos&#x2F;etcd:v3.4.0</span><br><span class="line">    volumes:</span><br><span class="line">      - node2-data:&#x2F;etcd-data</span><br><span class="line">    networks:</span><br><span class="line">      cluster_net:</span><br><span class="line">        ipv4_address: 172.16.238.101</span><br><span class="line">    environment:</span><br><span class="line">      - ETCDCTL_API&#x3D;3</span><br><span class="line">    expose:</span><br><span class="line">      - 2379</span><br><span class="line">      - 2380</span><br><span class="line">    command:</span><br><span class="line">      - &#x2F;usr&#x2F;local&#x2F;bin&#x2F;etcd</span><br><span class="line">      - --data-dir&#x3D;&#x2F;etcd-data</span><br><span class="line">      - --name</span><br><span class="line">      - node2</span><br><span class="line">      - --initial-advertise-peer-urls</span><br><span class="line">      - http:&#x2F;&#x2F;172.16.238.101:2380</span><br><span class="line">      - --listen-peer-urls</span><br><span class="line">      - http:&#x2F;&#x2F;0.0.0.0:2380</span><br><span class="line">      - --advertise-client-urls</span><br><span class="line">      - http:&#x2F;&#x2F;172.16.238.101:2379</span><br><span class="line">      - --listen-client-urls</span><br><span class="line">      - http:&#x2F;&#x2F;0.0.0.0:2379</span><br><span class="line">      - --initial-cluster</span><br><span class="line">      - node1&#x3D;http:&#x2F;&#x2F;172.16.238.100:2380,node2&#x3D;http:&#x2F;&#x2F;172.16.238.101:2380,node3&#x3D;http:&#x2F;&#x2F;172.16.238.102:2380</span><br><span class="line">      - --initial-cluster-state</span><br><span class="line">      - new</span><br><span class="line">      - --initial-cluster-token</span><br><span class="line">      - docker-etcd</span><br><span class="line"></span><br><span class="line">  node3:</span><br><span class="line">    image: quay.io&#x2F;coreos&#x2F;etcd:v3.4.0</span><br><span class="line">    volumes:</span><br><span class="line">      - node3-data:&#x2F;etcd-data</span><br><span class="line">    networks:</span><br><span class="line">      cluster_net:</span><br><span class="line">        ipv4_address: 172.16.238.102</span><br><span class="line">    environment:</span><br><span class="line">      - ETCDCTL_API&#x3D;3</span><br><span class="line">    expose:</span><br><span class="line">      - 2379</span><br><span class="line">      - 2380</span><br><span class="line">    command:</span><br><span class="line">      - &#x2F;usr&#x2F;local&#x2F;bin&#x2F;etcd</span><br><span class="line">      - --data-dir&#x3D;&#x2F;etcd-data</span><br><span class="line">      - --name</span><br><span class="line">      - node3</span><br><span class="line">      - --initial-advertise-peer-urls</span><br><span class="line">      - http:&#x2F;&#x2F;172.16.238.102:2380</span><br><span class="line">      - --listen-peer-urls</span><br><span class="line">      - http:&#x2F;&#x2F;0.0.0.0:2380</span><br><span class="line">      - --advertise-client-urls</span><br><span class="line">      - http:&#x2F;&#x2F;172.16.238.102:2379</span><br><span class="line">      - --listen-client-urls</span><br><span class="line">      - http:&#x2F;&#x2F;0.0.0.0:2379</span><br><span class="line">      - --initial-cluster</span><br><span class="line">      - node1&#x3D;http:&#x2F;&#x2F;172.16.238.100:2380,node2&#x3D;http:&#x2F;&#x2F;172.16.238.101:2380,node3&#x3D;http:&#x2F;&#x2F;172.16.238.102:2380</span><br><span class="line">      - --initial-cluster-state</span><br><span class="line">      - new</span><br><span class="line">      - --initial-cluster-token</span><br><span class="line">      - docker-etcd</span><br><span class="line"></span><br><span class="line">volumes:</span><br><span class="line">  node1-data:</span><br><span class="line">  node2-data:</span><br><span class="line">  node3-data:</span><br><span class="line"></span><br><span class="line">networks:</span><br><span class="line">  cluster_net:</span><br><span class="line">    driver: bridge</span><br><span class="line">    ipam:</span><br><span class="line">      driver: default</span><br><span class="line">      config:</span><br><span class="line">      -</span><br><span class="line">        subnet: 172.16.238.0&#x2F;24</span><br></pre></td></tr></table></figure>
+<p>使用 docker-compose up 启动集群之后使用 docker exec 命令登录到任一节点测试 etcd 集群。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[root@VM_0_3_centos tmp]# docker ps</span><br><span class="line">CONTAINER ID        IMAGE                        COMMAND                  CREATED             STATUS              PORTS               NAMES</span><br><span class="line">45c34fa7d4d5        quay.io&#x2F;coreos&#x2F;etcd:v3.4.0   &quot;&#x2F;usr&#x2F;local&#x2F;bin&#x2F;etcd…&quot;   25 minutes ago      Up 20 minutes       2379-2380&#x2F;tcp       etcd_node1_1</span><br><span class="line">b1d9ecc03d64        quay.io&#x2F;coreos&#x2F;etcd:v3.4.0   &quot;&#x2F;usr&#x2F;local&#x2F;bin&#x2F;etcd…&quot;   25 minutes ago      Up 25 minutes       2379-2380&#x2F;tcp       etcd_node3_1</span><br><span class="line">dae9d24f3197        quay.io&#x2F;coreos&#x2F;etcd:v3.4.0   &quot;&#x2F;usr&#x2F;local&#x2F;bin&#x2F;etcd…&quot;   25 minutes ago      Up 25 minutes       2379-2380&#x2F;tcp       etcd_node2_1</span><br><span class="line">[root@VM_0_3_centos tmp]# docker exec -it 45 &#x2F;bin&#x2F;sh</span><br><span class="line"># etcdctl member list</span><br><span class="line">daf3fd52e3583ff, started, node3, http:&#x2F;&#x2F;172.16.238.102:2380, http:&#x2F;&#x2F;172.16.238.102:2379, false</span><br><span class="line">422a74f03b622fef, started, node1, http:&#x2F;&#x2F;172.16.238.100:2380, http:&#x2F;&#x2F;172.16.238.100:2379, false</span><br><span class="line">ed635d2a2dbef43d, started, node2, http:&#x2F;&#x2F;172.16.238.101:2380, http:&#x2F;&#x2F;172.16.238.101:2379, false</span><br></pre></td></tr></table></figure>
+
+<h1 id="使用-etcdctl"><a href="#使用-etcdctl" class="headerlink" title="使用 etcdctl"></a>使用 etcdctl</h1><p>etcdctl 支持如下的命令，大体上分为数据库操作和非数据库操作两类。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><span class="line">NAME:</span><br><span class="line">    etcdctl - A simple command line client for etcd3.</span><br><span class="line"></span><br><span class="line">USAGE:</span><br><span class="line">    etcdctl</span><br><span class="line"></span><br><span class="line">VERSION:</span><br><span class="line">    3.4.0</span><br><span class="line"></span><br><span class="line">API VERSION:</span><br><span class="line">    3.4</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">COMMANDS:</span><br><span class="line">    get            Gets the key or a range of keys</span><br><span class="line">    put            Puts the given key into the store</span><br><span class="line">    del            Removes the specified key or range of keys [key, range_end)</span><br><span class="line">    txn            Txn processes all the requests in one transaction</span><br><span class="line">    compaction        Compacts the event history in etcd</span><br><span class="line">    alarm disarm        Disarms all alarms</span><br><span class="line">    alarm list        Lists all alarms</span><br><span class="line">    defrag            Defragments the storage of the etcd members with given endpoints</span><br><span class="line">    endpoint health        Checks the healthiness of endpoints specified in &#96;--endpoints&#96; flag</span><br><span class="line">    endpoint status        Prints out the status of endpoints specified in &#96;--endpoints&#96; flag</span><br><span class="line">    watch            Watches events stream on keys or prefixes</span><br><span class="line">    version            Prints the version of etcdctl</span><br><span class="line">    lease grant        Creates leases</span><br><span class="line">    lease revoke        Revokes leases</span><br><span class="line">    lease timetolive    Get lease information</span><br><span class="line">    lease keep-alive    Keeps leases alive (renew)</span><br><span class="line">    member add        Adds a member into the cluster</span><br><span class="line">    member remove        Removes a member from the cluster</span><br><span class="line">    member update        Updates a member in the cluster</span><br><span class="line">    member list        Lists all members in the cluster</span><br><span class="line">    snapshot save        Stores an etcd node backend snapshot to a given file</span><br><span class="line">    snapshot restore    Restores an etcd member snapshot to an etcd directory</span><br><span class="line">    snapshot status        Gets backend snapshot status of a given file</span><br><span class="line">    make-mirror        Makes a mirror at the destination etcd cluster</span><br><span class="line">    migrate            Migrates keys in a v2 store to a mvcc store</span><br><span class="line">    lock            Acquires a named lock</span><br><span class="line">    elect            Observes and participates in leader election</span><br><span class="line">    auth enable        Enables authentication</span><br><span class="line">    auth disable        Disables authentication</span><br><span class="line">    user add        Adds a new user</span><br><span class="line">    user delete        Deletes a user</span><br><span class="line">    user get        Gets detailed information of a user</span><br><span class="line">    user list        Lists all users</span><br><span class="line">    user passwd        Changes password of user</span><br><span class="line">    user grant-role        Grants a role to a user</span><br><span class="line">    user revoke-role    Revokes a role from a user</span><br><span class="line">    role add        Adds a new role</span><br><span class="line">    role delete        Deletes a role</span><br><span class="line">    role get        Gets detailed information of a role</span><br><span class="line">    role list        Lists all roles</span><br><span class="line">    role grant-permission    Grants a key to a role</span><br><span class="line">    role revoke-permission    Revokes a key from a role</span><br><span class="line">    check perf        Check the performance of the etcd cluster</span><br><span class="line">    help            Help about any command</span><br><span class="line"></span><br><span class="line">OPTIONS:</span><br><span class="line">      --cacert&#x3D;&quot;&quot;                verify certificates of TLS-enabled secure servers using this CA bundle</span><br><span class="line">      --cert&#x3D;&quot;&quot;                    identify secure client using this TLS certificate file</span><br><span class="line">      --command-timeout&#x3D;5s            timeout for short running command (excluding dial timeout)</span><br><span class="line">      --debug[&#x3D;false]                enable client-side debug logging</span><br><span class="line">      --dial-timeout&#x3D;2s                dial timeout for client connections</span><br><span class="line">      --endpoints&#x3D;[127.0.0.1:2379]        gRPC endpoints</span><br><span class="line">      --hex[&#x3D;false]                print byte strings as hex encoded strings</span><br><span class="line">      --insecure-skip-tls-verify[&#x3D;false]    skip server certificate verification</span><br><span class="line">      --insecure-transport[&#x3D;true]        disable transport security for client connections</span><br><span class="line">      --key&#x3D;&quot;&quot;                    identify secure client using this TLS key file</span><br><span class="line">      --user&#x3D;&quot;&quot;                    username[:password] for authentication (prompt if password is not supplied)</span><br><span class="line">  -w, --write-out&#x3D;&quot;simple&quot;            set the output format (fields, json, protobuf, simple, table)</span><br></pre></td></tr></table></figure>
+<h2 id="数据库操作"><a href="#数据库操作" class="headerlink" title="数据库操作"></a>数据库操作</h2><p>数据库操作围绕对键值和目录的 CRUD （符合 REST 风格的一套操作：Create）完整生命周期的管理。</p>
+<p>etcd 在键的组织上采用了层次化的空间结构（类似于文件系统中目录的概念），用户指定的键可以为单独的名字，如 testkey，此时实际上放在根目录 / 下面，也可以为指定目录结构，如 cluster1/node2/testkey，则将创建相应的目录结构。</p>
+<p>注：CRUD 即 Create, Read, Update, Delete，是符合 REST 风格的一套 API 操作。</p>
+<h3 id="put-set"><a href="#put-set" class="headerlink" title="put/set"></a>put/set</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ etcdctl put &#x2F;testdir&#x2F;testkey &quot;Hello world&quot;</span><br><span class="line">OK</span><br></pre></td></tr></table></figure>
+<h3 id="get"><a href="#get" class="headerlink" title="get"></a>get</h3><p>获取指定键的值。例如</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ etcdctl put testkey hello</span><br><span class="line">OK</span><br><span class="line">$ etcdctl get testkey</span><br><span class="line">testkey</span><br><span class="line">hello</span><br></pre></td></tr></table></figure>
+<p>支持的选项为</p>
+<p>–sort 对结果进行排序</p>
+<p>–consistent 将请求发给主节点，保证获取内容的一致性</p>
+<h3 id="del"><a href="#del" class="headerlink" title="del"></a>del</h3><p>删除某个键值。例如</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ etcdctl del testkey</span><br><span class="line">1</span><br></pre></td></tr></table></figure>
+<h3 id="update"><a href="#update" class="headerlink" title="update"></a>update</h3><p>当键存在时，更新值内容。例如</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ etcdctl set testkey hello</span><br><span class="line">hello</span><br><span class="line">$ etcdctl update testkey world</span><br><span class="line">world</span><br></pre></td></tr></table></figure>
+<p>当键不存在时，则会报错。例如</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ etcdctl update testkey2 world</span><br><span class="line">Error:  100: Key not found (&#x2F;testkey2) [1]</span><br></pre></td></tr></table></figure>
+<h2 id="非数据库操作"><a href="#非数据库操作" class="headerlink" title="非数据库操作"></a>非数据库操作</h2><h3 id="watch"><a href="#watch" class="headerlink" title="watch"></a>watch</h3><p>监测一个键值的变化，一旦键值发生更新，就会输出最新的值。</p>
+<p>例如，用户更新 testkey 键值为 Hello world。</p>
+<p>$ etcdctl watch testkey</p>
+<h3 id="PUT"><a href="#PUT" class="headerlink" title="PUT"></a>PUT</h3><p>testkey<br>2</p>
+<h3 id="member"><a href="#member" class="headerlink" title="member"></a>member</h3><p>通过 list、add、update、remove 命令列出、添加、更新、删除 etcd 实例到 etcd 集群中。</p>
+<p>例如本地启动一个 etcd 服务实例后，可以用如下命令进行查看。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ etcdctl member list</span><br><span class="line">422a74f03b622fef, started, node1, http:&#x2F;&#x2F;172.16.238.100:2380, http:&#x2F;&#x2F;172.16.238.100:23</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+     <!-- 相关文章推荐 -->
+    
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/docker/" rel="tag"># docker</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/05/19/Docker_Swarm_%E9%A1%B9%E7%9B%AE/" rel="next" title="Docker Swarm 项目">
+                <i class="fa fa-chevron-left"></i> Docker Swarm 项目
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/05/21/Docker_Kubernetes%E9%A1%B9%E7%9B%AE/" rel="prev" title="Docker Kubernetes项目">
+                Docker Kubernetes项目 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+<span class="jiathis_txt">分享到：</span>
+<a class="jiathis_button_fav">收藏夹</a>
+<a class="jiathis_button_copy">复制网址</a>
+<a class="jiathis_button_email">邮件</a>
+<a class="jiathis_button_weixin">微信</a>
+<a class="jiathis_button_qzone">QQ空间</a>
+<a class="jiathis_button_tqq">腾讯微博</a>
+<a class="jiathis_button_douban">豆瓣</a>
+<a class="jiathis_button_share">一键分享</a>
+
+<a href="http://www.jiathis.com/share?uid=2140465" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+<a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+var jiathis_config={
+  data_track_clickback:true,
+  summary:"",
+  shortUrl:false,
+  hideMore:false
+}
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://img.huyunshun.com/img/20200522182348.png"
+                alt="初晨" />
+            
+              <p class="site-author-name" itemprop="name">初晨</p>
+              <p class="site-description motion-element" itemprop="description">永远不要说你知道本质，更别说真相了。</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">249</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">46</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+<!--近期文章版块-->
+            
+                <div class="links-of-blogroll motion-element links-of-blogroll-block">
+                  <div class="links-of-blogroll-title">
+                    <!-- modify icon to fire by szw -->
+                    <i class="fa fa-history fa-" aria-hidden="true"></i>
+                    近期文章
+                  </div>
+                  <ul class="links-of-blogroll-list">
+                    
+                    
+                      <li>
+                        <a href="/2020/05/22/WebSocket%E3%80%81Socket%E3%80%81TCP%E3%80%81HTTP%E5%8C%BA%E5%88%AB/" title="WebSocket、Socket、TCP、HTTP区别" target="_blank">WebSocket、Socket、TCP、HTTP区别</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/19/Springboot%E9%A1%B9%E7%9B%AE%E7%9A%84%E6%8E%A5%E5%8F%A3%E9%98%B2%E5%88%B7/" title="Springboot项目的接口防刷" target="_blank">Springboot项目的接口防刷</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/03/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Volatile%E5%85%B3%E9%94%AE%E5%AD%97%E5%8F%8A%E5%85%B6%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/" title="深入理解Volatile关键字及其实现原理" target="_blank">深入理解Volatile关键字及其实现原理</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/04/20/%E4%BD%BF%E7%94%A8vscode%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0%E7%8E%AF%E5%A2%83/" title="使用vscode搭建个人笔记环境" target="_blank">使用vscode搭建个人笔记环境</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/01/20/HBase%E4%BB%8B%E7%BB%8D%E5%AE%89%E8%A3%85%E4%B8%8E%E6%93%8D%E4%BD%9C/" title="HBase介绍安装与操作" target="_blank">HBase介绍安装与操作</a>
+                      </li>
+                    
+                  </ul>
+                </div>
+            
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#安装"><span class="nav-number">1.</span> <span class="nav-text">安装</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#二进制文件方式下载"><span class="nav-number">1.1.</span> <span class="nav-text">二进制文件方式下载</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Docker-镜像方式运行"><span class="nav-number">1.2.</span> <span class="nav-text">Docker 镜像方式运行</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#macOS-中运行"><span class="nav-number">1.3.</span> <span class="nav-text">macOS 中运行</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Etcd-集群"><span class="nav-number">2.</span> <span class="nav-text">Etcd 集群</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#使用-etcdctl"><span class="nav-number">3.</span> <span class="nav-text">使用 etcdctl</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#数据库操作"><span class="nav-number">3.1.</span> <span class="nav-text">数据库操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#put-set"><span class="nav-number">3.1.1.</span> <span class="nav-text">put&#x2F;set</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#get"><span class="nav-number">3.1.2.</span> <span class="nav-text">get</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#del"><span class="nav-number">3.1.3.</span> <span class="nav-text">del</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#update"><span class="nav-number">3.1.4.</span> <span class="nav-text">update</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#非数据库操作"><span class="nav-number">3.2.</span> <span class="nav-text">非数据库操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#watch"><span class="nav-number">3.2.1.</span> <span class="nav-text">watch</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#PUT"><span class="nav-number">3.2.2.</span> <span class="nav-text">PUT</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#member"><span class="nav-number">3.2.3.</span> <span class="nav-text">member</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Copyright</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

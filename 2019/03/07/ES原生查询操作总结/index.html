@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Elasticsearch," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="ES的查询有query、URL两种方式，一种是通过REST请求URI发送检索参数，另一种是通过REST请求体发送检索参数。 1、URL方式1.1、语法1curl [ -s][ -g][ -X&lt;REST Verb&gt;][ -H &#39;Content-Type: application&#x2F;json&#39;] &#39;&lt;Node&gt;:&lt;Port&gt;&#x2F;&lt;Index&gt;[&#x2F;Type][">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ES原生查询操作总结">
+<meta property="og:url" content="https://huyunshun.com/2019/03/07/ES%E5%8E%9F%E7%94%9F%E6%9F%A5%E8%AF%A2%E6%93%8D%E4%BD%9C%E6%80%BB%E7%BB%93/index.html">
+<meta property="og:site_name" content="简">
+<meta property="og:description" content="ES的查询有query、URL两种方式，一种是通过REST请求URI发送检索参数，另一种是通过REST请求体发送检索参数。 1、URL方式1.1、语法1curl [ -s][ -g][ -X&lt;REST Verb&gt;][ -H &#39;Content-Type: application&#x2F;json&#39;] &#39;&lt;Node&gt;:&lt;Port&gt;&#x2F;&lt;Index&gt;[&#x2F;Type][">
+<meta property="og:image" content="https://img.huyunshun.com/img1/Elasticsearch/imgclidfdfpsasfasfasfsf.png">
+<meta property="article:published_time" content="2019-03-06T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-05-20T10:04:24.684Z">
+<meta property="article:author" content="初晨">
+<meta property="article:tag" content="Elasticsearch">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img.huyunshun.com/img1/Elasticsearch/imgclidfdfpsasfasfasfsf.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://huyunshun.com/2019/03/07/ES原生查询操作总结/"/>
+
+
+
+
+
+  <title>ES原生查询操作总结 | 简</title>
+  
+
+
+
+
+
+
+
+
+  <script type="text/javascript" src="/js/src/love.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
+
+  <!-- 看板娘 -->
+    
+        <script async src="/live2d-widget/autoload.js"></script>
+    
+ <!-- 飘动的彩带） -->
+  <script src="/js/src/piao.js" type="text/javascript"></script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">简</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">人生短暂，学海无边，而大道至简。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://huyunshun.com/2019/03/07/ES%E5%8E%9F%E7%94%9F%E6%9F%A5%E8%AF%A2%E6%93%8D%E4%BD%9C%E6%80%BB%E7%BB%93/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="初晨">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://img.huyunshun.com/img/20200522182348.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="简">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">ES原生查询操作总结</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-03-07T00:00:00+08:00">
+                2019-03-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Elasticsearch/" itemprop="url" rel="index">
+                    <span itemprop="name">Elasticsearch</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>ES的查询有query、URL两种方式，一种是通过REST请求URI发送检索参数，另一种是通过REST请求体发送检索参数。</p>
+<h1 id="1、URL方式"><a href="#1、URL方式" class="headerlink" title="1、URL方式"></a>1、URL方式</h1><h2 id="1-1、语法"><a href="#1-1、语法" class="headerlink" title="1.1、语法"></a>1.1、语法</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl [ -s][ -g][ -X&lt;REST Verb&gt;][ -H <span class="string">'Content-Type: application/json'</span>] <span class="string">'&lt;Node&gt;:&lt;Port&gt;/&lt;Index&gt;[/Type][/ID]/_search?pretty&amp;q=&lt;search string&gt;'</span></span><br></pre></td></tr></table></figure>
+
+<p>　　-s 不输出查询的时间那些东西<br>　　-g 做转义用　　<br>　　<REST Verb>：REST风格的语法谓词，GET/POST/PUT<br>　　<Node>:节点ip，默认使用localhost<br>　　<port>:节点端口号，默认80，ES默认使用9200<br>　　<Index>:索引名，支持通配符，power_json*<br>　　<Type>:索引类型，由于一个index只有一个type，可不输入<br>　　<ID>:操作对象的ID号，可不输入<br>　　q  ：前面加&amp;，后跟查询语句   </p>
+<h2 id="1-2、常用参数"><a href="#1-2、常用参数" class="headerlink" title="1.2、常用参数"></a>1.2、常用参数</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">q ：查询字符串</span><br><span class="line">sort ：排序执行。 fieldName:asc&#x2F;fieldName:desc。fieldName可以是文档中的实际字段，也可以是特殊_score名称，表示基于分数的排序。可以有几个sort参数 。</span><br><span class="line">from ：从命中的索引开始返回。默认为0。</span><br><span class="line">size ：表示要返回的命中数。默认值为10。</span><br><span class="line">_source_include ：查询包含某些source字段的文档。</span><br><span class="line">_source_exclude ：查询不包含某些source字段的文档。</span><br><span class="line">timeout ：搜索超时，将搜索请求限制在指定的时间值内执行，默认为无超时。</span><br><span class="line">default_field ：默认为index.query.default_field，即未指定字段前缀时返回所有字段，索引设置为*</span><br><span class="line">default_operator ：默认查询运算符，未指定时默认为OR。</span><br><span class="line">analyzer ：用于分析查询字符串的分析器名称。</span><br><span class="line">_source ：设置为false禁用_source字段检索。</span><br><span class="line">analyze_wildcard ：是否应分析通配符和前缀查询,默认为false</span><br><span class="line">status:active ：where the status field contains active  ——（status相当于fieldname,active相当于值——&gt;TESTID：39232032303039,由于&#x3D;被用在了前面“q&#x3D;”,所以这里用“：”代替了“&#x3D;”）</span><br><span class="line">title:(quick OR brown) ——where the title field contains quick or brown. If you omit the OR operator the default operator will be used</span><br><span class="line">author:&quot;John Smith&quot;——where the author field contains the exact phrase &quot;john smith&quot;</span><br><span class="line">_exists_:title——where the field title has any non-null value</span><br><span class="line">date:[2012-01-01 TO 2012-12-31]——All days in 2012</span><br><span class="line">count:[10 TO *]——Numbers from 10 upwards</span><br><span class="line">count:&gt;&#x3D;10——Numbers from 10 upwards</span><br></pre></td></tr></table></figure>
+<h2 id="1-3、示例"><a href="#1-3、示例" class="headerlink" title="1.3、示例"></a>1.3、示例</h2><p>** 基本操作 ** </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line">#创建索引</span><br><span class="line">PUT &#x2F;mydemo_01</span><br><span class="line">&#123;</span><br><span class="line">    &quot;settings&quot; : &#123;</span><br><span class="line">        &quot;index&quot; : &#123;</span><br><span class="line">            &quot;number_of_shards&quot; : 3, </span><br><span class="line">            &quot;number_of_replicas&quot; : 2 </span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">#索引的分片数为3，备份数为2</span><br><span class="line"></span><br><span class="line">GET &#x2F;mydemo_01</span><br><span class="line"></span><br><span class="line">#创建文档  &#x2F;索引&#x2F;类型&#x2F;ID  如果没有id会自动生成id</span><br><span class="line">PUT &#x2F;mydemo_01&#x2F;user&#x2F;3</span><br><span class="line">&#123;</span><br><span class="line">  &quot;name&quot;:&quot;hu&quot;,</span><br><span class="line">  &quot;idcard&quot;:&quot;2430&quot;,</span><br><span class="line">  &quot;age&quot;:24</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">GET &#x2F;mydemo_01&#x2F;user&#x2F;1 </span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line">  &quot;took&quot;: 1, #耗时</span><br><span class="line">  &quot;timed_out&quot;: false,#是否超时</span><br><span class="line">  &quot;_shards&quot;: &#123;	</span><br><span class="line">    &quot;total&quot;: 3,	#查询了多少分片</span><br><span class="line">    &quot;successful&quot;: 3,</span><br><span class="line">    &quot;skipped&quot;: 0,</span><br><span class="line">    &quot;failed&quot;: 0</span><br><span class="line">  &#125;,</span><br><span class="line">  &quot;hits&quot;: &#123;#命中结果</span><br><span class="line">    &quot;total&quot;: 1,#命中数</span><br><span class="line">    &quot;max_score&quot;: 0.2876821,#最高得分</span><br><span class="line">    &quot;hits&quot;: [</span><br><span class="line">      &#123;</span><br><span class="line">        &quot;_index&quot;: &quot;mydemo_01&quot;,</span><br><span class="line">        &quot;_type&quot;: &quot;_doc&quot;,</span><br><span class="line">        &quot;_id&quot;: &quot;3&quot;,</span><br><span class="line">        &quot;_score&quot;: 0.2876821,</span><br><span class="line">        &quot;_source&quot;: &#123;</span><br><span class="line">          &quot;name&quot;: &quot;hu&quot;,</span><br><span class="line">          &quot;idcard&quot;: &quot;2430&quot;,</span><br><span class="line">          &quot;age&quot;: 24</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    ]</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">#删除文档</span><br><span class="line">DELETE &#x2F;mydemo_01&#x2F;user&#x2F;2?pretty</span><br><span class="line"></span><br><span class="line">#删除索引</span><br><span class="line">DELETE &#x2F;mydemo_01</span><br><span class="line"></span><br><span class="line">#查数据</span><br><span class="line">GET &#x2F;mydemo_01&#x2F;_search</span><br><span class="line"></span><br><span class="line">GET &#x2F;mydemo_01?pretty</span><br></pre></td></tr></table></figure>
+<p>** 查看节点情况 ** </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">#查看node状态</span><br><span class="line">GET &#x2F;_cat&#x2F;nodes?v</span><br><span class="line"></span><br><span class="line">#查看集群健康状况　 s&#x3D;sort排序</span><br><span class="line">GET &#x2F;_cat&#x2F;health?v</span><br><span class="line">#查看索引，并以索引名字排序</span><br><span class="line">GET &#x2F;_cat&#x2F;indices?v&amp;s&#x3D;index</span><br><span class="line"></span><br><span class="line">#只看mydemo_01索引，并以索引名字排序</span><br><span class="line">GET &#x2F;_cat&#x2F;indices&#x2F;mydemo_01*?v&amp;s&#x3D;index</span><br><span class="line"></span><br><span class="line">#查询索引的具体记录信息  #pretty表示返回漂亮打印的JSON结果</span><br><span class="line">GET &#x2F;mydemo_01*?pretty </span><br><span class="line"></span><br><span class="line">GET &#x2F;_cat&#x2F;indices?v&amp;s&#x3D;index&#39;        &#x2F;&#x2F;查看索引，并以索引名字排序（s&#x3D;sort）</span><br><span class="line"></span><br><span class="line">#查看所有索引</span><br><span class="line">http:&#x2F;&#x2F;localhost:9200&#x2F;_cat&#x2F;indices?v</span><br><span class="line"></span><br><span class="line">#disk.percent显示占用的硬盘空间</span><br><span class="line">GET &#x2F;_cat&#x2F;allocation?v&amp;s&#x3D;node</span><br></pre></td></tr></table></figure>
+<ul>
+<li>Green - everything is good (cluster is fully functional)，即最佳状态</li>
+<li>Yellow - all data is available but some replicas are not yet allocated (cluster is fully functional)，即数据和集群可用，但是集群的备份有的是坏的</li>
+<li>Red - some data is not available for whatever reason (cluster is partially functional)，即数据和集群都不可用</li>
+</ul>
+<p>结果解释：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">heap.percent：堆内存，1&#x2F;2最大内存-1和31之间取较小的值，高的话就是ES集群负担比较重，解决：关闭一些索引（阈值差不多可以定在80左右）后会释放一部分heap.percent，但不会释放disk.percent</span><br><span class="line">ram.percent：一直挺高，物理内存的使用情况，Lucene会将闲置的内存都占用做cache，如果有应用使用内存时，cache会被释放出来</span><br><span class="line">cpu：一般不会很高，5以下吧，如果有很多query的话会高，如果一直高释放不掉可能查询语句有问题</span><br><span class="line">node.role：【mdi】master  data  i查询接口（可否在节点上查询）</span><br></pre></td></tr></table></figure>
+
+<p>** 数据查询 **</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line">GET &#x2F;mydemo_01*&#x2F;_search?pretty&amp;q&#x3D;_exists_:name #查指定字段是否存在</span><br><span class="line">GET &#x2F;mydemo_01*&#x2F;_search?pretty&amp;q&#x3D;name:hu&amp;size&#x3D;3 #查指定字段值显示3个</span><br><span class="line">#如果在浏览器中可以直接http:&#x2F;&#x2F;127.0.0.1:9200&#x2F;mydemo_01*&#x2F;_search?pretty&amp;q&#x3D;name:hu&amp;size&#x3D;3</span><br><span class="line"></span><br><span class="line">GET &#x2F;mydemo_01*&#x2F;_search?pretty&amp;q&#x3D;name:hu&amp;from&#x3D;2&amp;size&#x3D;3 #从第3个开始只显示3个</span><br><span class="line">GET &#x2F;mydemo_01*&#x2F;_search?pretty&amp;sort&#x3D;id:desc # 排序desc降序，默认为升序</span><br><span class="line">GET &#x2F;mydemo_01*&#x2F;_search?pretty&amp;analyze_wildcard&amp;q&#x3D;idcard:12 #模糊查询</span><br><span class="line">GET &#x2F;mydemo_01*&#x2F;_search?pretty&amp;q&#x3D;age:&lt;22 #比较大小 </span><br><span class="line">GET &#x2F;mydemo_01*&#x2F;_search?pretty&amp;q&#x3D;age[10 TO 30] #范围 </span><br><span class="line">GET &#x2F;mydemo_01*&#x2F;_search?pretty&amp;_source&#x3D;false #是否显示 </span><br><span class="line">GET &#x2F;mydemo_01*&#x2F;_search?pretty&amp;_source_includes&#x3D;name,idcard #查询包含的字段</span><br><span class="line">GET &#x2F;mydemo_01*&#x2F;_search?pretty&amp;q&#x3D;(name:hu AND idcard:243) #组合查询</span><br><span class="line"></span><br><span class="line">#查询多个索引（index），多个类型（type）</span><br><span class="line">GET &#x2F;mydemo_01,demo&#x2F;_search?q&#x3D;name:hu</span><br><span class="line"></span><br><span class="line">#还可以指定类型参数，例如</span><br><span class="line">GET &#x2F;mydemo_01&#x2F;user,fdf&#x2F;_search?q&#x3D;name:hu</span><br><span class="line">#由于类型在未来的版本中将被移除，所以这种用法也不那么重要了。</span><br><span class="line"></span><br><span class="line">#或者要在全部的索引中查询</span><br><span class="line">GET &#x2F;_all&#x2F;_search?q&#x3D;name:hu</span><br><span class="line"></span><br><span class="line">或者</span><br><span class="line"></span><br><span class="line">#多索引（搜索存在于所有索引或一些特定索引中的文档）</span><br><span class="line">GET &#x2F;_search?q&#x3D;name:huangxiaoming</span><br><span class="line"></span><br><span class="line">#多类型（搜索所有类型或某种指定类型的索引中搜索所有文档）</span><br><span class="line">GET &#x2F;mydemo_01&#x2F;_search?q&#x3D;age:100</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">#关闭和打开索引</span><br><span class="line"></span><br><span class="line">POST &#x2F;mydemo_01&#x2F;_close</span><br><span class="line">POST &#x2F;mydemo_01&#x2F;_open</span><br><span class="line"></span><br><span class="line">#删除符合条件的记录</span><br><span class="line"></span><br><span class="line">POST &#x2F;mydemo_01*&#x2F;_delete_by_query?pretty&amp;q&#x3D;name:zhangsanfeng</span><br><span class="line"></span><br><span class="line">#查询多个Id</span><br><span class="line">GET &#x2F;mydemo_01&#x2F;user&#x2F;_mget</span><br><span class="line">&#123;</span><br><span class="line">  &quot;ids&quot;:[1,3,2,4]</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">#为了保持_version与外部版本控制的数值一致，使用version_type&#x3D;external检查数据当前的version值是否小于请求中的version值</span><br><span class="line">#查询指定版本数据</span><br><span class="line"></span><br><span class="line">PUT &#x2F;mydemo_01&#x2F;user&#x2F;3?version&#x3D;2</span><br><span class="line">&#123;</span><br><span class="line">  &quot;name&quot;:&quot;huv2&quot;,</span><br><span class="line">  &quot;idcard&quot;:&quot;2430&quot;,</span><br><span class="line">  &quot;age&quot;:24</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">GET &#x2F;mydemo_01&#x2F;user&#x2F;3?version&#x3D;2</span><br></pre></td></tr></table></figure>
+<p>** 批量操作 **<br>Elasticsearch还可以使用_bulk API批量执行上述任何操作</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">#同时更新两个文档</span><br><span class="line">POST &#x2F;mydemo_01&#x2F;user&#x2F;_bulk?pretty</span><br><span class="line"> &#123;&quot;index&quot;:&#123;&quot;_id&quot;:&quot;1&quot;&#125;&#125;</span><br><span class="line"> &#123;&quot;name&quot;: &quot;xiaoming1&quot; &#125;</span><br><span class="line"> &#123;&quot;index&quot;:&#123;&quot;_id&quot;:&quot;3&quot;&#125;&#125;</span><br><span class="line"> &#123;&quot;name&quot;: &quot;xiaoming2&quot; &#125;</span><br><span class="line"></span><br><span class="line">GET &#x2F;mydemo_01&#x2F;_search</span><br><span class="line">#更新第一个文档（ID为1），删除第二个文档（ID为2）</span><br><span class="line">POST &#x2F;mydemo_01&#x2F;user&#x2F;_bulk?pretty</span><br><span class="line">&#123;&quot;update&quot;:&#123;&quot;_id&quot;:&quot;1&quot;&#125;&#125;</span><br><span class="line">&#123;&quot;doc&quot;: &#123; &quot;name&quot;: &quot;chas&quot; &#125; &#125;</span><br><span class="line">&#123;&quot;delete&quot;:&#123;&quot;_id&quot;:&quot;2&quot;&#125;&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="2、结构化查询（DSL）"><a href="#2、结构化查询（DSL）" class="headerlink" title="2、结构化查询（DSL）"></a>2、结构化查询（DSL）</h1><p><img src="https://img.huyunshun.com/img1/Elasticsearch/imgclidfdfpsasfasfasfsf.png" alt=""></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line">GET &#x2F;mydemo_01&#x2F;user&#x2F;_search</span><br><span class="line">#精确查询</span><br><span class="line">#Term查询不会对字段进行分词查询，会采用精确匹配。</span><br><span class="line">GET &#x2F;mydemo_01&#x2F;user&#x2F;_search</span><br><span class="line">&#123;</span><br><span class="line">  &quot;query&quot;: &#123;</span><br><span class="line">    &quot;term&quot;: &#123;</span><br><span class="line">      &quot;name&quot;: &quot;宋小明&quot;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">#term是代表完全匹配，即不进行分词器分析，文档中必须包含整个搜索的词汇</span><br><span class="line"></span><br><span class="line">#模糊查询</span><br><span class="line">#Match会根据该字段的分词器，进行分词查询。</span><br><span class="line">GET &#x2F;mydemo_01&#x2F;user&#x2F;_search</span><br><span class="line">&#123;</span><br><span class="line">  &quot;from&quot;: 0,</span><br><span class="line">  &quot;size&quot;: 2, </span><br><span class="line">  &quot;query&quot;: &#123;</span><br><span class="line">    &quot;match&quot;: &#123;</span><br><span class="line">       &quot;name&quot;: &quot;明&quot;</span><br><span class="line">      &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">#filter过滤查询</span><br><span class="line">GET &#x2F;mydemo_01&#x2F;user&#x2F;_search</span><br><span class="line">&#123;</span><br><span class="line">    &quot;query&quot;: &#123;</span><br><span class="line">        &quot;bool&quot;: &#123;</span><br><span class="line">            &quot;must&quot;: [</span><br><span class="line">                &#123;</span><br><span class="line">                    &quot;match_all&quot;: &#123;</span><br><span class="line">                        </span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            ],</span><br><span class="line">            &quot;filter&quot;: &#123;</span><br><span class="line">                &quot;range&quot;: &#123;</span><br><span class="line">                    &quot;age&quot;: &#123;</span><br><span class="line">                        &quot;gt&quot;: 10,</span><br><span class="line">                        &quot;lte&quot;: 20</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    &quot;from&quot;: 0,</span><br><span class="line">    &quot;size&quot;: 10,</span><br><span class="line">    &quot;_source&quot;: [</span><br><span class="line">        &quot;name&quot;,</span><br><span class="line">        &quot;age&quot;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      
+    </div>
+     <!-- 相关文章推荐 -->
+    
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Elasticsearch/" rel="tag"># Elasticsearch</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/03/05/ES%E5%9C%A8docker%E4%B8%AD%E9%83%A8%E7%BD%B2/" rel="next" title="ES在docker中部署">
+                <i class="fa fa-chevron-left"></i> ES在docker中部署
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/03/08/ES-Spring_JPA%E6%93%8D%E4%BD%9C/" rel="prev" title="ES-Spring JPA操作">
+                ES-Spring JPA操作 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+<span class="jiathis_txt">分享到：</span>
+<a class="jiathis_button_fav">收藏夹</a>
+<a class="jiathis_button_copy">复制网址</a>
+<a class="jiathis_button_email">邮件</a>
+<a class="jiathis_button_weixin">微信</a>
+<a class="jiathis_button_qzone">QQ空间</a>
+<a class="jiathis_button_tqq">腾讯微博</a>
+<a class="jiathis_button_douban">豆瓣</a>
+<a class="jiathis_button_share">一键分享</a>
+
+<a href="http://www.jiathis.com/share?uid=2140465" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+<a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+var jiathis_config={
+  data_track_clickback:true,
+  summary:"",
+  shortUrl:false,
+  hideMore:false
+}
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://img.huyunshun.com/img/20200522182348.png"
+                alt="初晨" />
+            
+              <p class="site-author-name" itemprop="name">初晨</p>
+              <p class="site-description motion-element" itemprop="description">永远不要说你知道本质，更别说真相了。</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">249</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">46</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+<!--近期文章版块-->
+            
+                <div class="links-of-blogroll motion-element links-of-blogroll-block">
+                  <div class="links-of-blogroll-title">
+                    <!-- modify icon to fire by szw -->
+                    <i class="fa fa-history fa-" aria-hidden="true"></i>
+                    近期文章
+                  </div>
+                  <ul class="links-of-blogroll-list">
+                    
+                    
+                      <li>
+                        <a href="/2020/05/22/WebSocket%E3%80%81Socket%E3%80%81TCP%E3%80%81HTTP%E5%8C%BA%E5%88%AB/" title="WebSocket、Socket、TCP、HTTP区别" target="_blank">WebSocket、Socket、TCP、HTTP区别</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/19/Springboot%E9%A1%B9%E7%9B%AE%E7%9A%84%E6%8E%A5%E5%8F%A3%E9%98%B2%E5%88%B7/" title="Springboot项目的接口防刷" target="_blank">Springboot项目的接口防刷</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/03/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Volatile%E5%85%B3%E9%94%AE%E5%AD%97%E5%8F%8A%E5%85%B6%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/" title="深入理解Volatile关键字及其实现原理" target="_blank">深入理解Volatile关键字及其实现原理</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/04/20/%E4%BD%BF%E7%94%A8vscode%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0%E7%8E%AF%E5%A2%83/" title="使用vscode搭建个人笔记环境" target="_blank">使用vscode搭建个人笔记环境</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/01/20/HBase%E4%BB%8B%E7%BB%8D%E5%AE%89%E8%A3%85%E4%B8%8E%E6%93%8D%E4%BD%9C/" title="HBase介绍安装与操作" target="_blank">HBase介绍安装与操作</a>
+                      </li>
+                    
+                  </ul>
+                </div>
+            
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1、URL方式"><span class="nav-number">1.</span> <span class="nav-text">1、URL方式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1、语法"><span class="nav-number">1.1.</span> <span class="nav-text">1.1、语法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-2、常用参数"><span class="nav-number">1.2.</span> <span class="nav-text">1.2、常用参数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-3、示例"><span class="nav-number">1.3.</span> <span class="nav-text">1.3、示例</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2、结构化查询（DSL）"><span class="nav-number">2.</span> <span class="nav-text">2、结构化查询（DSL）</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Copyright</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

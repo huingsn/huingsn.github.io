@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Elasticsearch," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="ElasticSearch在JPA与原生操作接口的对应关系    关键字 例子 Elasticsearch查询语句    And findByNameAndPrice {“bool” : {“must” : [ {“field” : {“name” : “?”}}, {“field” : {“price” : “?”}} ]}}   Or findByNameOrPrice {“bool” : {">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ES-Spring JPA操作">
+<meta property="og:url" content="https://huyunshun.com/2019/03/08/ES-Spring_JPA%E6%93%8D%E4%BD%9C/index.html">
+<meta property="og:site_name" content="简">
+<meta property="og:description" content="ElasticSearch在JPA与原生操作接口的对应关系    关键字 例子 Elasticsearch查询语句    And findByNameAndPrice {“bool” : {“must” : [ {“field” : {“name” : “?”}}, {“field” : {“price” : “?”}} ]}}   Or findByNameOrPrice {“bool” : {">
+<meta property="article:published_time" content="2019-03-07T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-05-20T10:04:24.698Z">
+<meta property="article:author" content="初晨">
+<meta property="article:tag" content="Elasticsearch">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://huyunshun.com/2019/03/08/ES-Spring_JPA操作/"/>
+
+
+
+
+
+  <title>ES-Spring JPA操作 | 简</title>
+  
+
+
+
+
+
+
+
+
+  <script type="text/javascript" src="/js/src/love.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
+
+  <!-- 看板娘 -->
+    
+        <script async src="/live2d-widget/autoload.js"></script>
+    
+ <!-- 飘动的彩带） -->
+  <script src="/js/src/piao.js" type="text/javascript"></script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">简</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">人生短暂，学海无边，而大道至简。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://huyunshun.com/2019/03/08/ES-Spring_JPA%E6%93%8D%E4%BD%9C/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="初晨">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://img.huyunshun.com/img/20200522182348.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="简">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">ES-Spring JPA操作</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-03-08T00:00:00+08:00">
+                2019-03-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Elasticsearch/" itemprop="url" rel="index">
+                    <span itemprop="name">Elasticsearch</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>ElasticSearch在JPA与原生操作接口的对应关系</p>
+<table>
+<thead>
+<tr>
+<th align="center">关键字</th>
+<th align="center">例子</th>
+<th align="center">Elasticsearch查询语句</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">And</td>
+<td align="center">findByNameAndPrice</td>
+<td align="center">{“bool” : {“must” : [ {“field” : {“name” : “?”}}, {“field” : {“price” : “?”}} ]}}</td>
+</tr>
+<tr>
+<td align="center">Or</td>
+<td align="center">findByNameOrPrice</td>
+<td align="center">{“bool” : {“should” : [ {“field” : {“name” : “?”}}, {“field” : {“price” : “?”}} ]}}</td>
+</tr>
+<tr>
+<td align="center">Is</td>
+<td align="center">findByName</td>
+<td align="center">{“bool” : {“must” : {“field” : {“name” : “?”}}}}</td>
+</tr>
+<tr>
+<td align="center">Not</td>
+<td align="center">findByNameNot</td>
+<td align="center">{“bool” : {“must_not” : {“field” : {“name” : “?”}}}}</td>
+</tr>
+<tr>
+<td align="center">Between</td>
+<td align="center">findByPriceBetween</td>
+<td align="center">{“bool” : {“must” : {“range” : {“price” : {“from” : ?,“to” : ?,“include_lower” : true,“include_upper” : true}}}}}</td>
+</tr>
+<tr>
+<td align="center">LessThanEqual</td>
+<td align="center">findByPriceLessThan</td>
+<td align="center">{“bool” : {“must” : {“range” : {“price” : {“from” : null,”to” : ?,”include_lower” : true,”include_upper” : true}}}}}</td>
+</tr>
+<tr>
+<td align="center">GreaterThanEqual</td>
+<td align="center">findByPriceGreaterThan</td>
+<td align="center">{“bool” : {“must” : {“range” : {“price” : {“from” : ?,”to” : null,”include_lower” : true,”include_upper” : true}}}}}</td>
+</tr>
+<tr>
+<td align="center">Before</td>
+<td align="center">findByPriceBefore</td>
+<td align="center">{“bool” : {“must” : {“range” : {“price” : {“from” : null,”to” : ?,”include_lower” : true,”include_upper” : true}}}}}</td>
+</tr>
+<tr>
+<td align="center">After</td>
+<td align="center">findByPriceAfter</td>
+<td align="center">{“bool” : {“must” : {“range” : {“price” : {“from” : ?,”to” : null,”include_lower” : true,”include_upper” : true}}}}}</td>
+</tr>
+<tr>
+<td align="center">Like</td>
+<td align="center">findByNameLike</td>
+<td align="center">{“bool” : {“must” : {“field” : {“name” : {“query” : “?*”,”analyze_wildcard” : true}}}}}</td>
+</tr>
+<tr>
+<td align="center">StartingWith</td>
+<td align="center">findByNameStartingWith</td>
+<td align="center">{“bool” : {“must” : {“field” : {“name” : {“query” : “?*”,”analyze_wildcard” : true}}}}}</td>
+</tr>
+<tr>
+<td align="center">EndingWith</td>
+<td align="center">findByNameEndingWith</td>
+<td align="center">{“bool” : {“must” : {“field” : {“name” : {“query” : “*?”,”analyze_wildcard” : true}}}}}</td>
+</tr>
+<tr>
+<td align="center">Contains/Containing</td>
+<td align="center">findByNameContaining</td>
+<td align="center">{“bool” : {“must” : {“field” : {“name” : {“query” : “?”,”analyze_wildcard” : true}}}}}</td>
+</tr>
+<tr>
+<td align="center">In</td>
+<td align="center">findByNameIn(Collectionnames)</td>
+<td align="center">{“bool” : {“must” : {“bool” : {“should” : [ {“field” : {“name” : “?”}}, {“field” : {“name” : “?”}} ]}}}}</td>
+</tr>
+<tr>
+<td align="center">NotIn</td>
+<td align="center">findByNameNotIn(Collectionnames)</td>
+<td align="center">{“bool” : {“must_not” : {“bool” : {“should” : {“field” : {“name” : “?”}}}}}}</td>
+</tr>
+<tr>
+<td align="center">Near</td>
+<td align="center">findByStoreNear</td>
+<td align="center">暂不支持</td>
+</tr>
+<tr>
+<td align="center">True</td>
+<td align="center">findByAvailableTrue</td>
+<td align="center">{“bool” : {“must” : {“field” : {“available” : true}}}}</td>
+</tr>
+<tr>
+<td align="center">False</td>
+<td align="center">findByAvailableFalse</td>
+<td align="center">{“bool” : {“must” : {“field” : {“available” : false}}}}</td>
+</tr>
+<tr>
+<td align="center">OrderBy</td>
+<td align="center">findByAvailableTrueOrderByNameDesc</td>
+<td align="center">{“sort” : [{ “name” : {“order” : “desc”} }],”bool” : {“must” : {“field” : {“available” : true}}}}</td>
+</tr>
+</tbody></table>
+<p>实体声明</p>
+<ul>
+<li>1、类上注解：@Document (相当于Hibernate实体的@Entity/@Table)</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th align="center">类型</th>
+<th align="center">属性名</th>
+<th align="center">默认值</th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">String</td>
+<td align="center">indexName</td>
+<td align="center">无</td>
+<td align="center">索引库的名称</td>
+</tr>
+<tr>
+<td align="center">String</td>
+<td align="center">type</td>
+<td align="center">“”</td>
+<td align="center">类型</td>
+</tr>
+<tr>
+<td align="center">short</td>
+<td align="center">shards</td>
+<td align="center">5</td>
+<td align="center">默认分区数</td>
+</tr>
+<tr>
+<td align="center">short</td>
+<td align="center">replica</td>
+<td align="center">1</td>
+<td align="center">每个分区默认的备份数</td>
+</tr>
+<tr>
+<td align="center">String</td>
+<td align="center">refreshInterval</td>
+<td align="center">“1s”</td>
+<td align="center">刷新间隔</td>
+</tr>
+<tr>
+<td align="center">String</td>
+<td align="center">indexStoreType</td>
+<td align="center">“fs”</td>
+<td align="center">索引文件存储类型</td>
+</tr>
+</tbody></table>
+<ul>
+<li>2、主键注解：@Id (相当于Hibernate实体的主键@Id注解) 只是一个标识，并没有属性。   </li>
+<li>3、属性注解 @Field (相当于Hibernate实体的@Column注解)   </li>
+</ul>
+<p>@Field默认是可以不加的，默认所有属性都会添加到ES中。</p>
+<table>
+<thead>
+<tr>
+<th align="center">类型</th>
+<th align="center">属性名</th>
+<th align="center">默认值</th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">FileType</td>
+<td align="center">type</td>
+<td align="center">FieldType.Auto</td>
+<td align="center">自动检测属性的类型</td>
+</tr>
+<tr>
+<td align="center">FileType</td>
+<td align="center">index</td>
+<td align="center">FieldIndex.analyzed</td>
+<td align="center">默认情况下分词</td>
+</tr>
+<tr>
+<td align="center">boolean</td>
+<td align="center">store</td>
+<td align="center">false</td>
+<td align="center">默认情况下不存储原文</td>
+</tr>
+<tr>
+<td align="center">String</td>
+<td align="center">searchAnalyzer</td>
+<td align="center">“”</td>
+<td align="center">指定字段搜索时使用的分词器</td>
+</tr>
+<tr>
+<td align="center">String</td>
+<td align="center">indexAnalyzer</td>
+<td align="center">“”</td>
+<td align="center">指定字段建立索引时指定的分词器</td>
+</tr>
+<tr>
+<td align="center">String[]</td>
+<td align="center">ignoreFields</td>
+<td align="center">{}</td>
+<td align="center">如果某个字段需要被忽略</td>
+</tr>
+</tbody></table>
+<h6 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h6><p>实体：   </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * index</span></span><br><span class="line"><span class="comment"> * 索引，相当于Mysql中的一个库，例如有一个叫『jd』的库，那么里面可以建立很多表，存储不同类型的数据，而表在ES中就是type。</span></span><br><span class="line"><span class="comment"> * type</span></span><br><span class="line"><span class="comment"> * 类型，相当于Mysql中的一张表，存储json类型的数据</span></span><br><span class="line"><span class="comment"> * document</span></span><br><span class="line"><span class="comment"> * 文档，一个文档相当于Mysql一行的数据</span></span><br><span class="line"><span class="comment"> * shards</span></span><br><span class="line"><span class="comment"> * 分片，通俗理解，就是数据分成几块区域来存储，可以理解为mysql中的分库分表(不太恰当)</span></span><br><span class="line"><span class="comment"> * replicas</span></span><br><span class="line"><span class="comment"> * 备份，就是分片的备份数,相当于mysql的备份库</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Data</span></span><br><span class="line"><span class="meta">@Document</span>(indexName = <span class="string">"account"</span>, type = <span class="string">"_doc"</span>, refreshInterval = <span class="string">"0s"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Account</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Id</span></span><br><span class="line">    <span class="keyword">private</span> Integer id;</span><br><span class="line">    <span class="keyword">private</span> String userName;</span><br><span class="line">    <span class="keyword">private</span> String realName;</span><br><span class="line">    <span class="keyword">private</span> String password;</span><br><span class="line">    <span class="keyword">private</span> Integer age;</span><br><span class="line">    <span class="comment">//这三个注解是为了前台序列化java8 LocalDateTime使用的，需要引入jsr310的包才可以使用</span></span><br><span class="line">    <span class="meta">@JsonSerialize</span>(using = LocalDateTimeSerializer<span class="class">.<span class="keyword">class</span>)</span></span><br><span class="line"><span class="class">    @<span class="title">JsonDeserialize</span>(<span class="title">using</span> </span>= LocalDateTimeDeserializer<span class="class">.<span class="keyword">class</span>)</span></span><br><span class="line"><span class="class">    @<span class="title">JsonFormat</span>(<span class="title">pattern</span> </span>= <span class="string">"yyyy-MM-dd HH:mm"</span>)</span><br><span class="line">    <span class="keyword">private</span> LocalDateTime birth;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>DAO:   </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@Description</span> TODO</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@Author</span> huyunshun 2019/8/16</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">AccountRepository</span> <span class="keyword">extends</span> <span class="title">ElasticsearchRepository</span>&lt;<span class="title">Account</span>, <span class="title">Integer</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 查询账户名为username的账户</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> userName</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function">List&lt;Account&gt; <span class="title">findByUserName</span><span class="params">(String userName)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 查询账户名为username并且真实姓名为realname的账户</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> userName</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> realName</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function">List&lt;Account&gt; <span class="title">findByUserNameAndRealName</span><span class="params">(String userName, String realName)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 查询账户名为userName或者姓名为realName的账户</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function">List&lt;Account&gt; <span class="title">findByUserNameOrRealName</span><span class="params">(String userName, String realName)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 查询账户名不是username的所有账户</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> userName</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function">List&lt;Account&gt; <span class="title">findByUserNameNot</span><span class="params">(String userName)</span></span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 查询年龄段为ageFrom到ageTo的账户</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> ageFrom</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> ageTo</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function">List&lt;Account&gt; <span class="title">findByAgeBetween</span><span class="params">(Integer ageFrom, Integer ageTo)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 查询生日小于birth的账户</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function">List&lt;Account&gt; <span class="title">findByBirthLessThan</span><span class="params">(LocalDateTime birth)</span></span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 查询生日段大于birthFrom的账户</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> birth</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function">List&lt;Account&gt; <span class="title">findByBirthGreaterThan</span><span class="params">(LocalDateTime birth)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 查询年龄小于或等于age的账户</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function">List&lt;Account&gt; <span class="title">findByAgeBefore</span><span class="params">(Integer age)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 查询年龄大于或等于age的账户</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> age</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function">List&lt;Account&gt; <span class="title">findByAgeAfter</span><span class="params">(Integer age)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 账户名模糊查询</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> userName</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function">List&lt;Account&gt; <span class="title">findByUserNameLike</span><span class="params">(String userName)</span></span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 查询以start开头的账户</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> start</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function">List&lt;Account&gt; <span class="title">findByUserNameStartingWith</span><span class="params">(String start)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 查询以end结尾的账户</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function">List&lt;Account&gt; <span class="title">findByUserNameEndingWith</span><span class="params">(String end)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 查询账户名包含word的账户</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> word</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function">List&lt;Account&gt; <span class="title">findByUserNameContaining</span><span class="params">(String word)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 查询名字属于usernames中的账户</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> userNames</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function">List&lt;Account&gt; <span class="title">findByUserNameIn</span><span class="params">(Collection&lt;String&gt; userNames)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 查询名字不属于userNames中的账户</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> userNames</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function">List&lt;Account&gt; <span class="title">findByUserNameNotIn</span><span class="params">(Collection&lt;String&gt; userNames)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     *查询年龄小于age,姓名以start开头，id大于id的账户，并且按照年龄倒序</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function">List&lt;Account&gt; <span class="title">findByAgeBeforeAndUserNameStartingWithAndIdGreaterThanOrderByAgeDesc</span><span class="params">(Integer age, String start, Integer id)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/** 写ES的查询语句</span></span><br><span class="line"><span class="comment">     * 查询名字为name的账户 分页</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> name</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> pageable</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Query</span>(<span class="string">"&#123;\"bool\" : &#123;\"must\" : &#123;\"field\" : &#123;\"name\" : \"?0\"&#125;&#125;&#125;&#125;"</span>)</span><br><span class="line">    <span class="function">Page&lt;Account&gt; <span class="title">findByName</span><span class="params">(String name, Pageable pageable)</span></span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Hibernate中criteria的方式进行查询   </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> Page&lt;Account&gt; <span class="title">getAccounts</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">//创建builder</span></span><br><span class="line">    BoolQueryBuilder builder = QueryBuilders.boolQuery();</span><br><span class="line">    <span class="comment">//设置模糊搜索,真实姓名中包含胡的用户</span></span><br><span class="line">    builder.must(QueryBuilders.fuzzyQuery(<span class="string">"realName"</span>, <span class="string">"胡"</span>));</span><br><span class="line">    <span class="comment">//设置用户名为huing</span></span><br><span class="line">    builder.must(<span class="keyword">new</span> QueryStringQueryBuilder(<span class="string">"huing"</span>).field(<span class="string">"userName"</span>));</span><br><span class="line"></span><br><span class="line">    <span class="comment">//排序</span></span><br><span class="line">    FieldSortBuilder sort = SortBuilders.fieldSort(<span class="string">"age"</span>).order(SortOrder.DESC);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//设置分页</span></span><br><span class="line">    PageRequest page = <span class="keyword">new</span> PageRequest(<span class="number">0</span>, <span class="number">2</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//构建查询</span></span><br><span class="line">    NativeSearchQueryBuilder nativeSearchQueryBuilder = <span class="keyword">new</span> NativeSearchQueryBuilder();</span><br><span class="line">    <span class="comment">//将搜索条件设置到构建中</span></span><br><span class="line">    nativeSearchQueryBuilder.withQuery(builder);</span><br><span class="line">    <span class="comment">//将分页设置到构建中</span></span><br><span class="line">    nativeSearchQueryBuilder.withPageable(page);</span><br><span class="line">    <span class="comment">//将排序设置到构建中</span></span><br><span class="line">    nativeSearchQueryBuilder.withSort(sort);</span><br><span class="line">    <span class="comment">//生产NativeSearchQuery</span></span><br><span class="line">    NativeSearchQuery query = nativeSearchQueryBuilder.build();</span><br><span class="line"></span><br><span class="line">    <span class="comment">//执行,返回包装结果的分页</span></span><br><span class="line">    Page&lt;Account&gt; resutlList = accountRepository.search(query);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> resutlList;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h6 id="术语"><a href="#术语" class="headerlink" title="术语"></a>术语</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line">Analysis（分析）</span><br><span class="line">​ 分析的过程就是将全文（full text）转换成 术语／分词（terms）。 这取决于使用那个分析器,这些短语:“FOO BAR”, “Foo-Bar”, “foo,bar”，可能会拆分成” foo”和“bar”。这些拆分后的词实际上是存储在索引中。一个完整的文本查询(而不是一个分词查询) “FoO:bAR”，将被分解成 “foo”,“bar”,来匹配存储在索引中的分词。正是这一过程的分析(包括在索引时间和搜索时间),允许elasticsearch执行全文查询。</span><br><span class="line"></span><br><span class="line">Cluster （集群）</span><br><span class="line">​ 一个集群包含一个或多个分配了相同的集群名称的节点。每个集群都有一个主节点是集群自动选择产生,并且可以决定如果当前主节点失败，哪些可以替换。</span><br><span class="line"></span><br><span class="line">Document（文档）</span><br><span class="line">​ 文档是存储在elasticsearch中的一个JSON文件。这是相当与关系数据库中表的一行数据。每个文档被存储在索引中，并具有一个类型和一个id。一个文档是一个JSON对象（也被称为在其他语言中的 hash &#x2F; hashmap &#x2F; associative array（关联数组）），其中包含零个或多个字段 或者 键值对。原始JSON文档将被存储在索引的_source字段，在获得（getting）或者 搜索（searching）默认的返回时，得到或搜索文档。</span><br><span class="line"></span><br><span class="line">Id（标识）</span><br><span class="line">​ 每个文档ID标识了一个文档。一个文档的索引&#x2F;类型&#x2F; ID必须是唯一的。如果没有提供ID，将是自动生成。（还可以看到路由）</span><br><span class="line"></span><br><span class="line">Field（字段）</span><br><span class="line">​ 文档中包含的一组字段或键值对。字段的值可以是一个简单的（标量）值（如字符串，整数，日期），或者一个嵌套的结构就像一个数组或对象。一个字段就是类似关系数据库表中的一列。映射的每个字段有一个字段的类型“type”（不要与文档类型混淆），表示那种类型的数据可以存储在该字段里，如：整数，字符串，对象。映射还允许你定义（除其他事项外）一个字段的值如何进行分析。</span><br><span class="line"></span><br><span class="line">Index（索引）</span><br><span class="line">​ 索引就是像关系数据库中的“数据库”。通过映射可以定义成多种类型。索引是一个逻辑命名空间映射到一个或多个主要的分片，可以有零个或多个副本分片。</span><br><span class="line"></span><br><span class="line">Mapping（映射）</span><br><span class="line">​ 映射是像关系数据库中的”模式定义“。每个索引都有一个映射，它定义了每个索引的类型，再加上一些索引范围的设置。映射可以被明确地定义，或者在一个文档被索引的时候自动生成。</span><br><span class="line"></span><br><span class="line">Node（节点）</span><br><span class="line">​ 节点是属于elasticsearch群集的运行实例。测试的时候，在一台服务器可以启动多个节点，但通常情况下应该在一台服务器运行一个节点。在启动时，节点将使用单播（或组播，但是必须指定）来发现使用相同的群集名称的群集，并会尝试加入该群集。</span><br><span class="line"></span><br><span class="line">Primary shard（主分片）</span><br><span class="line">​ 每个文档都存储在一个主要分片上。当你索引一个文档时，索引首先生成在主分片上，然后才到主分片的所有副本上。默认情况下，索引有5个主分片。您可以指定更多或更少的主分片来适应索引可以处理的文档数。一旦创建了索引，就不能改变索引中主分片的数量。</span><br><span class="line"></span><br><span class="line">Replica shard（副本分片）</span><br><span class="line">​ 每个主分片可以有零个或多个副本。副本是主分片的一个拷贝，有两个作用：</span><br><span class="line"></span><br><span class="line">​ 1、故障转移：如果主分片有问题，副本分片可以提升为主分片；</span><br><span class="line"></span><br><span class="line">​ 2、提高性能：获取和搜索请求可以处理主分片或副本分片。</span><br><span class="line"></span><br><span class="line">​ 默认情况下，每个主分片有一个副本，不过索引的副本数量可以动态地改变。在同一个节点上，一个副本分片将永远不会和其主分片一起运行。</span><br><span class="line"></span><br><span class="line">Routing（路由）</span><br><span class="line">​ 当你索引一个文档，它是存储在一个主分片里。这分片的选择是通过哈希的路由值。默认情况下，路由值来自文档的ID；如果该文档指定了父文档，则使用父文档的ID（以确保这个子文档和父文件都存储在相同的分片上）。这个路由值可以在索引的时候，通过指定数值或者配置字段映射来覆盖。</span><br><span class="line"></span><br><span class="line">Shard（分片）</span><br><span class="line">​ 一个分片是一个单一的Lucene的实例。这是一个低级别的通过ElasticSearch自动管理的“工作者”单元。索引是一个逻辑命名空间指向主分片和副本分片。索引的主分片和副本分片的数量需要明确的指定。然而你的代码应该只处理一个索引。Elasticsearch分配集群中所有节点的分片。在节点出现故障或增加新节点的时候，可以自动的将一个节点上的分片移动到另一个节点上。</span><br><span class="line"></span><br><span class="line">Source field（源字段）</span><br><span class="line">​ 默认情况下，你的JSON文档将被索引存储在_source字段里面，所有的get（获取）和search（搜索）请求将返回的该字段。这将允许你直接从搜索结果中访问到源数据，而不需要再次发起请求检索。</span><br><span class="line"></span><br><span class="line">​ 注：索引将返回完整的的JSON字符串给你，即使它包含无效的JSON。此字段里的内容不表示任何该对象里面的数据如何被索引。</span><br><span class="line"></span><br><span class="line">Term（术语）</span><br><span class="line">​ 在elasticsearch里，术语(term)是一个被索引的精确值。术语 foo, Foo,FOO 是不想等的。术语（即精确值）可以使用“term”查询接口来查询。</span><br><span class="line"></span><br><span class="line">Text(文本)</span><br><span class="line">​ 文本（或全文）是普通非结构化的文本，如本段。默认情况下，文本将被分析成术语，术语才是实际存储在索引中。文本字段在索引时需要进行分析，以便全文搜索，全文查询的关键字在搜索时，必须分析产生（搜索）与索引时相同的术语。</span><br><span class="line"></span><br><span class="line">Type(类型)</span><br><span class="line">​ Type是相当于关系数据库中的“表”。每种类型都有一列字段，用来定义文档的类型。映射定义了对在文档中的每个字段如何进行分析。</span><br></pre></td></tr></table></figure>
+<h6 id="QueryBuilders构建查询"><a href="#QueryBuilders构建查询" class="headerlink" title="QueryBuilders构建查询"></a>QueryBuilders构建查询</h6><p>QueryBuilder如：MatchAllQueryBuilder.class，FuzzyQueryBuilder.class等，它们是具体的查询实现类，它们是QueryBuilders抽象类的子类并实现了BoostableQueryBuilder&lt;&gt;接口。</p>
+<p>而QueryBuilders的主要作用就是提供了静态方法去创建一个子类的对象，方便QueryBuilder的构建与管理。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line">匹配所有文档的查询。</span><br><span class="line">matchAllQuery()</span><br><span class="line">为提供的字段名和文本创建类型为“BOOLEAN”的匹配查询。(解释过来就是单个匹配，可以模糊匹配)</span><br><span class="line">matchQuery(String name, Object text) &#x2F;&#x2F;name 字段值 ，text 查询文本（不支持通配符）</span><br><span class="line">为提供的字段名和文本创建一个通用查询。</span><br><span class="line">commonTermsQuery(String name, Object text)</span><br><span class="line">为提供的字段名和文本创建类型为“BOOLEAN”的匹配查询。</span><br><span class="line">multiMatchQuery(Object text, String... fieldNames) </span><br><span class="line">为提供的字段名和文本创建一个文本查询，并输入“短句”。</span><br><span class="line">matchPhraseQuery(String name, Object text)</span><br><span class="line">为提供的字段名和文本创建一个与类型“PHRASE_PREFIX”匹配的查询。</span><br><span class="line">matchPhrasePrefixQuery(String name, Object text)</span><br><span class="line">匹配包含术语的文档的查询。</span><br><span class="line">termQuery(String name, Object value)</span><br><span class="line">使用模糊查询匹配文档的查询</span><br><span class="line">fuzzyQuery(String name, Object value)</span><br><span class="line">与包含指定前缀的术语的文档相匹配的查询。</span><br><span class="line">prefixQuery(String name, String prefix)</span><br><span class="line">在一定范围内匹配文档的查询。</span><br><span class="line">rangeQuery(String name)</span><br><span class="line">实现通配符搜索查询。支持的通配符是*，它匹配任何字符序列(包括空字符)，而?它匹配任何单个字符。注意，这个查询可能很慢，因为它需要遍历许多项。为了防止异常缓慢的通配符查询，通配符项不应该以一个通配符*或?开头。</span><br><span class="line"></span><br><span class="line">wildcardQuery(String name, String query) &#x2F;&#x2F;query 通配符查询字符串</span><br><span class="line">将包含术语的文档与指定的正则表达式匹配的查询</span><br><span class="line">regexpQuery(String name, String regexp) &#x2F;&#x2F;regexp的正则表达式</span><br><span class="line">解析查询字符串并运行它的查询。有两种模式。第一,当没有字段添加(使用QueryStringQueryBuilder.field(字符串),将运行查询一次,非前缀字段将使用QueryStringQueryBuilder.defaultField(字符串)。第二,当一个或多个字段添加(使用QueryStringQueryBuilder.field(String)),将运行提供的解析查询字段,并结合使用DisMax或普通的布尔查询(参见QueryStringQueryBuilder.useDisMax(布尔))。</span><br><span class="line"></span><br><span class="line">queryStringQuery(String queryString)</span><br><span class="line">类似于query_string查询的查询，但不会为任何奇怪的字符串语法抛出异常。</span><br><span class="line">simpleQueryStringQuery(String queryString)</span><br><span class="line">可以使用BoostingQuery类来有效地降级与给定查询匹配的结果。</span><br><span class="line">boostingQuery()</span><br><span class="line">匹配与其他查询的布尔组合匹配的文档的查询</span><br><span class="line">boolQuery()</span><br><span class="line">创建一个可用于实现MultiTermQueryBuilder的子查询的SpanQueryBuilder。</span><br><span class="line">spanMultiTermQueryBuilder(MultiTermQueryBuilder multiTermQueryBuilder)</span><br><span class="line">允许定义自定义得分函数的查询。</span><br><span class="line">functionScoreQuery(QueryBuilder queryBuilder, ScoreFunctionBuilder function)</span><br><span class="line">更像这样的查询，查找“like”提供的文档，例如提供的MoreLikeThisQueryBuilder.likeText(String)，它是针对查询所构造的字段进行检查的</span><br><span class="line"></span><br><span class="line">moreLikeThisQuery(String... fields)</span><br><span class="line">构造一个新的非计分子查询，包含子类型和要在子文档上运行的查询。这个查询的结果是这些子文档匹配的父文档。</span><br><span class="line">hasChildQuery(String type, QueryBuilder query)</span><br><span class="line">构造一个新的非评分父查询，父类型和在父文档上运行的查询。这个查询的结果是父文档匹配的子文档。</span><br><span class="line">hasParentQuery(String type, QueryBuilder query)</span><br><span class="line">基于对其中任何一个项进行匹配的若干项的字段文件</span><br><span class="line">termsQuery(String name, String... values)</span><br><span class="line">一个查询构建器，它允许构建给定JSON字符串或二进制数据作为输入的查询。当您希望使用Java Builder API，但仍然需要将JSON查询字符串与其他查询构建器结合时，这是非常有用的。</span><br><span class="line"></span><br><span class="line">wrapperQuery(String source)</span><br><span class="line">这些都是官方提供的注释，有些晦涩难懂，还有很多，我这里不一一列举。</span><br></pre></td></tr></table></figure>
+<p>我们使用上述静态方法只是为了方便创建QueryBuilder系列对象。</p>
+<h6 id="条件查询"><a href="#条件查询" class="headerlink" title="条件查询"></a>条件查询</h6><p>调用QueryBuilders 的静态方法创建完具体的QueryBuilder对象之后，传入.withQuery(QueryBuilder)方法就可以实现的自定义查询。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line">1.完全匹配</span><br><span class="line">MatchQueryBuilder queryBuilder &#x3D; QueryBuilders.matchQuery(&quot;字段名&quot;, &quot;查询文本&quot;);</span><br><span class="line">2.短语匹配</span><br><span class="line">比如你要查询短语Love You，当你使用QueryBuilders.matchQuery(&quot;name&quot;, &quot;Love You&quot;)时，可能会查询到Love And You这样分开的结果，这时候我们指定为短语进行查询：</span><br><span class="line"></span><br><span class="line">QueryBuilder queryBuilder &#x3D; QueryBuilders.matchPhraseQuery(&quot;name&quot;, &quot;Love You&quot;);</span><br><span class="line">3.模糊匹配</span><br><span class="line">        MoreLikeThisQueryBuilder queryBuilder &#x3D; QueryBuilders</span><br><span class="line">                .moreLikeThisQuery(&quot;name&quot;)&#x2F;&#x2F; 要匹配的字段, 不填默认_all</span><br><span class="line">                .like(&quot;西游&quot;)&#x2F;&#x2F; 匹配的文本</span><br><span class="line">                .minTermFreq(1);&#x2F;&#x2F; 文本最少出现的次数（默认是2，我们设为1）</span><br><span class="line">我们再从源码去看其它方法</span><br><span class="line"></span><br><span class="line">添加一些文本以查找“类似”的文档</span><br><span class="line">addLikeText(String... likeTexts)</span><br><span class="line">查找类似文档</span><br><span class="line">like(Item... likeItems)</span><br><span class="line">设置不从其中选择（比如我们调用.like(&quot;西游&quot;).unlike(&quot;西游记&quot;)这样会导致啥也查不到）</span><br><span class="line">unlike(String... unlikeTexts)</span><br><span class="line">添加一些文本以查找与此不同的文档</span><br><span class="line">addUnlikeText(String... unlikeTexts)</span><br><span class="line">设置将包含在任何生成查询中的查询条件的最大数量。默认25</span><br><span class="line">maxQueryTerms(int maxQueryTerms)</span><br><span class="line">设置单词被忽略的频率，默认5，小于将不会被发现</span><br><span class="line">minDocFreq(int minDocFreq)</span><br><span class="line">设置单词仍然出现的最大频率。单词出现更多的文档将被忽略。默认为无限</span><br><span class="line">maxDocFreq(int maxDocFreq)</span><br><span class="line">设置将被忽略的单词的最小单词长度，默认0</span><br><span class="line">minWordLength(int minWordLength)</span><br><span class="line">设置将被忽略的单词的最大单词长度，默认无限</span><br><span class="line">maxWordLength(int maxWordLength)</span><br><span class="line">设置停止词，匹配时会忽略停止词</span><br><span class="line">stopWords(String... stopWords)</span><br><span class="line">设置词语权重，默认是1</span><br><span class="line">boostTerms(float boostTerms)</span><br><span class="line">查询权重（默认1）</span><br><span class="line">boost(float boost)</span><br><span class="line">设置不从其中选择术语的文本（文档Item）</span><br><span class="line">ignoreLike(String... likeText)</span><br><span class="line">4.组合查询</span><br><span class="line">        QueryBuilder queryBuilder &#x3D; QueryBuilders.boolQuery()</span><br><span class="line">                .must(QueryBuilders.matchQuery(&quot;name&quot;, &quot;西游&quot;)) &#x2F;&#x2F;AND</span><br><span class="line">                .must(QueryBuilders.wildcardQuery(&quot;name&quot;, &quot;西游?&quot;)) &#x2F;&#x2F;Not</span><br><span class="line">                .should(QueryBuilders.matchQuery(&quot;name&quot;, &quot;西游记&quot;)); &#x2F;&#x2F;Or</span><br><span class="line">5.包裹查询</span><br><span class="line">高于设定分数, 不计算相关性</span><br><span class="line"></span><br><span class="line">        QueryBuilder queryBuilder &#x3D; QueryBuilders</span><br><span class="line">                .constantScoreQuery(QueryBuilders.matchQuery(&quot;name&quot;, &quot;西游记&quot;))</span><br><span class="line">                .boost(2.0f);</span><br><span class="line">6.范围查询</span><br><span class="line">查询id值在20-50之间的</span><br><span class="line"></span><br><span class="line">        QueryBuilder queryBuilder &#x3D; QueryBuilders.rangeQuery(&quot;id&quot;)</span><br><span class="line">                .from(&quot;20&quot;)</span><br><span class="line">                .to(&quot;50&quot;)</span><br><span class="line">                .includeLower(true)     &#x2F;&#x2F; 包含上界</span><br><span class="line">                .includeUpper(true);      &#x2F;&#x2F; 包含下届</span><br><span class="line">7.通配符查询</span><br><span class="line">通配符查询, 支持 * 匹配任何字符序列, 包括空</span><br><span class="line"></span><br><span class="line">避免* 开始, 会检索大量内容造成效率缓慢</span><br><span class="line"></span><br><span class="line">单个字符用?</span><br><span class="line"></span><br><span class="line">QueryBuilder queryBuilder &#x3D; QueryBuilders.wildcardQuery(&quot;user&quot;, &quot;ki*hy&quot;);</span><br><span class="line">8.过滤查询</span><br><span class="line">QueryBuilders.constantScoreQuery(FilterBuilders.termQuery(&quot;name&quot;, &quot;kimchy&quot;)).boost(2.0f);</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      
+    </div>
+     <!-- 相关文章推荐 -->
+    
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Elasticsearch/" rel="tag"># Elasticsearch</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/03/07/ES%E5%8E%9F%E7%94%9F%E6%9F%A5%E8%AF%A2%E6%93%8D%E4%BD%9C%E6%80%BB%E7%BB%93/" rel="next" title="ES原生查询操作总结">
+                <i class="fa fa-chevron-left"></i> ES原生查询操作总结
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/03/09/Elasticsearch%E4%BB%8B%E7%BB%8D%E5%92%8C%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8/" rel="prev" title="Elasticsearch介绍和基本使用">
+                Elasticsearch介绍和基本使用 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+<span class="jiathis_txt">分享到：</span>
+<a class="jiathis_button_fav">收藏夹</a>
+<a class="jiathis_button_copy">复制网址</a>
+<a class="jiathis_button_email">邮件</a>
+<a class="jiathis_button_weixin">微信</a>
+<a class="jiathis_button_qzone">QQ空间</a>
+<a class="jiathis_button_tqq">腾讯微博</a>
+<a class="jiathis_button_douban">豆瓣</a>
+<a class="jiathis_button_share">一键分享</a>
+
+<a href="http://www.jiathis.com/share?uid=2140465" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+<a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+var jiathis_config={
+  data_track_clickback:true,
+  summary:"",
+  shortUrl:false,
+  hideMore:false
+}
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://img.huyunshun.com/img/20200522182348.png"
+                alt="初晨" />
+            
+              <p class="site-author-name" itemprop="name">初晨</p>
+              <p class="site-description motion-element" itemprop="description">永远不要说你知道本质，更别说真相了。</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">249</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">46</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+<!--近期文章版块-->
+            
+                <div class="links-of-blogroll motion-element links-of-blogroll-block">
+                  <div class="links-of-blogroll-title">
+                    <!-- modify icon to fire by szw -->
+                    <i class="fa fa-history fa-" aria-hidden="true"></i>
+                    近期文章
+                  </div>
+                  <ul class="links-of-blogroll-list">
+                    
+                    
+                      <li>
+                        <a href="/2020/05/22/WebSocket%E3%80%81Socket%E3%80%81TCP%E3%80%81HTTP%E5%8C%BA%E5%88%AB/" title="WebSocket、Socket、TCP、HTTP区别" target="_blank">WebSocket、Socket、TCP、HTTP区别</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/19/Springboot%E9%A1%B9%E7%9B%AE%E7%9A%84%E6%8E%A5%E5%8F%A3%E9%98%B2%E5%88%B7/" title="Springboot项目的接口防刷" target="_blank">Springboot项目的接口防刷</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/03/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Volatile%E5%85%B3%E9%94%AE%E5%AD%97%E5%8F%8A%E5%85%B6%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/" title="深入理解Volatile关键字及其实现原理" target="_blank">深入理解Volatile关键字及其实现原理</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/04/20/%E4%BD%BF%E7%94%A8vscode%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0%E7%8E%AF%E5%A2%83/" title="使用vscode搭建个人笔记环境" target="_blank">使用vscode搭建个人笔记环境</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/01/20/HBase%E4%BB%8B%E7%BB%8D%E5%AE%89%E8%A3%85%E4%B8%8E%E6%93%8D%E4%BD%9C/" title="HBase介绍安装与操作" target="_blank">HBase介绍安装与操作</a>
+                      </li>
+                    
+                  </ul>
+                </div>
+            
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-6"><a class="nav-link" href="#实例"><span class="nav-number">1.</span> <span class="nav-text">实例</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#术语"><span class="nav-number">2.</span> <span class="nav-text">术语</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#QueryBuilders构建查询"><span class="nav-number">3.</span> <span class="nav-text">QueryBuilders构建查询</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#条件查询"><span class="nav-number">4.</span> <span class="nav-text">条件查询</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Copyright</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

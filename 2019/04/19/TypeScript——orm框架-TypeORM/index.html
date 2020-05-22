@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Node," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="在nodejs中也有比较好用的ORM框架，比如TypeORM，Sequelize等等。 TypeORM 是一个 ORM 框架，它可以运行在 NodeJS、Browser、Cordova、PhoneGap、Ionic、React Native、Expo 和 Electron 平台上，可以与 TypeScript 和 JavaScript (ES5,ES6,ES7,ES8)一起使用。 它的目标是始终支">
+<meta property="og:type" content="article">
+<meta property="og:title" content="TypeScript——orm框架-TypeORM">
+<meta property="og:url" content="https://huyunshun.com/2019/04/19/TypeScript%E2%80%94%E2%80%94orm%E6%A1%86%E6%9E%B6-TypeORM/index.html">
+<meta property="og:site_name" content="简">
+<meta property="og:description" content="在nodejs中也有比较好用的ORM框架，比如TypeORM，Sequelize等等。 TypeORM 是一个 ORM 框架，它可以运行在 NodeJS、Browser、Cordova、PhoneGap、Ionic、React Native、Expo 和 Electron 平台上，可以与 TypeScript 和 JavaScript (ES5,ES6,ES7,ES8)一起使用。 它的目标是始终支">
+<meta property="article:published_time" content="2019-04-18T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-05-20T10:04:24.700Z">
+<meta property="article:author" content="初晨">
+<meta property="article:tag" content="Node">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://huyunshun.com/2019/04/19/TypeScript——orm框架-TypeORM/"/>
+
+
+
+
+
+  <title>TypeScript——orm框架-TypeORM | 简</title>
+  
+
+
+
+
+
+
+
+
+  <script type="text/javascript" src="/js/src/love.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
+
+  <!-- 看板娘 -->
+    
+        <script async src="/live2d-widget/autoload.js"></script>
+    
+ <!-- 飘动的彩带） -->
+  <script src="/js/src/piao.js" type="text/javascript"></script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">简</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">人生短暂，学海无边，而大道至简。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://huyunshun.com/2019/04/19/TypeScript%E2%80%94%E2%80%94orm%E6%A1%86%E6%9E%B6-TypeORM/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="初晨">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://img.huyunshun.com/img/20200522182348.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="简">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">TypeScript——orm框架-TypeORM</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-19T00:00:00+08:00">
+                2019-04-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Node/" itemprop="url" rel="index">
+                    <span itemprop="name">Node</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>在nodejs中也有比较好用的ORM框架，比如TypeORM，Sequelize等等。</p>
+<p>TypeORM 是一个 ORM 框架，它可以运行在 NodeJS、Browser、Cordova、PhoneGap、Ionic、React Native、Expo 和 Electron 平台上，可以与 TypeScript 和 JavaScript (ES5,ES6,ES7,ES8)一起使用。 它的目标是始终支持最新的 JavaScript 特性并提供额外的特性以帮助你开发任何使用数据库的（不管是只有几张表的小型应用还是拥有多数据库的大型企业应用）应用程序。</p>
+<p>不同于现有的所有其他 JavaScript ORM 框架，TypeORM 支持 Active Record 和 Data Mapper 模式，这意味着你可以以最高效的方式编写高质量的、松耦合的、可扩展的、可维护的应用程序。</p>
+<p>TypeORM 参考了很多其他优秀 ORM 的实现, 比如 Hibernate, Doctrine 和 Entity Framework。</p>
+<p>TypeORM 的一些特性:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">同时支持 DataMapper 和 ActiveRecord (随你选择)</span><br><span class="line">实体和列</span><br><span class="line">数据库特性列类型</span><br><span class="line">实体管理</span><br><span class="line">存储库和自定义存储库</span><br><span class="line">清晰的对象关系模型</span><br><span class="line">关联（关系）</span><br><span class="line">贪婪和延迟关系</span><br><span class="line">单向的，双向的和自引用的关系</span><br><span class="line">支持多重继承模式</span><br><span class="line">级联</span><br><span class="line">索引</span><br><span class="line">事务</span><br><span class="line">迁移和自动迁移</span><br><span class="line">连接池</span><br><span class="line">主从复制</span><br><span class="line">使用多个数据库连接</span><br><span class="line">使用多个数据库类型</span><br><span class="line">跨数据库和跨模式查询</span><br><span class="line">优雅的语法，灵活而强大的 QueryBuilder</span><br><span class="line">左联接和内联接</span><br><span class="line">使用联查查询的适当分页</span><br><span class="line">查询缓存</span><br><span class="line">原始结果流</span><br><span class="line">日志</span><br><span class="line">监听者和订阅者（钩子）</span><br><span class="line">支持闭包表模式</span><br><span class="line">在模型或者分离的配置文件中声明模式</span><br><span class="line">json &#x2F; xml &#x2F; yml &#x2F; env 格式的连接配置</span><br><span class="line">支持 MySQL &#x2F; MariaDB &#x2F; Postgres &#x2F; SQLite &#x2F; Microsoft SQL Server &#x2F; Oracle &#x2F; sql.js</span><br><span class="line">支持 MongoDB NoSQL 数据库</span><br><span class="line">可在 NodeJS &#x2F; 浏览器 &#x2F; Ionic &#x2F; Cordova &#x2F; React Native &#x2F; Expo &#x2F; Electron 平台上使用</span><br><span class="line">支持 TypeScript 和 JavaScript</span><br><span class="line">生成高性能、灵活、清晰和可维护的代码</span><br><span class="line">遵循所有可能的最佳实践</span><br><span class="line">命令行工具</span><br></pre></td></tr></table></figure>
+<h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">npm install typeorm --save</span><br><span class="line">npm install reflect-metadata --save</span><br></pre></td></tr></table></figure>
+<p>并且需要在应用程序的全局位置导入（例如在app.ts中）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">import &quot;reflect-metadata&quot;;</span><br></pre></td></tr></table></figure>
+<p>你可能还需要安装 node typings(以此来使用 Node 的智能提示):</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install @types&#x2F;node --save</span><br></pre></td></tr></table></figure>
+<p>安装数据库驱动:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">MySQL 或者 MariaDB</span><br><span class="line">npm install mysql --save (也可以安装 mysql2)</span><br><span class="line"></span><br><span class="line">PostgreSQL</span><br><span class="line">npm install pg --save</span><br><span class="line"></span><br><span class="line">SQLite</span><br><span class="line">npm install sqlite3 --save</span><br><span class="line"></span><br><span class="line">Microsoft SQL Server</span><br><span class="line">npm install mssql --save</span><br><span class="line"></span><br><span class="line">sql.js</span><br><span class="line">npm install sql.js --save</span><br><span class="line"></span><br><span class="line">Oracle</span><br><span class="line">npm install oracledb --save</span><br></pre></td></tr></table></figure>
+<ul>
+<li>TypeScript 配置 *<br>此外，请确保你使用的 TypeScript 编译器版本是2.3或更高版本，并且已经在 tsconfig.json 中启用了以下设置:<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&quot;emitDecoratorMetadata&quot;: true,</span><br><span class="line">&quot;experimentalDecorators&quot;: true,</span><br></pre></td></tr></table></figure>
+除此之外，你可能还需要在编译器选项的 lib 中启用 es6，或者安装 es6-shim 的 @types。</li>
+</ul>
+<h3 id="快速开始"><a href="#快速开始" class="headerlink" title="快速开始"></a>快速开始</h3><p>全局安装 TypeORM:npm install typeorm -g</p>
+<p>然后转到要创建新项目的目录并运行命令：typeorm init –name MyProject –database mysql</p>
+<p>其中 name 是项目的名称，database 是将使用的数据库。</p>
+<p>数据库可以是以下值之一: mysql、 mariadb、 postgres、 sqlite、 mssql、 oracle、 mongodb、 cordova、 react-native、 expo、 nativescript.</p>
+<p>此命令将在 MyProject 目录中生成一个包含以下文件的新项目:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">MyProject</span><br><span class="line">├── src              &#x2F;&#x2F; TypeScript 代码</span><br><span class="line">│   ├── entity       &#x2F;&#x2F; 存储实体（数据库模型）的位置</span><br><span class="line">│   │   └── User.ts  &#x2F;&#x2F; 示例 entity</span><br><span class="line">│   ├── migration    &#x2F;&#x2F; 存储迁移的目录</span><br><span class="line">│   └── index.ts     &#x2F;&#x2F; 程序执行主文件</span><br><span class="line">├── .gitignore       &#x2F;&#x2F; gitignore文件</span><br><span class="line">├── ormconfig.json   &#x2F;&#x2F; ORM和数据库连接配置</span><br><span class="line">├── package.json     &#x2F;&#x2F; node module 依赖</span><br><span class="line">├── README.md        &#x2F;&#x2F; 简单的 readme 文件</span><br><span class="line">└── tsconfig.json    &#x2F;&#x2F; TypeScript 编译选项</span><br></pre></td></tr></table></figure>
+<p>或者在现有 node 项目上运行 typeorm init，但要注意，此操作可能会覆盖已有的某些文件。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">D:\mydoc\NodeJs\前端-study-demo\typeorm-demo&gt;typeorm init</span><br><span class="line">Project created inside current directory.</span><br></pre></td></tr></table></figure>
+<p>接下来安装项目依赖项：npm install</p>
+<p>在安装过程中，编辑 ormconfig.json 文件并在其中编辑自己的数据库连接配置选项：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//ormconfig.json</span></span><br><span class="line">设置 synchronize 可确保每次运行应用程序时实体都将与数据库同步</span><br><span class="line">&#123;</span><br><span class="line">   <span class="attr">"type"</span>: <span class="string">"mysql"</span>,</span><br><span class="line">   <span class="attr">"host"</span>: <span class="string">"172.16.3.34"</span>,</span><br><span class="line">   <span class="attr">"port"</span>: <span class="number">3306</span>,</span><br><span class="line">   <span class="attr">"username"</span>: <span class="string">"root"</span>,</span><br><span class="line">   <span class="attr">"password"</span>: <span class="string">"root"</span>,</span><br><span class="line">   <span class="attr">"database"</span>: <span class="string">"root"</span>,</span><br><span class="line">   <span class="attr">"synchronize"</span>: <span class="literal">true</span>,</span><br><span class="line">   <span class="attr">"logging"</span>: <span class="literal">false</span>,</span><br><span class="line">   <span class="attr">"entities"</span>: [</span><br><span class="line">      <span class="string">"src/entity/**/*.ts"</span></span><br><span class="line">   ],</span><br><span class="line">   <span class="attr">"migrations"</span>: [</span><br><span class="line">      <span class="string">"src/migration/**/*.ts"</span></span><br><span class="line">   ],</span><br><span class="line">   <span class="attr">"subscribers"</span>: [</span><br><span class="line">      <span class="string">"src/subscriber/**/*.ts"</span></span><br><span class="line">   ],</span><br><span class="line">   <span class="attr">"cli"</span>: &#123;</span><br><span class="line">      <span class="attr">"entitiesDir"</span>: <span class="string">"src/entity"</span>,</span><br><span class="line">      <span class="attr">"migrationsDir"</span>: <span class="string">"src/migration"</span>,</span><br><span class="line">      <span class="attr">"subscribersDir"</span>: <span class="string">"src/subscriber"</span></span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//tsconfig.json</span></span><br><span class="line">&#123;</span><br><span class="line">   <span class="attr">"compilerOptions"</span>: &#123;</span><br><span class="line">      <span class="attr">"lib"</span>: [</span><br><span class="line">         <span class="string">"es5"</span>,</span><br><span class="line">         <span class="string">"es6"</span></span><br><span class="line">      ],</span><br><span class="line">      <span class="attr">"target"</span>: <span class="string">"es5"</span>,</span><br><span class="line">      <span class="attr">"module"</span>: <span class="string">"commonjs"</span>,</span><br><span class="line">      <span class="attr">"moduleResolution"</span>: <span class="string">"node"</span>,</span><br><span class="line">      <span class="attr">"outDir"</span>: <span class="string">"./build"</span>,</span><br><span class="line">      <span class="attr">"emitDecoratorMetadata"</span>: <span class="literal">true</span>,</span><br><span class="line">      <span class="attr">"experimentalDecorators"</span>: <span class="literal">true</span>,</span><br><span class="line">      <span class="attr">"sourceMap"</span>: <span class="literal">true</span></span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//package.json</span></span><br><span class="line">&#123;</span><br><span class="line">   <span class="attr">"name"</span>: <span class="string">"typeorm-demo"</span>,</span><br><span class="line">   <span class="attr">"version"</span>: <span class="string">"0.0.1"</span>,</span><br><span class="line">   <span class="attr">"description"</span>: <span class="string">"Awesome project developed with TypeORM."</span>,</span><br><span class="line">   <span class="attr">"devDependencies"</span>: &#123;</span><br><span class="line">      <span class="attr">"ts-node"</span>: <span class="string">"3.3.0"</span>,</span><br><span class="line">      <span class="attr">"@types/node"</span>: <span class="string">"^8.0.29"</span>,</span><br><span class="line">      <span class="attr">"typescript"</span>: <span class="string">"3.3.3333"</span></span><br><span class="line">   &#125;,</span><br><span class="line">   <span class="attr">"dependencies"</span>: &#123;</span><br><span class="line">      <span class="attr">"typeorm"</span>: <span class="string">"0.2.22"</span>,</span><br><span class="line">      <span class="attr">"reflect-metadata"</span>: <span class="string">"^0.1.10"</span>,</span><br><span class="line">      <span class="attr">"mysql"</span>: <span class="string">"^2.14.1"</span></span><br><span class="line">   &#125;,</span><br><span class="line">   <span class="attr">"scripts"</span>: &#123;</span><br><span class="line">      <span class="attr">"start"</span>: <span class="string">"ts-node src/index.ts"</span></span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>运行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&gt; typeorm-demo@0.0.1 start D:\mydoc\NodeJs\前端-study-demo\typeorm-demo</span><br><span class="line">&gt; ts-node src&#x2F;index.ts</span><br><span class="line"></span><br><span class="line">Inserting a new user into the database...</span><br><span class="line">Saved a new user with id: 11</span><br><span class="line">Loading users from the database...</span><br><span class="line">Loaded users:  [ User &#123; id: 1, firstName: &#39;Timber&#39;, lastName: &#39;Saw&#39;, age: 25 &#125;,</span><br><span class="line">  User &#123; id: 2, firstName: &#39;Timber&#39;, lastName: &#39;Saw&#39;, age: 25 &#125;,</span><br><span class="line">  User &#123; id: 3, firstName: &#39;Timber&#39;, lastName: &#39;Saw&#39;, age: 25 &#125;,</span><br><span class="line">  User &#123; id: 10, firstName: &#39;sundial&#39;, lastName: &#39;3434&#39;, age: 20 &#125;,</span><br><span class="line">  User &#123; id: 11, firstName: &#39;Timber&#39;, lastName: &#39;Saw&#39;, age: 25 &#125; ]</span><br><span class="line">Here you can setup and run express&#x2F;koa&#x2F;any other framework.</span><br></pre></td></tr></table></figure>
+<p>绝大多数情况下，你只需要配置 host, username, password, database 或者 port 即可。</p>
+<p>完成配置并安装所有 node modules 后，即可运行应用程序：npm start</p>
+<p>还可以通过运行 typeorm init –name MyProject –database mysql –express 来生成一个更高级的 Express 项目</p>
+<h3 id="分步指南"><a href="#分步指南" class="headerlink" title="分步指南"></a>分步指南</h3><h4 id="创建实体"><a href="#创建实体" class="headerlink" title="创建实体"></a>创建实体</h4><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123;Entity, PrimaryGeneratedColumn, Column&#125; <span class="keyword">from</span> <span class="string">"typeorm"</span>;</span><br><span class="line"></span><br><span class="line">@Entity()</span><br><span class="line"><span class="keyword">export</span> <span class="class"><span class="keyword">class</span> <span class="title">User</span> </span>&#123;</span><br><span class="line">    @PrimaryGeneratedColumn()</span><br><span class="line">    id: number;</span><br><span class="line">    @Column()</span><br><span class="line">    firstName: string;</span><br><span class="line">    @Column()</span><br><span class="line">    lastName: string;</span><br><span class="line">    @Column()</span><br><span class="line">    age: number;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>每个表都必须至少有一个主键列。使用 @PrimaryColumn 修饰符。自动生成的列@PrimaryGeneratedColumn()</p>
+<h4 id="列数据类型"><a href="#列数据类型" class="headerlink" title="列数据类型"></a>列数据类型</h4><p>见最后</p>
+<h4 id="创建数据库连接"><a href="#创建数据库连接" class="headerlink" title="创建数据库连接"></a>创建数据库连接</h4><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">createConnection(&#123;</span><br><span class="line">    type: <span class="string">"mysql"</span>,</span><br><span class="line">    host: <span class="string">"localhost"</span>,</span><br><span class="line">    port: <span class="number">3306</span>,</span><br><span class="line">    username: <span class="string">"root"</span>,</span><br><span class="line">    password: <span class="string">"admin"</span>,</span><br><span class="line">    database: <span class="string">"test"</span>,</span><br><span class="line">    entities: [</span><br><span class="line">        Photo<span class="comment">//引用目录下的所有实体__dirname + "/entity/*.js"</span></span><br><span class="line">    ],</span><br><span class="line">    synchronize: <span class="literal">true</span>,</span><br><span class="line">    logging: <span class="literal">false</span></span><br><span class="line">&#125;).then(<span class="function"><span class="params">connection</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="comment">// 这里可以写实体操作相关的代码 </span></span><br><span class="line">&#125;).catch(<span class="function"><span class="params">error</span> =&gt;</span> <span class="built_in">console</span>.log(error));</span><br></pre></td></tr></table></figure>
+<p>可以吧数据库配置信息放到ormconfig.json</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">   <span class="string">"name"</span>: <span class="string">"default"</span>,</span><br><span class="line">   <span class="string">"type"</span>: <span class="string">"mysql"</span>,</span><br><span class="line">   <span class="string">"host"</span>: <span class="string">"172.16.3.34"</span>,</span><br><span class="line">   <span class="string">"port"</span>: <span class="number">3306</span>,</span><br><span class="line">   <span class="string">"username"</span>: <span class="string">"root"</span>,</span><br><span class="line">   <span class="string">"password"</span>: <span class="string">"root"</span>,</span><br><span class="line">   <span class="string">"database"</span>: <span class="string">"sonar"</span>,</span><br><span class="line">   <span class="string">"synchronize"</span>: <span class="literal">true</span>,</span><br><span class="line">   <span class="string">"logging"</span>: <span class="literal">false</span>,</span><br><span class="line">   <span class="string">"cache"</span>: <span class="literal">true</span>,</span><br><span class="line">   <span class="string">"entities"</span>: [</span><br><span class="line">      <span class="string">"src/entity/**/*.ts"</span></span><br><span class="line">   ],</span><br><span class="line">   <span class="string">"migrations"</span>: [</span><br><span class="line">      <span class="string">"src/migration/**/*.ts"</span></span><br><span class="line">   ],</span><br><span class="line">   <span class="string">"subscribers"</span>: [</span><br><span class="line">      <span class="string">"src/subscriber/**/*.&#123;ts,js&#125;"</span></span><br><span class="line">   ],</span><br><span class="line">   <span class="string">"cli"</span>: &#123;</span><br><span class="line">      <span class="string">"entitiesDir"</span>: <span class="string">"src/entity"</span>,</span><br><span class="line">      <span class="string">"migrationsDir"</span>: <span class="string">"src/migration"</span>,</span><br><span class="line">      <span class="string">"subscribersDir"</span>: <span class="string">"src/subscriber"</span></span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">import &quot;reflect-metadata&quot;;</span><br><span class="line">import &#123;createConnection&#125; from &quot;typeorm&quot;;</span><br><span class="line">import &#123;User&#125; from &quot;.&#x2F;entity&#x2F;User&quot;;</span><br><span class="line">createConnection().then(connection &#x3D;&gt; &#123;</span><br><span class="line">    &#x2F;&#x2F; 这里可以写实体操作相关的代码</span><br><span class="line">    connection.manager.find(User).then(o&#x3D;&gt;console.log(&quot;Loaded users: &quot;, o));</span><br><span class="line">&#125;).catch(error &#x3D;&gt; console.log(error));</span><br><span class="line"></span><br><span class="line">结果：</span><br><span class="line">D:\mydoc\NodeJs\前端-study-demo\typeorm-demo&gt;ts-node src&#x2F;test1</span><br><span class="line">Loaded users:  [ User &#123; id: 1, firstName: &#39;Timber&#39;, lastName: &#39;Saw&#39;, age: 25 &#125;,</span><br><span class="line">  User &#123; id: 2, firstName: &#39;Timber&#39;, lastName: &#39;Saw&#39;, age: 25 &#125;,</span><br><span class="line">  User &#123; id: 3, firstName: &#39;Timber&#39;, lastName: &#39;Saw&#39;, age: 25 &#125;,</span><br><span class="line">  User &#123; id: 10, firstName: &#39;sundial&#39;, lastName: &#39;3434&#39;, age: 20 &#125;,</span><br><span class="line">  User &#123; id: 11, firstName: &#39;Timber&#39;, lastName: &#39;Saw&#39;, age: 25 &#125;,</span><br><span class="line">  User &#123; id: 12, firstName: &#39;Timber&#39;, lastName: &#39;Saw&#39;, age: 25 &#125; ]</span><br></pre></td></tr></table></figure>
+<h4 id="使用async-await语法"><a href="#使用async-await语法" class="headerlink" title="使用async/await语法"></a>使用async/await语法</h4><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="string">"reflect-metadata"</span>;</span><br><span class="line"><span class="keyword">import</span> &#123;createConnection&#125; <span class="keyword">from</span> <span class="string">"typeorm"</span>;</span><br><span class="line"><span class="keyword">import</span> &#123;User&#125; <span class="keyword">from</span> <span class="string">"./entity/User"</span>;</span><br><span class="line">createConnection().then(<span class="keyword">async</span> connection =&gt; &#123;</span><br><span class="line">    <span class="comment">// 这里可以写实体操作相关的代码</span></span><br><span class="line">    <span class="keyword">const</span> users = <span class="keyword">await</span> connection.manager.find(User);</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">"Loaded users: "</span>, users);</span><br><span class="line"></span><br><span class="line">&#125;).catch(<span class="function"><span class="params">error</span> =&gt;</span> <span class="built_in">console</span>.log(error));</span><br></pre></td></tr></table></figure>
+<h4 id="使用Repositories"><a href="#使用Repositories" class="headerlink" title="使用Repositories"></a>使用Repositories</h4><p>使用Repository来代替EntityManage。每个实体都有自己的repository，可以对这个实体进行任何操作。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">import &quot;reflect-metadata&quot;;</span><br><span class="line">import &#123;createConnection&#125; from &quot;typeorm&quot;;</span><br><span class="line">import &#123;User&#125; from &quot;.&#x2F;entity&#x2F;User&quot;;</span><br><span class="line">createConnection().then(async connection &#x3D;&gt; &#123;</span><br><span class="line">    &#x2F;&#x2F; 使用repository</span><br><span class="line">    const repository &#x3D; await connection.getRepository(User);</span><br><span class="line">    let user &#x3D; await repository.findOne(2);</span><br><span class="line">    user.firstName&#x3D;&quot;11111111111&quot;;</span><br><span class="line">    await repository.save(user);</span><br><span class="line">    console.log(&quot;Loaded users: &quot;, await repository.find());</span><br><span class="line">    await repository.remove(user);</span><br><span class="line">    process.exit();</span><br><span class="line">&#125;).catch(error &#x3D;&gt; console.log(error));</span><br></pre></td></tr></table></figure>
+<h4 id="封装一个Repository"><a href="#封装一个Repository" class="headerlink" title="封装一个Repository"></a>封装一个Repository</h4><h4 id="ActiveRecord方式实现"><a href="#ActiveRecord方式实现" class="headerlink" title="ActiveRecord方式实现"></a>ActiveRecord方式实现</h4><p>实体：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123;Entity, PrimaryGeneratedColumn, Column, BaseEntity&#125; <span class="keyword">from</span> <span class="string">"typeorm"</span>;</span><br><span class="line"></span><br><span class="line">@Entity(<span class="string">"user"</span>)</span><br><span class="line"><span class="keyword">export</span> <span class="class"><span class="keyword">class</span> <span class="title">Person</span> <span class="keyword">extends</span> <span class="title">BaseEntity</span></span>&#123;</span><br><span class="line">    @PrimaryGeneratedColumn()</span><br><span class="line">    id: number;</span><br><span class="line">    @Column()</span><br><span class="line">    firstName: string;</span><br><span class="line">    @Column()</span><br><span class="line">    lastName: string;</span><br><span class="line">    @Column()</span><br><span class="line">    age: number;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>操作：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="string">"reflect-metadata"</span>;</span><br><span class="line"><span class="keyword">import</span> &#123;createConnection&#125; <span class="keyword">from</span> <span class="string">"typeorm"</span>;</span><br><span class="line"><span class="keyword">import</span> &#123;Person&#125; <span class="keyword">from</span> <span class="string">"./entity/Person"</span>;</span><br><span class="line">createConnection().then(<span class="keyword">async</span> connection =&gt; &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">"Loaded users: "</span>, <span class="keyword">await</span> Person.findOne(<span class="number">2</span>));</span><br><span class="line">    process.exit();</span><br><span class="line">&#125;).catch(<span class="function"><span class="params">error</span> =&gt;</span> <span class="built_in">console</span>.log(error));</span><br></pre></td></tr></table></figure>
+<p>结果：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">D:\mydoc\NodeJs\前端-study-demo\typeorm-demo&gt;ts-node src&#x2F;test2</span><br><span class="line">Loaded users:  Person &#123; id: 2, firstName: &#39;Timber&#39;, lastName: &#39;Saw&#39;, age: 25 &#125;</span><br></pre></td></tr></table></figure>
+<h3 id="Caching-queries-缓存查询"><a href="#Caching-queries-缓存查询" class="headerlink" title="Caching queries (缓存查询)"></a>Caching queries (缓存查询)</h3><p>它缓存的实现，主要依赖于，自己在数据库里面建立一张缓存表，用的不是内存缓存，这样有好有坏吧，和我们的业务场景其实是不太适用的。这样做的好处，就是它不会把我们的内存跑满，而且也能大幅提高查询速度。但是我们更希望的是一个内存缓存。</p>
+<p>它的用法，就是在数据库配置的过程中，增加一个cache字段。”cache”: true,</p>
+<p>可以在这个方法中使用：getMany, getOne, getRawMany, getRawOne and getCount  find, findAndCount, findByIds, and count</p>
+<p>使用例子：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> users = <span class="keyword">await</span> connection</span><br><span class="line">    .createQueryBuilder(User, <span class="string">"user"</span>)</span><br><span class="line">    .where(<span class="string">"user.isAdmin = :isAdmin"</span>, &#123; <span class="attr">isAdmin</span>: <span class="literal">true</span> &#125;)</span><br><span class="line">    .cache(<span class="literal">true</span>)</span><br><span class="line">    .getMany();</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> users = <span class="keyword">await</span> connection</span><br><span class="line">    .getRepository(User)</span><br><span class="line">    .find(&#123;</span><br><span class="line">        where: &#123; <span class="attr">isAdmin</span>: <span class="literal">true</span> &#125;,</span><br><span class="line">        cache: <span class="literal">true</span></span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> users = <span class="keyword">await</span> connection</span><br><span class="line">    .createQueryBuilder(User, <span class="string">"user"</span>)</span><br><span class="line">    .where(<span class="string">"user.isAdmin = :isAdmin"</span>, &#123; <span class="attr">isAdmin</span>: <span class="literal">true</span> &#125;)</span><br><span class="line">    .cache(<span class="number">60000</span>) <span class="comment">// 设置缓存时间 1 minute</span></span><br><span class="line">    .getMany();</span><br><span class="line"></span><br><span class="line"><span class="comment">//设置缓存时间</span></span><br><span class="line">&#123;</span><br><span class="line">    cache: &#123;</span><br><span class="line">        duration: <span class="number">30000</span> <span class="comment">// 30 seconds</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> users = <span class="keyword">await</span> connection</span><br><span class="line">    .createQueryBuilder(User, <span class="string">"user"</span>)</span><br><span class="line">    .where(<span class="string">"user.isAdmin = :isAdmin"</span>, &#123; <span class="attr">isAdmin</span>: <span class="literal">true</span> &#125;)</span><br><span class="line">    .cache(<span class="string">"users_admins"</span>, <span class="number">25000</span>)<span class="comment">//缓存名称和时间</span></span><br><span class="line">    .getMany();</span><br></pre></td></tr></table></figure>
+<p>也可以用redis当作缓存模块，这样也是比较不错的做法。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    type: <span class="string">"mysql"</span>,</span><br><span class="line">    host: <span class="string">"localhost"</span>,</span><br><span class="line">    ...</span><br><span class="line">    cache: &#123;</span><br><span class="line">        type: <span class="string">"redis"</span>,</span><br><span class="line">        options: &#123;</span><br><span class="line">            host: <span class="string">"localhost"</span>,</span><br><span class="line">            port: <span class="number">6379</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="对应关系"><a href="#对应关系" class="headerlink" title="对应关系"></a>对应关系</h3><h4 id="一对一"><a href="#一对一" class="headerlink" title="一对一"></a>一对一</h4><p>要与另一个类创建一对一的关系：</p>
+<p>其他参考：<a href="https://typeorm.io" target="_blank" rel="noopener">https://typeorm.io</a></p>
+<h3 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h3><h4 id="基本配置参数"><a href="#基本配置参数" class="headerlink" title="基本配置参数"></a>基本配置参数</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">type: 当前要连接的数据库类型(mysql,mssql, moongo, ...)</span><br><span class="line">host: 数据库服务暴露的host</span><br><span class="line">port: 数据库服务暴露的端口</span><br><span class="line">username: 连接数据库服务的用户名</span><br><span class="line">password: 连接数据库服务的用户名</span><br><span class="line">database: 连接数据库名</span><br></pre></td></tr></table></figure>
+<h4 id="额外参数"><a href="#额外参数" class="headerlink" title="额外参数"></a>额外参数</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">name: 设置连接名，连多个数据库的时候，需要获取连接的时候可用 getConnection(&#39;name&#39;) 的方式取得对应的数据库连接；</span><br><span class="line">entities: 要加载并用于此连接的实体。写法类似：</span><br><span class="line"> entities: [Post, Category, &quot;entity&#x2F;*.js&quot;, &quot;modules&#x2F;**&#x2F;entity&#x2F;*.js&quot;]</span><br><span class="line">entityPrefix: 表名前缀</span><br><span class="line">extra: 拓展的参数值, 如设置连接池连接数量等;</span><br><span class="line">logging：</span><br><span class="line">查询(query):记录所有查询。</span><br><span class="line">错误(error):记录所有失败的查询和错误。</span><br><span class="line">模式(schema):记录模式构建过程。</span><br><span class="line">警告(warn):记录内部orm警告。</span><br><span class="line">记录(info):内部orm信息信息。</span><br><span class="line">日志(log):记录内部orm日志消息。</span><br><span class="line"></span><br><span class="line">如果只是简单的打印基本的数据库操作(包含错误)则设置 logging: true</span><br><span class="line">如果要打印以上全部类型，则设置 logging: &#39;all&#39;</span><br><span class="line">如果只是打印其中的1～2个（如query, error），则可设置 logging: [&#39;query&#39;, &#39;error&#39;]</span><br><span class="line"></span><br><span class="line">logger: 可设置的类型有 advanced-console,simple-console,file, debug, 在开启 logging 的情况下，logger默认使用类型是 advanced-console, 这个模式会高亮字体和标示sql语句。</span><br><span class="line">cache: 对查询的 sql 结果进行缓存。 支持数据库或者redis。看了下api，redis更为方便一点。</span><br><span class="line">cache: &#123;</span><br><span class="line">        type: &#39;redis&#39;, &#x2F;&#x2F; 必须参数</span><br><span class="line">        options: &#123;</span><br><span class="line">            host: &#39;localhost&#39;,</span><br><span class="line">            port: 6379,</span><br><span class="line">            username: &#39;&#39;,</span><br><span class="line">            password:&#39;&#39;,</span><br><span class="line">            db: 1,</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="创建多个数据库连接"><a href="#创建多个数据库连接" class="headerlink" title="创建多个数据库连接"></a>创建多个数据库连接</h4><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line">[&#123;</span><br><span class="line">   <span class="attr">"name"</span>: <span class="string">"dev"</span>,</span><br><span class="line">   <span class="attr">"type"</span>: <span class="string">"mysql"</span>,</span><br><span class="line">   <span class="attr">"host"</span>: <span class="string">"172.16.3.34"</span>,</span><br><span class="line">   <span class="attr">"port"</span>: <span class="number">3306</span>,</span><br><span class="line">   <span class="attr">"username"</span>: <span class="string">"root"</span>,</span><br><span class="line">   <span class="attr">"password"</span>: <span class="string">"root"</span>,</span><br><span class="line">   <span class="attr">"database"</span>: <span class="string">"sonar"</span>,</span><br><span class="line">   <span class="attr">"synchronize"</span>: <span class="literal">true</span>,</span><br><span class="line">   <span class="attr">"logging"</span>: <span class="literal">false</span>,</span><br><span class="line">   <span class="attr">"entities"</span>: [</span><br><span class="line">      <span class="string">"src/entity/**/*.ts"</span></span><br><span class="line">   ],</span><br><span class="line">   <span class="attr">"migrations"</span>: [</span><br><span class="line">      <span class="string">"src/migration/**/*.ts"</span></span><br><span class="line">   ],</span><br><span class="line">   <span class="attr">"subscribers"</span>: [</span><br><span class="line">      <span class="string">"src/subscriber/**/*.ts"</span></span><br><span class="line">   ],</span><br><span class="line">   <span class="attr">"cli"</span>: &#123;</span><br><span class="line">      <span class="attr">"entitiesDir"</span>: <span class="string">"src/entity"</span>,</span><br><span class="line">      <span class="attr">"migrationsDir"</span>: <span class="string">"src/migration"</span>,</span><br><span class="line">      <span class="attr">"subscribersDir"</span>: <span class="string">"src/subscriber"</span></span><br><span class="line">   &#125;</span><br><span class="line">&#125;,&#123;</span><br><span class="line">   <span class="attr">"name"</span>: <span class="string">"pro"</span>,</span><br><span class="line">   <span class="attr">"type"</span>: <span class="string">"mysql"</span>,</span><br><span class="line">   <span class="attr">"host"</span>: <span class="string">"172.16.3.34"</span>,</span><br><span class="line">   <span class="attr">"port"</span>: <span class="number">3306</span>,</span><br><span class="line">   <span class="attr">"username"</span>: <span class="string">"root"</span>,</span><br><span class="line">   <span class="attr">"password"</span>: <span class="string">"root"</span>,</span><br><span class="line">   <span class="attr">"database"</span>: <span class="string">"sonar"</span>,</span><br><span class="line">   <span class="attr">"synchronize"</span>: <span class="literal">true</span>,</span><br><span class="line">   <span class="attr">"entities"</span>: [</span><br><span class="line">      <span class="string">"src/entity/**/*.ts"</span></span><br><span class="line">   ],</span><br><span class="line">   <span class="attr">"migrations"</span>: [</span><br><span class="line">      <span class="string">"src/migration/**/*.ts"</span></span><br><span class="line">   ],</span><br><span class="line">   <span class="attr">"subscribers"</span>: [</span><br><span class="line">      <span class="string">"src/subscriber/**/*.ts"</span></span><br><span class="line">   ],</span><br><span class="line">   <span class="attr">"cli"</span>: &#123;</span><br><span class="line">      <span class="attr">"entitiesDir"</span>: <span class="string">"src/entity"</span>,</span><br><span class="line">      <span class="attr">"migrationsDir"</span>: <span class="string">"src/migration"</span>,</span><br><span class="line">      <span class="attr">"subscribersDir"</span>: <span class="string">"src/subscriber"</span></span><br><span class="line">   &#125;,</span><br><span class="line">   <span class="attr">"logging"</span>: <span class="literal">true</span>, <span class="comment">// 开启所有数据库信息打印</span></span><br><span class="line">   <span class="attr">"logger"</span>: <span class="string">"advanced-console"</span>, <span class="comment">// 高亮字体的打印信息,</span></span><br><span class="line">   <span class="attr">"extra"</span>: &#123;</span><br><span class="line">      <span class="attr">"connectionLimit"</span>:  <span class="number">10</span>, <span class="comment">// 连接池最大连接数量, 查阅资料 建议是  core number  * 2 + n </span></span><br><span class="line">   &#125;</span><br><span class="line">&#125;]</span><br></pre></td></tr></table></figure>
+<p>获取指定数据库连接：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">方式一：</span><br><span class="line">import &#123; getConnection &#125; from &#39;typeorm&#39;;</span><br><span class="line"></span><br><span class="line">const dev_connection &#x3D; getConnection(&#39;dev&#39;);</span><br><span class="line">const dev_connection &#x3D; getConnection(&#39;dev&#39;);</span><br><span class="line"></span><br><span class="line">方式二：</span><br><span class="line">import &#123; getConnectionManager &#125; from &quot;typeorm&quot;;</span><br><span class="line"></span><br><span class="line">const dev_connection &#x3D; getConnectionManager().get(&#39;dev&#39;);</span><br><span class="line">const dev_connection  &#x3D; getConnectionManager().get(&#39;pro&#39;);</span><br></pre></td></tr></table></figure>
+
+<h4 id="使用-QueryBuilder"><a href="#使用-QueryBuilder" class="headerlink" title="使用 QueryBuilder"></a>使用 QueryBuilder</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">import &quot;reflect-metadata&quot;;</span><br><span class="line">import &#123;createConnection, getConnectionOptions,getManager&#125; from &quot;typeorm&quot;;</span><br><span class="line">import &#123;User&#125; from &quot;.&#x2F;entity&#x2F;User&quot;;</span><br><span class="line">&#x2F;&#x2F;import &#123;dev&#125; from &quot;.&#x2F;MyConnectionInfo&quot;;</span><br><span class="line">const myConn &#x3D; require(&quot;.&#x2F;MyConnectionInfo&quot;);</span><br><span class="line"></span><br><span class="line">async function testConn()&#123;</span><br><span class="line">    const connectionOptions &#x3D; await getConnectionOptions(&quot;dev&quot;);</span><br><span class="line">    const dev &#x3D; await createConnection(connectionOptions);</span><br><span class="line">    let user &#x3D; await dev</span><br><span class="line">        .getRepository(User)</span><br><span class="line">        .createQueryBuilder(&quot;user&quot;) &#x2F;&#x2F; 第一个参数是别名</span><br><span class="line">        .where(&quot;user.id &#x3D; 10&quot;)</span><br><span class="line">        .orderBy(&quot;user.id&quot;, &quot;DESC&quot;)</span><br><span class="line">        .skip(0)</span><br><span class="line">        .take(10)</span><br><span class="line">        .getMany();</span><br><span class="line">    console.log(user);</span><br><span class="line"></span><br><span class="line">    process.exit();</span><br><span class="line">&#125;</span><br><span class="line">testConn();</span><br></pre></td></tr></table></figure>
+
+<p>附录：</p>
+<p>列数据类型</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//主键自动生成列类型，主要为整型、小数等数值类型</span></span><br><span class="line"><span class="keyword">export</span> type PrimaryGeneratedColumnType = <span class="string">"int"</span> <span class="comment">// mysql, mssql, oracle, sqlite</span></span><br><span class="line">    |<span class="string">"int2"</span> <span class="comment">// postgres, sqlite</span></span><br><span class="line">    |<span class="string">"int2"</span> <span class="comment">// postgres, sqlite</span></span><br><span class="line">    |<span class="string">"int4"</span> <span class="comment">// postgres</span></span><br><span class="line">    |<span class="string">"int8"</span> <span class="comment">// postgres, sqlite</span></span><br><span class="line">    |<span class="string">"integer"</span> <span class="comment">// postgres, oracle, sqlite</span></span><br><span class="line">    |<span class="string">"tinyint"</span> <span class="comment">// mysql, mssql, sqlite</span></span><br><span class="line">    |<span class="string">"smallint"</span> <span class="comment">// mysql, postgres, mssql, oracle, sqlite</span></span><br><span class="line">    |<span class="string">"mediumint"</span> <span class="comment">// mysql, sqlite</span></span><br><span class="line">    |<span class="string">"bigint"</span> <span class="comment">// mysql, postgres, mssql, sqlite</span></span><br><span class="line">    |<span class="string">"dec"</span> <span class="comment">// oracle, mssql</span></span><br><span class="line">    |<span class="string">"decimal"</span> <span class="comment">// mysql, postgres, mssql, sqlite</span></span><br><span class="line">    |<span class="string">"numeric"</span> <span class="comment">// postgres, mssql, sqlite</span></span><br><span class="line">    |<span class="string">"number"</span>; <span class="comment">// oracle</span></span><br><span class="line"> </span><br><span class="line"><span class="comment">//带有精度的列类型，主要为各种浮点数、小数类型</span></span><br><span class="line"><span class="keyword">export</span> type WithPrecisionColumnType = <span class="string">"float"</span> <span class="comment">// mysql, mssql, oracle, sqlite</span></span><br><span class="line">    |<span class="string">"double"</span> <span class="comment">// mysql, sqlite</span></span><br><span class="line">    |<span class="string">"dec"</span> <span class="comment">// oracle, mssql</span></span><br><span class="line">    |<span class="string">"decimal"</span> <span class="comment">// mysql, postgres, mssql, sqlite</span></span><br><span class="line">    |<span class="string">"numeric"</span> <span class="comment">// postgres, mssql, sqlite</span></span><br><span class="line">    |<span class="string">"real"</span> <span class="comment">// mysql, postgres, mssql, oracle, sqlite</span></span><br><span class="line">    |<span class="string">"double precision"</span> <span class="comment">// postgres, oracle, sqlite</span></span><br><span class="line">    |<span class="string">"number"</span> <span class="comment">// oracle</span></span><br><span class="line">    |<span class="string">"datetime"</span> <span class="comment">// mssql, mysql, sqlite</span></span><br><span class="line">    |<span class="string">"datetime2"</span> <span class="comment">// mssql</span></span><br><span class="line">    |<span class="string">"datetimeoffset"</span> <span class="comment">// mssql</span></span><br><span class="line">    |<span class="string">"time"</span> <span class="comment">// mysql, postgres, mssql</span></span><br><span class="line">    |<span class="string">"time with time zone"</span> <span class="comment">// postgres</span></span><br><span class="line">    |<span class="string">"time without time zone"</span> <span class="comment">// postgres</span></span><br><span class="line">    |<span class="string">"timestamp"</span> <span class="comment">// mysql, postgres, mssql, oracle</span></span><br><span class="line">    |<span class="string">"timestamp without time zone"</span> <span class="comment">// postgres</span></span><br><span class="line">    |<span class="string">"timestamp with time zone"</span>; <span class="comment">// postgres, oracle</span></span><br><span class="line"> </span><br><span class="line"><span class="comment">//带有长度的列类型，</span></span><br><span class="line"><span class="keyword">export</span> type WithLengthColumnType = <span class="string">"int"</span> <span class="comment">// mysql, postgres, mssql, oracle, sqlite</span></span><br><span class="line">    |<span class="string">"tinyint"</span> <span class="comment">// mysql, mssql, sqlite</span></span><br><span class="line">    |<span class="string">"smallint"</span> <span class="comment">// mysql, postgres, mssql, oracle, sqlite</span></span><br><span class="line">    |<span class="string">"mediumint"</span> <span class="comment">// mysql, sqlite</span></span><br><span class="line">    |<span class="string">"bigint"</span> <span class="comment">// mysql, postgres, mssql, sqlite</span></span><br><span class="line">    |<span class="string">"character varying"</span> <span class="comment">// postgres</span></span><br><span class="line">    |<span class="string">"varying character"</span> <span class="comment">// sqlite</span></span><br><span class="line">    |<span class="string">"nvarchar"</span> <span class="comment">// mssql</span></span><br><span class="line">    |<span class="string">"character"</span> <span class="comment">// mysql, postgres, sqlite</span></span><br><span class="line">    |<span class="string">"native character"</span> <span class="comment">// sqlite</span></span><br><span class="line">    |<span class="string">"varchar"</span> <span class="comment">// mysql, postgres, mssql, sqlite</span></span><br><span class="line">    |<span class="string">"char"</span> <span class="comment">// mysql, postgres, mssql, oracle</span></span><br><span class="line">    |<span class="string">"nchar"</span> <span class="comment">// mssql, oracle, sqlite</span></span><br><span class="line">    |<span class="string">"varchar2"</span> <span class="comment">// oracle</span></span><br><span class="line">    |<span class="string">"nvarchar2"</span> <span class="comment">// oracle, sqlite</span></span><br><span class="line">    |<span class="string">"binary"</span> <span class="comment">// mssql</span></span><br><span class="line">    |<span class="string">"varbinary"</span>; <span class="comment">// mssql</span></span><br><span class="line"> </span><br><span class="line"><span class="comment">//简单列类型</span></span><br><span class="line"><span class="keyword">export</span> type SimpleColumnType =</span><br><span class="line">    <span class="comment">//简单数组，为typeorm特有，对饮数据库中string类型</span></span><br><span class="line">    <span class="string">"simple-array"</span> <span class="comment">// typeorm-specific, automatically mapped to string</span></span><br><span class="line">    <span class="comment">//string类型，对应数据库中varchar类型</span></span><br><span class="line">    |<span class="string">"string"</span> <span class="comment">// typeorm-specific, automatically mapped to varchar depend on platform</span></span><br><span class="line">    <span class="comment">//数值类型</span></span><br><span class="line">    |<span class="string">"bit"</span> <span class="comment">// mssql</span></span><br><span class="line">    |<span class="string">"int2"</span> <span class="comment">// postgres, sqlite</span></span><br><span class="line">    |<span class="string">"integer"</span> <span class="comment">// postgres, oracle, sqlite</span></span><br><span class="line">    |<span class="string">"int4"</span> <span class="comment">// postgres</span></span><br><span class="line">    |<span class="string">"int8"</span> <span class="comment">// postgres, sqlite</span></span><br><span class="line">    |<span class="string">"unsigned big int"</span> <span class="comment">// sqlite</span></span><br><span class="line">    |<span class="string">"float4"</span> <span class="comment">// postgres</span></span><br><span class="line">    |<span class="string">"float8"</span> <span class="comment">// postgres</span></span><br><span class="line">    |<span class="string">"smallmoney"</span> <span class="comment">// mssql</span></span><br><span class="line">    |<span class="string">"money"</span> <span class="comment">// postgres, mssql</span></span><br><span class="line"> </span><br><span class="line">    <span class="comment">//boolean类型</span></span><br><span class="line">    |<span class="string">"boolean"</span> <span class="comment">// postgres, sqlite</span></span><br><span class="line">    |<span class="string">"bool"</span> <span class="comment">// postgres</span></span><br><span class="line"> </span><br><span class="line">    <span class="comment">//二进制、文本类型</span></span><br><span class="line">    |<span class="string">"tinyblob"</span> <span class="comment">// mysql</span></span><br><span class="line">    |<span class="string">"tinytext"</span> <span class="comment">// mysql</span></span><br><span class="line">    |<span class="string">"mediumblob"</span> <span class="comment">// mysql</span></span><br><span class="line">    |<span class="string">"mediumtext"</span> <span class="comment">// mysql</span></span><br><span class="line">    |<span class="string">"blob"</span> <span class="comment">// mysql, oracle, sqlite</span></span><br><span class="line">    |<span class="string">"text"</span> <span class="comment">// mysql, postgres, mssql, sqlite</span></span><br><span class="line">    |<span class="string">"ntext"</span> <span class="comment">// mssql</span></span><br><span class="line">    |<span class="string">"citext"</span> <span class="comment">// postgres</span></span><br><span class="line">    |<span class="string">"longblob"</span> <span class="comment">// mysql</span></span><br><span class="line">    |<span class="string">"longtext"</span> <span class="comment">// mysql</span></span><br><span class="line">    |<span class="string">"bytea"</span> <span class="comment">// postgres</span></span><br><span class="line">    |<span class="string">"long"</span> <span class="comment">// oracle</span></span><br><span class="line">    |<span class="string">"raw"</span> <span class="comment">// oracle</span></span><br><span class="line">    |<span class="string">"long raw"</span> <span class="comment">// oracle</span></span><br><span class="line">    |<span class="string">"bfile"</span> <span class="comment">// oracle</span></span><br><span class="line">    |<span class="string">"clob"</span> <span class="comment">// oracle, sqlite</span></span><br><span class="line">    |<span class="string">"nclob"</span> <span class="comment">// oracle</span></span><br><span class="line">    |<span class="string">"image"</span> <span class="comment">// mssql</span></span><br><span class="line"> </span><br><span class="line">    <span class="comment">//日期类型</span></span><br><span class="line">    |<span class="string">"timestamp with local time zone"</span> <span class="comment">// oracle</span></span><br><span class="line">    |<span class="string">"smalldatetime"</span> <span class="comment">// mssql</span></span><br><span class="line">    |<span class="string">"date"</span> <span class="comment">// mysql, postgres, mssql, oracle, sqlite</span></span><br><span class="line">    |<span class="string">"interval year"</span> <span class="comment">// oracle</span></span><br><span class="line">    |<span class="string">"interval day"</span> <span class="comment">// oracle</span></span><br><span class="line">    |<span class="string">"interval"</span> <span class="comment">// postgres</span></span><br><span class="line">    |<span class="string">"year"</span> <span class="comment">// mysql</span></span><br><span class="line"> </span><br><span class="line">    <span class="comment">//几何类型，只有postgres支持</span></span><br><span class="line">    |<span class="string">"point"</span> <span class="comment">// postgres</span></span><br><span class="line">    |<span class="string">"line"</span> <span class="comment">// postgres</span></span><br><span class="line">    |<span class="string">"lseg"</span> <span class="comment">// postgres</span></span><br><span class="line">    |<span class="string">"box"</span> <span class="comment">// postgres</span></span><br><span class="line">    |<span class="string">"circle"</span> <span class="comment">// postgres</span></span><br><span class="line">    |<span class="string">"path"</span> <span class="comment">// postgres</span></span><br><span class="line">    |<span class="string">"polygon"</span> <span class="comment">// postgres</span></span><br><span class="line"> </span><br><span class="line">    <span class="comment">// other types</span></span><br><span class="line">    |<span class="string">"enum"</span> <span class="comment">// mysql, postgres</span></span><br><span class="line">    |<span class="string">"cidr"</span> <span class="comment">// postgres</span></span><br><span class="line">    |<span class="string">"inet"</span> <span class="comment">// postgres</span></span><br><span class="line">    |<span class="string">"macaddr"</span><span class="comment">// postgres</span></span><br><span class="line">    |<span class="string">"bit"</span> <span class="comment">// postgres</span></span><br><span class="line">    |<span class="string">"bit varying"</span> <span class="comment">// postgres</span></span><br><span class="line">    |<span class="string">"varbit"</span><span class="comment">// postgres</span></span><br><span class="line">    |<span class="string">"tsvector"</span> <span class="comment">// postgres</span></span><br><span class="line">    |<span class="string">"tsquery"</span> <span class="comment">// postgres</span></span><br><span class="line">    |<span class="string">"uuid"</span> <span class="comment">// postgres</span></span><br><span class="line">    |<span class="string">"xml"</span> <span class="comment">// mssql, postgres</span></span><br><span class="line">    |<span class="string">"json"</span> <span class="comment">// mysql, postgres</span></span><br><span class="line">    |<span class="string">"jsonb"</span> <span class="comment">// postgres</span></span><br><span class="line">    |<span class="string">"varbinary"</span> <span class="comment">// mssql</span></span><br><span class="line">    |<span class="string">"cursor"</span> <span class="comment">// mssql</span></span><br><span class="line">    |<span class="string">"hierarchyid"</span> <span class="comment">// mssql</span></span><br><span class="line">    |<span class="string">"sql_variant"</span> <span class="comment">// mssql</span></span><br><span class="line">    |<span class="string">"table"</span> <span class="comment">// mssql</span></span><br><span class="line">    |<span class="string">"rowid"</span> <span class="comment">// oracle</span></span><br><span class="line">    |<span class="string">"urowid"</span> <span class="comment">// oracle</span></span><br><span class="line">    |<span class="string">"uniqueidentifier"</span>; <span class="comment">// mssql</span></span><br><span class="line"> </span><br><span class="line"><span class="comment">//列数据类型，为联合类型，各个类型之间可能有重复</span></span><br><span class="line"><span class="keyword">export</span> type ColumnType = </span><br><span class="line">    <span class="comment">//带有精度类型</span></span><br><span class="line">    WithPrecisionColumnType</span><br><span class="line">    <span class="comment">//带有长度类型</span></span><br><span class="line">    |WithLengthColumnType</span><br><span class="line">    <span class="comment">//简单类型</span></span><br><span class="line">    |SimpleColumnType</span><br><span class="line">    <span class="comment">//boolean类型</span></span><br><span class="line">    |BooleanConstructor</span><br><span class="line">    <span class="comment">//Date类型</span></span><br><span class="line">    |DateConstructor</span><br><span class="line">    <span class="comment">//数字类型</span></span><br><span class="line">    |NumberConstructor</span><br><span class="line">    <span class="comment">//字符串类型</span></span><br><span class="line">    |StringConstructor;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+     <!-- 相关文章推荐 -->
+    
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Node/" rel="tag"># Node</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/18/Lombok%E7%9A%84%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8/" rel="next" title="Lombok的基本使用">
+                <i class="fa fa-chevron-left"></i> Lombok的基本使用
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/04/20/ES6%E2%80%94babel/" rel="prev" title="ES6—babel">
+                ES6—babel <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+<span class="jiathis_txt">分享到：</span>
+<a class="jiathis_button_fav">收藏夹</a>
+<a class="jiathis_button_copy">复制网址</a>
+<a class="jiathis_button_email">邮件</a>
+<a class="jiathis_button_weixin">微信</a>
+<a class="jiathis_button_qzone">QQ空间</a>
+<a class="jiathis_button_tqq">腾讯微博</a>
+<a class="jiathis_button_douban">豆瓣</a>
+<a class="jiathis_button_share">一键分享</a>
+
+<a href="http://www.jiathis.com/share?uid=2140465" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+<a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+var jiathis_config={
+  data_track_clickback:true,
+  summary:"",
+  shortUrl:false,
+  hideMore:false
+}
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://img.huyunshun.com/img/20200522182348.png"
+                alt="初晨" />
+            
+              <p class="site-author-name" itemprop="name">初晨</p>
+              <p class="site-description motion-element" itemprop="description">永远不要说你知道本质，更别说真相了。</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">249</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">46</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+<!--近期文章版块-->
+            
+                <div class="links-of-blogroll motion-element links-of-blogroll-block">
+                  <div class="links-of-blogroll-title">
+                    <!-- modify icon to fire by szw -->
+                    <i class="fa fa-history fa-" aria-hidden="true"></i>
+                    近期文章
+                  </div>
+                  <ul class="links-of-blogroll-list">
+                    
+                    
+                      <li>
+                        <a href="/2020/05/22/WebSocket%E3%80%81Socket%E3%80%81TCP%E3%80%81HTTP%E5%8C%BA%E5%88%AB/" title="WebSocket、Socket、TCP、HTTP区别" target="_blank">WebSocket、Socket、TCP、HTTP区别</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/19/Springboot%E9%A1%B9%E7%9B%AE%E7%9A%84%E6%8E%A5%E5%8F%A3%E9%98%B2%E5%88%B7/" title="Springboot项目的接口防刷" target="_blank">Springboot项目的接口防刷</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/03/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Volatile%E5%85%B3%E9%94%AE%E5%AD%97%E5%8F%8A%E5%85%B6%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/" title="深入理解Volatile关键字及其实现原理" target="_blank">深入理解Volatile关键字及其实现原理</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/04/20/%E4%BD%BF%E7%94%A8vscode%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0%E7%8E%AF%E5%A2%83/" title="使用vscode搭建个人笔记环境" target="_blank">使用vscode搭建个人笔记环境</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/01/20/HBase%E4%BB%8B%E7%BB%8D%E5%AE%89%E8%A3%85%E4%B8%8E%E6%93%8D%E4%BD%9C/" title="HBase介绍安装与操作" target="_blank">HBase介绍安装与操作</a>
+                      </li>
+                    
+                  </ul>
+                </div>
+            
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装"><span class="nav-number">1.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#快速开始"><span class="nav-number">2.</span> <span class="nav-text">快速开始</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#分步指南"><span class="nav-number">3.</span> <span class="nav-text">分步指南</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#创建实体"><span class="nav-number">3.1.</span> <span class="nav-text">创建实体</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#列数据类型"><span class="nav-number">3.2.</span> <span class="nav-text">列数据类型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#创建数据库连接"><span class="nav-number">3.3.</span> <span class="nav-text">创建数据库连接</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#测试"><span class="nav-number">3.4.</span> <span class="nav-text">测试</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#使用async-await语法"><span class="nav-number">3.5.</span> <span class="nav-text">使用async&#x2F;await语法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#使用Repositories"><span class="nav-number">3.6.</span> <span class="nav-text">使用Repositories</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#封装一个Repository"><span class="nav-number">3.7.</span> <span class="nav-text">封装一个Repository</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ActiveRecord方式实现"><span class="nav-number">3.8.</span> <span class="nav-text">ActiveRecord方式实现</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Caching-queries-缓存查询"><span class="nav-number">4.</span> <span class="nav-text">Caching queries (缓存查询)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#对应关系"><span class="nav-number">5.</span> <span class="nav-text">对应关系</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#一对一"><span class="nav-number">5.1.</span> <span class="nav-text">一对一</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置"><span class="nav-number">6.</span> <span class="nav-text">配置</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#基本配置参数"><span class="nav-number">6.1.</span> <span class="nav-text">基本配置参数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#额外参数"><span class="nav-number">6.2.</span> <span class="nav-text">额外参数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#创建多个数据库连接"><span class="nav-number">6.3.</span> <span class="nav-text">创建多个数据库连接</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#使用-QueryBuilder"><span class="nav-number">6.4.</span> <span class="nav-text">使用 QueryBuilder</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Copyright</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Node," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="MVVM最早由微软提出来，它借鉴了桌面应用程序的MVC思想，在前端页面中，把Model用纯JavaScript对象表示，View负责显示，两者做到了最大限度的分离。 把Model和View关联起来的就是ViewModel。ViewModel负责把Model的数据同步到View显示出来，还负责把View的修改同步回Model。需要用JavaScript编写一个通用的ViewModel，这样，就可以复">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Nodejs—MVVM">
+<meta property="og:url" content="https://huyunshun.com/2019/04/12/Nodejs%E2%80%94MVVM/index.html">
+<meta property="og:site_name" content="简">
+<meta property="og:description" content="MVVM最早由微软提出来，它借鉴了桌面应用程序的MVC思想，在前端页面中，把Model用纯JavaScript对象表示，View负责显示，两者做到了最大限度的分离。 把Model和View关联起来的就是ViewModel。ViewModel负责把Model的数据同步到View显示出来，还负责把View的修改同步回Model。需要用JavaScript编写一个通用的ViewModel，这样，就可以复">
+<meta property="og:image" content="https://img.huyunshun.com/img1/222222222imgclip.png">
+<meta property="og:image" content="https://img.huyunshun.com/img1/222222222imgclip_1.png">
+<meta property="og:image" content="https://img.huyunshun.com/img1/222222222imgclip_2.png">
+<meta property="article:published_time" content="2019-04-11T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-05-20T10:04:24.688Z">
+<meta property="article:author" content="初晨">
+<meta property="article:tag" content="Node">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img.huyunshun.com/img1/222222222imgclip.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://huyunshun.com/2019/04/12/Nodejs—MVVM/"/>
+
+
+
+
+
+  <title>Nodejs—MVVM | 简</title>
+  
+
+
+
+
+
+
+
+
+  <script type="text/javascript" src="/js/src/love.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
+
+  <!-- 看板娘 -->
+    
+        <script async src="/live2d-widget/autoload.js"></script>
+    
+ <!-- 飘动的彩带） -->
+  <script src="/js/src/piao.js" type="text/javascript"></script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">简</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">人生短暂，学海无边，而大道至简。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://huyunshun.com/2019/04/12/Nodejs%E2%80%94MVVM/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="初晨">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://img.huyunshun.com/img/20200522182348.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="简">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Nodejs—MVVM</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-12T00:00:00+08:00">
+                2019-04-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Node/" itemprop="url" rel="index">
+                    <span itemprop="name">Node</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>MVVM最早由微软提出来，它借鉴了桌面应用程序的MVC思想，在前端页面中，把Model用纯JavaScript对象表示，View负责显示，两者做到了最大限度的分离。</p>
+<p>把Model和View关联起来的就是ViewModel。ViewModel负责把Model的数据同步到View显示出来，还负责把View的修改同步回Model。需要用JavaScript编写一个通用的ViewModel，这样，就可以复用整个MVVM模型了。</p>
+<h1 id="单向绑定"><a href="#单向绑定" class="headerlink" title="单向绑定"></a>单向绑定</h1><p>MVVM就是在前端页面上，应用了扩展的MVC模式，我们关心Model的变化，MVVM框架自动把Model的变化映射到DOM结构上，这样，用户看到的页面内容就会随着Model的变化而更新。</p>
+<p><img src="https://img.huyunshun.com/img1/222222222imgclip.png" alt=""></p>
+<p>经过MVVM框架的自动转换，浏览器就可以直接显示Model的数据。目前，常用的MVVM框架有：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Angular：Google出品，名气大，但是很难用；</span><br><span class="line">Backbone.js：入门非常困难，因为自身API太多；</span><br><span class="line">Ember：一个大而全的框架，想写个Hello world都很困难。</span><br></pre></td></tr></table></figure>
+<p>我们选择MVVM的目标应该是入门容易，安装简单，能直接在页面写JavaScript，需要更复杂的功能时又能扩展支持。综合考察，最佳选择是尤雨溪大神开发的MVVM框架：Vue.js 目前，Vue.js的最新版本是2.0，我们会使用2.0版本作为示例。</p>
+<p>创建基于koa的Node.js项目结构如下：</p>
+<p><img src="https://img.huyunshun.com/img1/222222222imgclip_1.png" alt=""></p>
+<h5 id="编写MVVM"><a href="#编写MVVM" class="headerlink" title="编写MVVM"></a>编写MVVM</h5><p>Model是一个JavaScript对象，它包含两个属性：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    name: <span class="string">'hu'</span>,</span><br><span class="line">    age: <span class="number">15</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>而负责显示的是DOM节点可以用和来引用Model的属性：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;div id=<span class="string">"vm"</span>&gt;</span><br><span class="line">    &lt;p&gt;Hello, &#123;&#123; name &#125;&#125;!&lt;<span class="regexp">/p&gt;</span></span><br><span class="line"><span class="regexp">    &lt;p&gt;You are &#123;&#123; age &#125;&#125; years old!&lt;/</span>p&gt;</span><br><span class="line">&lt;<span class="regexp">/div&gt;</span></span><br></pre></td></tr></table></figure>
+<p>最后一步是用Vue把两者关联起来。</p>
+<p>在<head>内部编写的JavaScript代码，需要用jQuery把MVVM的初始化代码推迟到页面加载完毕后执行，否则，直接在<head>内执行MVVM代码时，DOM节点尚未被浏览器加载，初始化将失败。正确的写法如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line"></span><br><span class="line">&lt;!-- 引用jQuery --&gt;</span><br><span class="line">&lt;script src=<span class="string">"/static/js/jquery.min.js"</span>&gt;&lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp"></span></span><br><span class="line"><span class="regexp">&lt;!-- 引用Vue --&gt;</span></span><br><span class="line"><span class="regexp">&lt;script src="/</span><span class="keyword">static</span>/js/vue.js<span class="string">"&gt;&lt;/script&gt;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">&lt;script&gt;</span></span><br><span class="line"><span class="string">// 初始化代码:</span></span><br><span class="line"><span class="string">$(function () &#123;</span></span><br><span class="line"><span class="string">    var vm = new Vue(&#123;</span></span><br><span class="line"><span class="string">        el: '#vm',</span></span><br><span class="line"><span class="string">        data: &#123;</span></span><br><span class="line"><span class="string">            name: 'hu',</span></span><br><span class="line"><span class="string">            age: 15</span></span><br><span class="line"><span class="string">        &#125;</span></span><br><span class="line"><span class="string">    &#125;);</span></span><br><span class="line"><span class="string">    window.vm = vm;</span></span><br><span class="line"><span class="string">&#125;);</span></span><br><span class="line"><span class="string">&lt;/script&gt;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">&lt;/head&gt;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">&lt;body&gt;</span></span><br><span class="line"><span class="string">    &lt;div id="</span>vm<span class="string">"&gt;</span></span><br><span class="line"><span class="string">        &lt;p&gt;Hello, &#123;&#123; name &#125;&#125;!&lt;/p&gt;</span></span><br><span class="line"><span class="string">        &lt;p&gt;You are &#123;&#123; age &#125;&#125; years old!&lt;/p&gt;</span></span><br><span class="line"><span class="string">    &lt;/div&gt;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">&lt;/body&gt;</span></span><br><span class="line"><span class="string">&lt;html&gt;</span></span><br></pre></td></tr></table></figure>
+<p>其中，el指定了要把Model绑定到哪个DOM根节点上，语法和jQuery类似。这里的’#vm’对应ID为vm的一个<div>节点：</p>
+<p>在该节点以及该节点内部，就是Vue可以操作的View。Vue可以自动把Model的状态映射到View上，但是不能操作View范围之外的其他DOM节点。</p>
+<p>然后，data属性指定了Model，我们初始化了Model的两个属性name和age，在View内部的<p>节点上，可以直接用引用Model的某个属性。</p>
+<p>如果打开浏览器console，因为我们用代码window.vm = vm，把VM变量绑定到了window对象上，所以，可以直接修改VM的Model：</p>
+<p>Vue作为MVVM框架会自动监听Model的任何变化，在Model数据变化时，更新View的显示。这种Model到View的绑定我们称为单向绑定。</p>
+<h5 id="单向绑定-1"><a href="#单向绑定-1" class="headerlink" title="单向绑定"></a>单向绑定</h5><p>在Vue中，可以直接写绑定某个属性。如果属性关联的是对象，还可以用多个.引用，例如，。</p>
+<p>另一种单向绑定的方法是使用Vue的指令v-text，写法如下：</p>
+<p>Hello, <span v-text="name"></span>!</p>
+
+<pre><code>这种写法是把指令写在HTML节点的属性上，它会被Vue解析，该节点的文本内容会被绑定为Model的指定属性，注意不能再写双花括号{{ }}。</code></pre><h1 id="双向绑定"><a href="#双向绑定" class="headerlink" title="双向绑定"></a>双向绑定</h1><p><img src="https://img.huyunshun.com/img1/222222222imgclip_2.png" alt=""></p>
+<p>在Vue中，使用双向绑定非常容易，我们仍然先创建一个VM实例：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">$(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> vm = <span class="keyword">new</span> Vue(&#123;</span><br><span class="line">        el: <span class="string">'#vm'</span>,</span><br><span class="line">        data: &#123;</span><br><span class="line">            email: <span class="string">''</span>,</span><br><span class="line">            name: <span class="string">''</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="built_in">window</span>.vm = vm;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>然后，编写一个HTML FORM表单，并用v-model指令把某个&lt;input&gt;和Model的某个属性作双向绑定：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;form id=<span class="string">"vm"</span> action=<span class="string">"#"</span>&gt;</span><br><span class="line">    &lt;p&gt;<span class="xml"><span class="tag">&lt;<span class="name">input</span> <span class="attr">v-model</span>=<span class="string">"email"</span>&gt;</span><span class="tag">&lt;/<span class="name">p</span>&gt;</span></span></span><br><span class="line">    &lt;p&gt;<span class="xml"><span class="tag">&lt;<span class="name">input</span> <span class="attr">v-model</span>=<span class="string">"name"</span>&gt;</span><span class="tag">&lt;/<span class="name">p</span>&gt;</span></span></span><br><span class="line">&lt;<span class="regexp">/form&gt;</span></span><br></pre></td></tr></table></figure>
+<p>我们可以在表单中输入内容，然后在浏览器console中用window.vm.$data查看Model的内容，也可以用window.vm.name查看Model的name属性，它的值和FORM表单对应的&lt;input&gt;是一致的。</p>
+<p>如果在浏览器console中用JavaScript更新Model，例如，执行window.vm.name=’22222’，表单对应的&lt;input&gt;内容就会立刻更新。</p>
+<p>多个checkbox可以和数组绑定：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;label&gt;<span class="xml"><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"checkbox"</span> <span class="attr">v-model</span>=<span class="string">"language"</span> <span class="attr">value</span>=<span class="string">"zh"</span>&gt;</span> Chinese<span class="tag">&lt;/<span class="name">label</span>&gt;</span></span></span><br><span class="line">&lt;label&gt;<span class="xml"><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"checkbox"</span> <span class="attr">v-model</span>=<span class="string">"language"</span> <span class="attr">value</span>=<span class="string">"en"</span>&gt;</span> English<span class="tag">&lt;/<span class="name">label</span>&gt;</span></span></span><br><span class="line">&lt;label&gt;<span class="xml"><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"checkbox"</span> <span class="attr">v-model</span>=<span class="string">"language"</span> <span class="attr">value</span>=<span class="string">"fr"</span>&gt;</span> French<span class="tag">&lt;/<span class="name">label</span>&gt;</span></span></span><br></pre></td></tr></table></figure>
+<p>对应的Model为：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">language: [<span class="string">'zh'</span>, <span class="string">'en'</span>]</span><br></pre></td></tr></table></figure>
+<p>单个checkbox可以和boolean类型变量绑定：</p>
+<pre><code>&lt;input type=&quot;checkbox&quot; v-model=&quot;subscribe&quot;&gt;</code></pre><p>对应的Model为：</p>
+<p>subscribe: true; // 根据checkbox是否选中为true/false</p>
+<p>下拉框&lt;select&gt;绑定的是字符串，但是要注意，绑定的是value而非用户看到的文本：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;select v-model=<span class="string">"city"</span>&gt;</span><br><span class="line">    &lt;option value=<span class="string">"bj"</span>&gt;Beijing&lt;<span class="regexp">/option&gt;</span></span><br><span class="line"><span class="regexp">    &lt;option value="sh"&gt;Shanghai&lt;/</span>option&gt;</span><br><span class="line">    &lt;option value=<span class="string">"gz"</span>&gt;Guangzhou&lt;<span class="regexp">/option&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>select&gt;</span><br></pre></td></tr></table></figure>
+<p>对应的Model为：</p>
+<p>city: ‘bj’ // 对应option的value</p>
+<p>双向绑定最大的好处是我们不再需要用jQuery去查询表单的状态，而是直接获得了用JavaScript对象表示的Model。</p>
+<h5 id="处理事件"><a href="#处理事件" class="headerlink" title="处理事件"></a>处理事件</h5><p>当用户提交表单时，传统的做法是响应onsubmit事件，用jQuery获取表单内容，检查输入是否有效，最后提交表单，或者用AJAX提交表单。</p>
+<p>现在，获取表单内容已经不需要了，因为双向绑定直接让我们获得了表单内容，并且获得了合适的数据类型。</p>
+<p>响应onsubmit事件也可以放到VM中。我们在<form>元素上使用指令：</p>
+<pre><code>&lt;form id=&quot;vm&quot; v-on:submit.prevent=&quot;register&quot;&gt;</code></pre><p>其中，v-on:submit=”register”指令就会自动监听表单的submit事件，并调用register方法处理该事件。使用.prevent表示阻止事件冒泡，这样，浏览器不再处理<form>的submit事件。</p>
+<p>因为我们指定了事件处理函数是register，所以需要在创建VM时添加一个register函数：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> vm = <span class="keyword">new</span> Vue(&#123;</span><br><span class="line">    el: <span class="string">'#vm'</span>,</span><br><span class="line">    data: &#123;</span><br><span class="line">        ...</span><br><span class="line">    &#125;,</span><br><span class="line">    methods: &#123;</span><br><span class="line">        register: <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">            <span class="comment">// 显示JSON格式的Model:</span></span><br><span class="line">            alert(<span class="built_in">JSON</span>.stringify(<span class="keyword">this</span>.$data));</span><br><span class="line">            <span class="comment">// <span class="doctag">TODO:</span> AJAX POST...</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>在register()函数内部，我们可以用AJAX把JSON格式的Model发送给服务器，就完成了用户注册的功能。</p>
+<h1 id="同步DOM结构"><a href="#同步DOM结构" class="headerlink" title="同步DOM结构"></a>同步DOM结构</h1><p>除了简单的单向绑定和双向绑定，MVVM还有一个重要的用途，就是让Model和DOM的结构保持同步。</p>
+<p>我们用一个TODO的列表作为示例，从用户角度看，一个TODO列表在DOM结构的表现形式就是一组<li>节点：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">ol</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">li</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dl</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">dt</span>&gt;</span>产品评审<span class="tag">&lt;/<span class="name">dt</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">dd</span>&gt;</span>新款iPhone上市前评审<span class="tag">&lt;/<span class="name">dd</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dl</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">li</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dl</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">dt</span>&gt;</span>开发计划<span class="tag">&lt;/<span class="name">dt</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">dd</span>&gt;</span>与PM确定下一版Android开发计划<span class="tag">&lt;/<span class="name">dd</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dl</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">li</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dl</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">dt</span>&gt;</span>VC会议<span class="tag">&lt;/<span class="name">dt</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">dd</span>&gt;</span>敲定C轮5000万美元融资<span class="tag">&lt;/<span class="name">dd</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dl</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">ol</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>而对应的Model可以用JavaScript数组表示：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">todos: [</span><br><span class="line">    &#123;</span><br><span class="line">        name: <span class="string">'产品评审'</span>,</span><br><span class="line">        description: <span class="string">'新款iPhone上市前评审'</span></span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">        name: <span class="string">'开发计划'</span>,</span><br><span class="line">        description: <span class="string">'与PM确定下一版Android开发计划'</span></span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">        name: <span class="string">'VC会议'</span>,</span><br><span class="line">        description: <span class="string">'敲定C轮5000万美元融资'</span></span><br><span class="line">    &#125;</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<p>使用MVVM时，当我们更新Model时，DOM结构会随着Model的变化而自动更新。当todos数组增加或删除元素时，相应的DOM节点会增加<li>或者删除<li>节点。</p>
+<p>在Vue中，可以使用v-for指令来实现：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">ol</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">li</span> <span class="attr">v-for</span>=<span class="string">"t in todos"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dl</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">dt</span>&gt;</span>&#123;&#123; t.name &#125;&#125;<span class="tag">&lt;/<span class="name">dt</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">dd</span>&gt;</span>&#123;&#123; t.description &#125;&#125;<span class="tag">&lt;/<span class="name">dd</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dl</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">ol</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>v-for指令把数组和一组<li>元素绑定了。在<li>元素内部，用循环变量t引用某个属性，例如，。这样，我们只关心如何更新Model，不关心如何增删DOM节点，大大简化了整个页面的逻辑。</p>
+<p>我们可以在浏览器console中用window.vm.todos[0].name=’计划有变’查看View的变化，或者通过window.vm.todos.push({name:’新计划’,description:’blabla…’})来增加一个数组元素，从而自动添加一个<li>元素。</p>
+<p>需要注意的是，Vue之所以能够监听Model状态的变化，是因为JavaScript语言本身提供了Proxy或者Object.observe()机制来监听对象状态的变化。但是，对于数组元素的赋值，却没有办法直接监听，因此，如果我们直接对数组元素赋值：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">vm.todos[<span class="number">0</span>] = &#123;</span><br><span class="line">    name: <span class="string">'New name'</span>,</span><br><span class="line">    description: <span class="string">'New description'</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>会导致Vue无法更新View。</p>
+<p>正确的方法是不要对数组元素赋值，而是更新：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">vm.todos[0].name &#x3D; &#39;New name&#39;;</span><br><span class="line">vm.todos[0].description &#x3D; &#39;New description&#39;;</span><br><span class="line">或者，通过splice()方法，删除某个元素后，再添加一个元素，达到“赋值”的效果：</span><br><span class="line"></span><br><span class="line">var index &#x3D; 0;</span><br><span class="line">var newElement &#x3D; &#123;...&#125;;</span><br><span class="line">vm.todos.splice(index, 1, newElement);</span><br><span class="line">Vue可以监听数组的splice、push、unshift等方法调用，所以，上述代码可以正确更新View。</span><br></pre></td></tr></table></figure>
+
+<h1 id="和后端交互"><a href="#和后端交互" class="headerlink" title="和后端交互"></a>和后端交互</h1><p>现在，如果要把这个简单的TODO应用变成一个用户能使用的Web应用，我们需要解决几个问题：</p>
+<ul>
+<li>用户的TODO数据应该从后台读取；</li>
+<li>对TODO的增删改必须同步到服务器后端；</li>
+<li>用户在View上必须能够修改TODO。</li>
+</ul>
+<p>第1个和第2个问题都是和API相关的。只要我们实现了合适的API接口，就可以在MVVM内部更新Model的同时，通过API把数据更新反映到服务器端，这样，用户数据就保存到了服务器端，下次打开页面时就可以读取TODO列表。</p>
+<p>在api.js文件中，我们用数组在服务器端模拟一个数据库，然后实现以下4个API：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">GET &#x2F;api&#x2F;todos：返回所有TODO列表；</span><br><span class="line">POST &#x2F;api&#x2F;todos：创建一个新的TODO，并返回创建后的对象；</span><br><span class="line">PUT &#x2F;api&#x2F;todos&#x2F;:id：更新一个TODO，并返回更新后的对象；</span><br><span class="line">DELETE &#x2F;api&#x2F;todos&#x2F;:id：删除一个TODO。</span><br></pre></td></tr></table></figure>
+<p>和上一节的TODO数据结构相比，我们需要增加一个id属性，来唯一标识一个TODO。</p>
+<p>准备好API后，在Vue中，有两个方法：一是直接用jQuery的AJAX调用REST API，不过这种方式比较麻烦。第二个方法是使用vue-resource这个针对Vue的扩展，它可以给VM对象加上一个$resource属性，通过$resource来方便地操作API。</p>
+<p>使用vue-resource只需要在导入vue.js后，加一行<script>导入vue-resource.min.js文件即可。可以直接使用CDN的地址：<script src="https://cdn.jsdelivr.net/vue.resource/1.0.3/vue-resource.min.js"></script></p>
+<p>我们给VM增加一个init()方法，读取TODO列表：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> vm = <span class="keyword">new</span> Vue(&#123;</span><br><span class="line">    el: <span class="string">'#vm'</span>,</span><br><span class="line">    data: &#123;</span><br><span class="line">        title: <span class="string">'TODO List'</span>,</span><br><span class="line">        todos: []</span><br><span class="line">    &#125;,</span><br><span class="line">    created: <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.init();</span><br><span class="line">    &#125;,</span><br><span class="line">    methods: &#123;</span><br><span class="line">        init: <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">            <span class="keyword">var</span> that = <span class="keyword">this</span>;</span><br><span class="line">            that.$resource(<span class="string">'/api/todos'</span>).get().then(<span class="function"><span class="keyword">function</span> (<span class="params">resp</span>) </span>&#123;</span><br><span class="line">                <span class="comment">// 调用API成功时调用json()异步返回结果:</span></span><br><span class="line">                resp.json().then(<span class="function"><span class="keyword">function</span> (<span class="params">result</span>) </span>&#123;</span><br><span class="line">                    <span class="comment">// 更新VM的todos:</span></span><br><span class="line">                    that.todos = result.todos;</span><br><span class="line">                &#125;);</span><br><span class="line">            &#125;, <span class="function"><span class="keyword">function</span> (<span class="params">resp</span>) </span>&#123;</span><br><span class="line">                <span class="comment">// 调用API失败:</span></span><br><span class="line">                alert(<span class="string">'error'</span>);</span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>注意到创建VM时，created指定了当VM初始化成功后的回调函数，这样，init()方法会被自动调用。</p>
+<p>类似的，对于添加、修改、删除的操作，我们也需要往VM中添加对应的函数。以添加为例：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> vm = <span class="keyword">new</span> Vue(&#123;</span><br><span class="line">    ...</span><br><span class="line">    methods: &#123;</span><br><span class="line">        ...</span><br><span class="line">        create: <span class="function"><span class="keyword">function</span> (<span class="params">todo</span>) </span>&#123;</span><br><span class="line">            <span class="keyword">var</span> that = <span class="keyword">this</span>;</span><br><span class="line">            that.$resource(<span class="string">'/api/todos'</span>).save(todo).then(<span class="function"><span class="keyword">function</span> (<span class="params">resp</span>) </span>&#123;</span><br><span class="line">                resp.json().then(<span class="function"><span class="keyword">function</span> (<span class="params">result</span>) </span>&#123;</span><br><span class="line">                    that.todos.push(result);</span><br><span class="line">                &#125;);</span><br><span class="line">            &#125;, showError);</span><br><span class="line">        &#125;,</span><br><span class="line">        update: <span class="function"><span class="keyword">function</span> (<span class="params">todo, prop, e</span>) </span>&#123;</span><br><span class="line">            ...</span><br><span class="line">        &#125;,</span><br><span class="line">        remove: <span class="function"><span class="keyword">function</span> (<span class="params">todo</span>) </span>&#123;</span><br><span class="line">            ...</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>添加操作需要一个额外的表单，我们可以创建另一个VM对象vmAdd来对表单作双向绑定，然后，在提交表单的事件中调用vm对象的create方法：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> vmAdd = <span class="keyword">new</span> Vue(&#123;</span><br><span class="line">    el: <span class="string">'#vmAdd'</span>,</span><br><span class="line">    data: &#123;</span><br><span class="line">        name: <span class="string">''</span>,</span><br><span class="line">        description: <span class="string">''</span></span><br><span class="line">    &#125;,</span><br><span class="line">    methods: &#123;</span><br><span class="line">        submit: <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">            vm.create(<span class="keyword">this</span>.$data);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>vmAdd和FORM表单绑定：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;form id=<span class="string">"vmAdd"</span> action=<span class="string">"#0"</span> v-on:submit.prevent=<span class="string">"submit"</span>&gt;</span><br><span class="line">    &lt;p&gt;<span class="xml"><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">v-model</span>=<span class="string">"name"</span>&gt;</span><span class="tag">&lt;/<span class="name">p</span>&gt;</span></span></span><br><span class="line">    &lt;p&gt;<span class="xml"><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">v-model</span>=<span class="string">"description"</span>&gt;</span><span class="tag">&lt;/<span class="name">p</span>&gt;</span></span></span><br><span class="line">    &lt;p&gt;<span class="xml"><span class="tag">&lt;<span class="name">button</span> <span class="attr">type</span>=<span class="string">"submit"</span>&gt;</span>Add<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span>&lt;<span class="regexp">/p&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>form&gt;</span><br></pre></td></tr></table></figure>
+<p>最后，把vm绑定到对应的DOM：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&lt;div id=<span class="string">"vm"</span>&gt;</span><br><span class="line">    &lt;h3&gt;&#123;&#123; title &#125;&#125;&lt;<span class="regexp">/h3&gt;</span></span><br><span class="line"><span class="regexp">    &lt;ol&gt;</span></span><br><span class="line"><span class="regexp">        &lt;li v-for="t in todos"&gt;</span></span><br><span class="line"><span class="regexp">            &lt;dl&gt;</span></span><br><span class="line"><span class="regexp">                &lt;dt contenteditable="true" v-on:blur="update(t, 'name', $event)"&gt;&#123;&#123; t.name &#125;&#125;&lt;/</span>dt&gt;</span><br><span class="line">                &lt;dd contenteditable=<span class="string">"true"</span> v-on:blur=<span class="string">"update(t, 'description', $event)"</span>&gt;&#123;&#123; t.description &#125;&#125;&lt;<span class="regexp">/dd&gt;</span></span><br><span class="line"><span class="regexp">                &lt;dd&gt;&lt;a href="#0" v-on:click="remove(t)"&gt;Delete&lt;/</span>a&gt;&lt;<span class="regexp">/dd&gt;</span></span><br><span class="line"><span class="regexp">            &lt;/</span>dl&gt;</span><br><span class="line">        &lt;<span class="regexp">/li&gt;</span></span><br><span class="line"><span class="regexp">    &lt;/</span>ol&gt;</span><br><span class="line">&lt;<span class="regexp">/div&gt;</span></span><br></pre></td></tr></table></figure>
+<p>这里我们用contenteditable=”true”让DOM节点变成可编辑的，用v-on:blur=”update(t, ‘name’, $event)”在编辑结束时调用update()方法并传入参数，特殊变量$event表示DOM事件本身。</p>
+<p>删除TODO是通过对<a>节点绑定v-on:click事件并调用remove()方法实现的。</p>
+<p>如果一切无误，我们就可以先启动服务器，然后在浏览器中访问<a href="http://localhost:3000/static/index.html，对TODO进行增删改等操作，操作结果会保存在服务器端。" target="_blank" rel="noopener">http://localhost:3000/static/index.html，对TODO进行增删改等操作，操作结果会保存在服务器端。</a></p>
+<p>通过Vue和vue-resource插件，我们用简单的几十行代码就实现了一个真正可用的TODO应用。</p>
+
+      
+    </div>
+     <!-- 相关文章推荐 -->
+    
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Node/" rel="tag"># Node</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/11/Nodejs%E8%B7%AF%E7%94%B1/" rel="next" title="Nodejs路由">
+                <i class="fa fa-chevron-left"></i> Nodejs路由
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/04/12/Java%E5%AE%9E%E7%8E%B0%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6%E5%AE%9A%E6%97%B6%E6%96%B9%E5%BC%8F/" rel="prev" title="Java实现任务调度定时方式总结">
+                Java实现任务调度定时方式总结 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+<span class="jiathis_txt">分享到：</span>
+<a class="jiathis_button_fav">收藏夹</a>
+<a class="jiathis_button_copy">复制网址</a>
+<a class="jiathis_button_email">邮件</a>
+<a class="jiathis_button_weixin">微信</a>
+<a class="jiathis_button_qzone">QQ空间</a>
+<a class="jiathis_button_tqq">腾讯微博</a>
+<a class="jiathis_button_douban">豆瓣</a>
+<a class="jiathis_button_share">一键分享</a>
+
+<a href="http://www.jiathis.com/share?uid=2140465" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+<a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+var jiathis_config={
+  data_track_clickback:true,
+  summary:"",
+  shortUrl:false,
+  hideMore:false
+}
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://img.huyunshun.com/img/20200522182348.png"
+                alt="初晨" />
+            
+              <p class="site-author-name" itemprop="name">初晨</p>
+              <p class="site-description motion-element" itemprop="description">永远不要说你知道本质，更别说真相了。</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">249</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">46</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+<!--近期文章版块-->
+            
+                <div class="links-of-blogroll motion-element links-of-blogroll-block">
+                  <div class="links-of-blogroll-title">
+                    <!-- modify icon to fire by szw -->
+                    <i class="fa fa-history fa-" aria-hidden="true"></i>
+                    近期文章
+                  </div>
+                  <ul class="links-of-blogroll-list">
+                    
+                    
+                      <li>
+                        <a href="/2020/05/22/WebSocket%E3%80%81Socket%E3%80%81TCP%E3%80%81HTTP%E5%8C%BA%E5%88%AB/" title="WebSocket、Socket、TCP、HTTP区别" target="_blank">WebSocket、Socket、TCP、HTTP区别</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/19/Springboot%E9%A1%B9%E7%9B%AE%E7%9A%84%E6%8E%A5%E5%8F%A3%E9%98%B2%E5%88%B7/" title="Springboot项目的接口防刷" target="_blank">Springboot项目的接口防刷</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/03/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Volatile%E5%85%B3%E9%94%AE%E5%AD%97%E5%8F%8A%E5%85%B6%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/" title="深入理解Volatile关键字及其实现原理" target="_blank">深入理解Volatile关键字及其实现原理</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/04/20/%E4%BD%BF%E7%94%A8vscode%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0%E7%8E%AF%E5%A2%83/" title="使用vscode搭建个人笔记环境" target="_blank">使用vscode搭建个人笔记环境</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/01/20/HBase%E4%BB%8B%E7%BB%8D%E5%AE%89%E8%A3%85%E4%B8%8E%E6%93%8D%E4%BD%9C/" title="HBase介绍安装与操作" target="_blank">HBase介绍安装与操作</a>
+                      </li>
+                    
+                  </ul>
+                </div>
+            
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#单向绑定"><span class="nav-number">1.</span> <span class="nav-text">单向绑定</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#编写MVVM"><span class="nav-number">1.0.0.0.1.</span> <span class="nav-text">编写MVVM</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#单向绑定-1"><span class="nav-number">1.0.0.0.2.</span> <span class="nav-text">单向绑定</span></a></li></ol></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#双向绑定"><span class="nav-number">2.</span> <span class="nav-text">双向绑定</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#处理事件"><span class="nav-number">2.0.0.0.1.</span> <span class="nav-text">处理事件</span></a></li></ol></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#同步DOM结构"><span class="nav-number">3.</span> <span class="nav-text">同步DOM结构</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#和后端交互"><span class="nav-number">4.</span> <span class="nav-text">和后端交互</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Copyright</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

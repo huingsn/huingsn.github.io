@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="mybatis,mapper," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="mapper配置标签介绍insert,update,delete,select,sql,resultMap sql:可被其它语句引用的可重用语句块；resultMap:确定实体类属性与表中字段对应关系； namespace的作用 在MyBatis中，Mapper中的namespace用于绑定Dao接口的，即面向接口编程。 它的好处在于当使用了namespace之后就可以不用写接口实现类，业务逻辑会">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Mybatis缓存和mapper配置">
+<meta property="og:url" content="https://huyunshun.com/2018/04/05/%E7%BC%93%E5%AD%98%E5%92%8Cmapper/index.html">
+<meta property="og:site_name" content="简">
+<meta property="og:description" content="mapper配置标签介绍insert,update,delete,select,sql,resultMap sql:可被其它语句引用的可重用语句块；resultMap:确定实体类属性与表中字段对应关系； namespace的作用 在MyBatis中，Mapper中的namespace用于绑定Dao接口的，即面向接口编程。 它的好处在于当使用了namespace之后就可以不用写接口实现类，业务逻辑会">
+<meta property="og:image" content="https://img.huyunshun.com/img/20200407084528.png">
+<meta property="og:image" content="https://img.huyunshun.com/img/20200407084850.png">
+<meta property="og:image" content="https://img.huyunshun.com/img/20200407092946.png">
+<meta property="article:published_time" content="2018-04-04T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-05-20T10:04:24.699Z">
+<meta property="article:author" content="初晨">
+<meta property="article:tag" content="mybatis">
+<meta property="article:tag" content="mapper">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img.huyunshun.com/img/20200407084528.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://huyunshun.com/2018/04/05/缓存和mapper/"/>
+
+
+
+
+
+  <title>Mybatis缓存和mapper配置 | 简</title>
+  
+
+
+
+
+
+
+
+
+  <script type="text/javascript" src="/js/src/love.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
+
+  <!-- 看板娘 -->
+    
+        <script async src="/live2d-widget/autoload.js"></script>
+    
+ <!-- 飘动的彩带） -->
+  <script src="/js/src/piao.js" type="text/javascript"></script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">简</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">人生短暂，学海无边，而大道至简。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://huyunshun.com/2018/04/05/%E7%BC%93%E5%AD%98%E5%92%8Cmapper/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="初晨">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://img.huyunshun.com/img/20200522182348.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="简">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Mybatis缓存和mapper配置</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-05T00:00:00+08:00">
+                2018-04-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mybatis/" itemprop="url" rel="index">
+                    <span itemprop="name">mybatis</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="mapper配置"><a href="#mapper配置" class="headerlink" title="mapper配置"></a>mapper配置</h2><h3 id="标签介绍"><a href="#标签介绍" class="headerlink" title="标签介绍"></a>标签介绍</h3><p>insert,update,delete,select,sql,resultMap</p>
+<p>sql:可被其它语句引用的可重用语句块；resultMap:确定实体类属性与表中字段对应关系；</p>
+<h3 id="namespace的作用"><a href="#namespace的作用" class="headerlink" title="namespace的作用"></a>namespace的作用</h3><p> 在MyBatis中，Mapper中的namespace用于绑定Dao接口的，即面向接口编程。</p>
+<p>它的好处在于当使用了namespace之后就可以不用写接口实现类，业务逻辑会直接通过这个绑定寻找到相对应的SQL语句进行对应的数据处理</p>
+<h3 id="parametetType属性"><a href="#parametetType属性" class="headerlink" title="parametetType属性"></a>parametetType属性</h3><p>在<strong>insert,update,select,delete</strong>标签中,可以通过parameterType指定输入参数的类型，类型可以是简单类型、map、pojo的包装类型。</p>
+<p>parameterType属性是可以省略的.MyBatis框架可以根据SqlSession接口中方法的参数来判断输入参数的实际数据类型.</p>
+<h3 id="和-区别"><a href="#和-区别" class="headerlink" title="#{}和${}区别"></a>#{}和${}区别</h3><p>在MyBatis中提供了两种方式读取参数的内容到SQL语句中,分别是</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#&#123;参数名&#125; :实体类对象或则Map集合读取内容，采用预编译方式,可以防止SQL注入 </span><br><span class="line">$&#123;参数名&#125; :实体类对象或则Map集合读取内容，采用直接赋值方式,无法阻止SQL注入攻击</span><br></pre></td></tr></table></figure>
+<p>在大多数情况下，我们都是采用#{}读取参数内容，但是在一些特殊的情况下：表名、选取的列是动态的，order by和in操作，可以考虑使用${}。</p>
+<h3 id="resultType属性"><a href="#resultType属性" class="headerlink" title="resultType属性"></a>resultType属性</h3><ul>
+<li>resultType属性存在select标签.负责将查询结果进行映射.</li>
+<li>resultType属性可以指定一个基本类型也可以是一个实体类类型</li>
+<li>使用resultType属性为实体类类型时，只有查询出来的列名和实体类中的属性名一致，才可以映射成功. 如果查询出来的列名和pojo中的属性名全部不一致，就不会创建实体类对象.但是只要查询出来的列名和实体类中的属性有一个一致，就会创建实体类对象</li>
+<li>resultType属性无法与resultMap属性同时出现.</li>
+</ul>
+<h3 id="注解方式配置"><a href="#注解方式配置" class="headerlink" title="注解方式配置"></a>注解方式配置</h3><p>注解方式就是将SQL语句直接写在接口上，对于需求比较简单的系统，效率较高。缺点在于，每次修改sql语句都要编译代码，对于复杂的sql语句可编辑性和可读性都差，一般不建议使用这种配置方式。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">@Select</span><br><span class="line">@Results</span><br><span class="line">@ResultMap</span><br><span class="line">@Insert</span><br><span class="line">@Update</span><br><span class="line">@Delete</span><br></pre></td></tr></table></figure>
+<h3 id="typeAliases-别名"><a href="#typeAliases-别名" class="headerlink" title="typeAliases  别名"></a>typeAliases  别名</h3><p>全局配置mybatis.xml 文件中</p>
+<h2 id="MyBatis事务"><a href="#MyBatis事务" class="headerlink" title="MyBatis事务"></a>MyBatis事务</h2><p>在 mybatis 中默认是关闭了 JDBC 的自动提交功能setAutoCommit(false)。</p>
+<p>每一个 SqlSession 默认都是不自动提交事务，需要使用session.commit()提交事务。或者使用openSession(true);全局设置自动提交，相当于setAutoCommittrue);</p>
+<p>在 openSession()时 Mybatis 会创建 SqlSession 时同时创建一个Transaction(事务对象)，同时 autoCommit 都为 false。如果出现异常，应该 session.rollback()回滚事务。</p>
+<p>mybatis 中<insert> <delete> <update>标签没有 resultType 属性，默认了返回值都是 int</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">insert</span> <span class="attr">id</span>=<span class="string">"insertUser"</span> <span class="attr">parameterType</span>=<span class="string">"User"</span>&gt;</span></span><br><span class="line">      insert into user values(default,#&#123;name&#125;,#&#123;age&#125;)</span><br><span class="line"><span class="tag">&lt;/<span class="name">insert</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>Java:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//插入数据</span></span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="keyword">int</span> i=session.insert(<span class="string">"com.hu.mapper.UserMapper.insertUser"</span>, <span class="keyword">new</span> User(<span class="string">"张无忌1"</span>, <span class="number">28</span>));</span><br><span class="line">    System.out.println(i&gt;<span class="number">0</span>?<span class="string">"插入成功"</span>:<span class="string">"插入失败"</span>);</span><br><span class="line">&#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">    session.rollback();</span><br><span class="line">    e.printStackTrace();</span><br><span class="line">&#125;                </span><br><span class="line"> session.commit();</span><br></pre></td></tr></table></figure>
+<h2 id="动态SQL"><a href="#动态SQL" class="headerlink" title="动态SQL"></a>动态SQL</h2><p>根据不同的条件需要执行不同的 SQL 命令.称为动态 SQL，MyBatis 中动态 SQL 在 mapper.xml 中添加逻辑判断。</p>
+<h3 id="lt-if-gt"><a href="#lt-if-gt" class="headerlink" title="&lt;if&gt;"></a>&lt;if&gt;</h3><p>例子：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">"getAllUser"</span> <span class="attr">resultType</span>=<span class="string">"user"</span>&gt;</span></span><br><span class="line">        select * from user where 1=1</span><br><span class="line">        <span class="comment">&lt;!-- OGNL 表达式,直接写 key 或对象的属性 不需要添加任 何特字符号 --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"id!=null and id!=''"</span>&gt;</span></span><br><span class="line">                and id=#&#123;id&#125;</span><br><span class="line">        <span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"name!=null and name!=''"</span>&gt;</span></span><br><span class="line">                and name=#&#123;name&#125;</span><br><span class="line">        <span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h3 id="lt-where-gt"><a href="#lt-where-gt" class="headerlink" title="&lt;where&gt;"></a>&lt;where&gt;</h3><p>此时where不好处理，还要加一个1=1，因此引入where标签。当编写 where 标签时，如果内容中第一个是 and 去掉第 一个and，   如果&lt;where&gt;中有内容会生成 where 关键字,如果没有内容不生成 where 关键字。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">"getAllUser"</span> <span class="attr">resultType</span>=<span class="string">"user"</span>&gt;</span></span><br><span class="line">      select * from user</span><br><span class="line">      <span class="tag">&lt;<span class="name">where</span>&gt;</span></span><br><span class="line">              <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"id!=null and id!=''"</span>&gt;</span></span><br><span class="line">                      and id=#&#123;id&#125;</span><br><span class="line">              <span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">              <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"name!=null and name!=''"</span>&gt;</span></span><br><span class="line">                      and name=#&#123;name&#125;</span><br><span class="line">              <span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">where</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h3 id="lt-choose-gt-lt-when-gt-lt-otherwise-gt"><a href="#lt-choose-gt-lt-when-gt-lt-otherwise-gt" class="headerlink" title="&lt;choose&gt;&lt;when&gt; &lt;otherwise&gt;"></a>&lt;choose&gt;&lt;when&gt; &lt;otherwise&gt;</h3><p>有时我们不想应用所有的条件, 相反我们想选择很多情况下的一种。 Java 中的 switch 和语句相似,MyBatis 提供 choose 元素<br>只要有一个成立其他都不成立。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">"getAllUser"</span> <span class="attr">resultType</span>=<span class="string">"user"</span>&gt;</span></span><br><span class="line">        select * from user</span><br><span class="line">        <span class="tag">&lt;<span class="name">where</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">choose</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">when</span> <span class="attr">test</span>=<span class="string">"id!=null and id!=''"</span>&gt;</span>and id=#&#123;id&#125;<span class="tag">&lt;/<span class="name">when</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">when</span> <span class="attr">test</span>=<span class="string">"name!=null and name!=''"</span>&gt;</span>and name=#&#123;name&#125;<span class="tag">&lt;/<span class="name">when</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">otherwise</span>&gt;</span>and 1=1<span class="tag">&lt;/<span class="name">otherwise</span>&gt;</span><span class="comment">&lt;!-- 其他情况 --&gt;</span></span><br><span class="line">                <span class="tag">&lt;/<span class="name">choose</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">where</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h3 id="lt-set-gt"><a href="#lt-set-gt" class="headerlink" title="&lt;set&gt;"></a>&lt;set&gt;</h3><p>用在修改 SQL 中 set 从句。用来去掉最后一个逗号。如果&lt;set&gt;里面有内容生成 set 关键字，没有就不生成。<br>例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;update id&#x3D;&quot;updateUserByid&quot;&gt;</span><br><span class="line">        update user</span><br><span class="line">        &lt;set&gt;</span><br><span class="line">                id&#x3D;#&#123;id&#125;,&lt;!--  目的防止&lt;set&gt;中没有内容  mybatis 不生成 set关键字 如果修改中没有 set 从句 SQL 语法错误 --&gt;</span><br><span class="line">                &lt;if test&#x3D;&quot;name!&#x3D;null and name!&#x3D;&#39;&#39;&quot;&gt;</span><br><span class="line">                        name&#x3D;#&#123;name&#125;,</span><br><span class="line">                &lt;&#x2F;if&gt;</span><br><span class="line">        &lt;&#x2F;set&gt;</span><br><span class="line">        where id&#x3D;#&#123;id&#125;</span><br><span class="line">&lt;&#x2F;update&gt;</span><br></pre></td></tr></table></figure>
+<p>接口：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">updateUserByid</span><span class="params">(@Param(<span class="string">"id"</span>)</span>Integer id, @<span class="title">Param</span><span class="params">(<span class="string">"name"</span>)</span>String name)</span>;</span><br><span class="line">测试：</span><br><span class="line"><span class="comment">//把id为1的记录修改name为李连杰</span></span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">int</span> index = userMapper.updateUserByid(<span class="number">1</span>, <span class="string">"李连杰"</span>);</span><br><span class="line">        System.out.println(index);</span><br><span class="line">&#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">        session.rollback();</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">&#125;</span><br><span class="line">session.commit();</span><br></pre></td></tr></table></figure>
+<p>结果：</p>
+<h3 id="lt-Trim-gt"><a href="#lt-Trim-gt" class="headerlink" title="&lt;Trim&gt;"></a>&lt;Trim&gt;</h3><p>标签属性：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">prefix 在前面添加内容</span><br><span class="line">prefixOverrides 去掉前面内容</span><br><span class="line">suffix 在后面添加内容</span><br><span class="line">suffixOverrieds 去掉后面内容</span><br><span class="line">执行顺序去掉内容后添加内容</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;update id&#x3D;&quot;upd&quot; parameterType&#x3D;&quot;User&quot;&gt;</span><br><span class="line">        update user</span><br><span class="line">        &lt;trim prefix&#x3D;&quot;set&quot; suffixOverrides&#x3D;&quot;,&quot;&gt;</span><br><span class="line">                name&#x3D;#&#123;name&#125;</span><br><span class="line">        &lt;&#x2F;trim&gt;</span><br><span class="line">        where id&#x3D;#&#123;id&#125;</span><br><span class="line">&lt;&#x2F;update&gt;</span><br></pre></td></tr></table></figure>
+<p>得到sql语句就是：update user set name=? where id=?</p>
+<h3 id="lt-bind-gt"><a href="#lt-bind-gt" class="headerlink" title="&lt;bind&gt;"></a>&lt;bind&gt;</h3><p>给参数重新赋值，比如在原内容前后添加内容，如：模糊查询。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;select id&#x3D;&quot;selByUserNameLike&quot; resultType&#x3D;&quot;user&quot;&gt;</span><br><span class="line">        &lt;bind name&#x3D;&quot;name&quot; value&#x3D;&quot;&#39;%&#39;+name+&#39;%&#39;&quot;&#x2F;&gt;</span><br><span class="line">        select * from user where name like #&#123;name&#125;</span><br><span class="line">&lt;&#x2F;select&gt;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> List&lt;User&gt; <span class="title">selByUserNameLike</span><span class="params">(@Param(<span class="string">"name"</span>)</span>String name)</span>;</span><br><span class="line"></span><br><span class="line">List&lt;User&gt; users = userMapper.selByUserNameLike(<span class="string">"张"</span>);</span><br><span class="line">System.out.println(users.size());</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="lt-foreach-gt"><a href="#lt-foreach-gt" class="headerlink" title="&lt;foreach&gt;"></a>&lt;foreach&gt;</h3><p>循环参数内容，还具备在内容的前后添加内容，还具备添加分隔符功能。       适用场景：in  查询中，批量新增中(mybatis 中foreach 效率比较低)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;select id&#x3D;&quot;selIn&quot; parameterType&#x3D;&quot;list&quot; resultType&#x3D;&quot;user&quot;&gt;</span><br><span class="line">        select * from user where name in</span><br><span class="line">        &lt;foreach collection&#x3D;&quot;list&quot; item&#x3D;&quot;name&quot; open&#x3D;&quot;(&quot; close&#x3D;&quot;)&quot; separator&#x3D;&quot;,&quot;&gt;</span><br><span class="line">                #&#123;name&#125;</span><br><span class="line">        &lt;&#x2F;foreach&gt;</span><br><span class="line">&lt;&#x2F;select&gt;</span><br></pre></td></tr></table></figure>
+<p>接口：<br>public List<User> selIn(@Param(“list”)List&lt;?&gt; list);</p>
+<p>测试：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">List&lt;String&gt; list &#x3D; new ArrayList&lt;&gt;();</span><br><span class="line">list.add(&quot;张三丰&quot;);</span><br><span class="line">list.add(&quot;李连杰&quot;);</span><br><span class="line">List&lt;User&gt; users &#x3D; userMapper.selIn(list);</span><br><span class="line">System.out.println(users.size());</span><br></pre></td></tr></table></figure>
+<p>结果：</p>
+<p>插入集合数据</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;insert id&#x3D;&quot;insertList&quot; parameterType&#x3D;&quot;list&quot;&gt;</span><br><span class="line">        insert into user values</span><br><span class="line">        &lt;foreach collection&#x3D;&quot;list&quot; item&#x3D;&quot;name&quot; separator&#x3D;&quot;,&quot;&gt;</span><br><span class="line">                (default,#&#123;name &#125;,30)</span><br><span class="line">        &lt;&#x2F;foreach&gt;</span><br><span class="line">&lt;&#x2F;insert&gt;</span><br></pre></td></tr></table></figure>
+<p>接口：<br>public int insertList(@Param(“list”)List&lt;?&gt; list);</p>
+<p>测试：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">List&lt;String&gt; list &#x3D; new ArrayList&lt;&gt;();</span><br><span class="line">for (int i &#x3D; 0; i &lt; 20; i++) &#123;</span><br><span class="line">        list.add(&quot;古龙&quot;+i);</span><br><span class="line">&#125;</span><br><span class="line">int index &#x3D; userMapper.insertList(list);</span><br><span class="line">System.out.println(index);</span><br><span class="line">session.commit();</span><br></pre></td></tr></table></figure>
+<p>结果：</p>
+<p>如果是批量插入数据，应该这样处理。</p>
+<p>创建session时，openSession()必须指定参数。 底层 JDBC 的 PreparedStatement.addBatch();</p>
+<p>factory.openSession(ExecutorType.BATCH)</p>
+<h3 id="lt-sql-gt-lt-include-gt"><a href="#lt-sql-gt-lt-include-gt" class="headerlink" title="&lt;sql&gt; &lt;include&gt;"></a>&lt;sql&gt; &lt;include&gt;</h3><p>某些 SQL 片段如果希望复用,可以使用&lt;sql&gt;定义这个片段，在&lt;select&gt;或&lt;delete&gt;或&lt;update&gt;或&lt;insert&gt;中使用&lt;include&gt;</p>
+<h2 id="Mybatis-注解"><a href="#Mybatis-注解" class="headerlink" title="Mybatis 注解"></a>Mybatis 注解</h2><p>Mybatis 的注解简化 mapper.xml 文件，如果涉及动态 SQL 依然使用 mapper.xml，mapper.xml 和注解可以共存，使用注解时 mybatis.xml 中&lt;mappers&gt;使用</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">package</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">mapper</span> <span class="attr">class</span>=<span class="string">""</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">mapper</span> <span class="attr">class</span>=<span class="string">"com.hu.mapper.StudentTeacher"</span>/&gt;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">StudentTeacher</span> </span>&#123;</span><br><span class="line">       <span class="comment">/**</span></span><br><span class="line"><span class="comment">        * 实现查询</span></span><br><span class="line"><span class="comment">        * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">        */</span></span><br><span class="line">       <span class="meta">@Select</span>(<span class="string">"select * from student"</span>)</span><br><span class="line">       <span class="function">List&lt;Student&gt; <span class="title">selectAll</span><span class="params">()</span></span>;</span><br><span class="line">       <span class="comment">/**</span></span><br><span class="line"><span class="comment">        * 实现插入</span></span><br><span class="line"><span class="comment">        * <span class="doctag">@param</span> student</span></span><br><span class="line"><span class="comment">        * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">        */</span></span><br><span class="line">       <span class="meta">@Insert</span>(<span class="string">"insert into student values(default,#&#123;name&#125;,#&#123;age&#125;,2)"</span>)</span><br><span class="line">       <span class="function"><span class="keyword">int</span> <span class="title">insertStudent</span><span class="params">(Student student)</span></span>;</span><br><span class="line">       <span class="comment">/**</span></span><br><span class="line"><span class="comment">        * 实现修改</span></span><br><span class="line"><span class="comment">        * <span class="doctag">@param</span> student</span></span><br><span class="line"><span class="comment">        * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">        */</span></span><br><span class="line">       <span class="meta">@Update</span>(<span class="string">"update student set name=#&#123;name&#125; where id=#&#123;id&#125;"</span>)</span><br><span class="line">       <span class="function"><span class="keyword">int</span> <span class="title">updateStudent</span><span class="params">(Student student)</span></span>;</span><br><span class="line">       <span class="comment">/**</span></span><br><span class="line"><span class="comment">        * 实现删除操作</span></span><br><span class="line"><span class="comment">        * <span class="doctag">@param</span> id</span></span><br><span class="line"><span class="comment">        * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">        */</span></span><br><span class="line">       <span class="meta">@Delete</span>(<span class="string">"delete from student where id=#&#123;0&#125;"</span>)</span><br><span class="line">       <span class="function"><span class="keyword">int</span> <span class="title">deleteById</span><span class="params">(<span class="keyword">int</span> id)</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">    SqlSession session = MyBatisUtil.getSession();</span><br><span class="line">    StudentTeacher st = session.getMapper(StudentTeacher<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">    <span class="comment">//查询</span></span><br><span class="line">    List&lt;Student&gt; students = st.selectAll();</span><br><span class="line">    System.out.println(students.size());</span><br><span class="line">    <span class="comment">//增加</span></span><br><span class="line">    Student student = <span class="keyword">new</span> Student();</span><br><span class="line">    student.setAge(<span class="number">44</span>);</span><br><span class="line">    student.setName(<span class="string">"小明"</span>);</span><br><span class="line">    <span class="keyword">int</span> index = st.insertStudent(student);</span><br><span class="line">    System.out.println(index);</span><br><span class="line">    <span class="comment">//..................</span></span><br></pre></td></tr></table></figure>
+<p>使用注解实现resultMap：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* 使用注解实现resultMap</span></span><br><span class="line"><span class="comment">* <span class="doctag">@param</span> id</span></span><br><span class="line"><span class="comment">* <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="meta">@Results</span>(value= &#123;</span><br><span class="line">                <span class="meta">@Result</span>(id=<span class="keyword">true</span>,property=<span class="string">"id"</span>,column=<span class="string">"id"</span>),</span><br><span class="line">                <span class="meta">@Result</span>(property=<span class="string">"name"</span>,column=<span class="string">"name"</span>),</span><br><span class="line">                <span class="meta">@Result</span>(property=<span class="string">"students"</span>,column=<span class="string">"id"</span>,</span><br><span class="line">                                many=<span class="meta">@Many</span>(select=<span class="string">"com.hu.mapper.StudentMapper.selectByTid"</span>))</span><br><span class="line">&#125;)</span><br><span class="line"><span class="meta">@Select</span>(<span class="string">"select * from teacher where id=#&#123;0&#125;"</span>)</span><br><span class="line"><span class="function">Teacher <span class="title">selTeacherById</span> <span class="params">(<span class="keyword">int</span> id)</span></span>;</span><br><span class="line"><span class="comment">//----------------------</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        SqlSession session = MyBatisUtil.getSession();</span><br><span class="line">        StudentTeacher st = session.getMapper(StudentTeacher<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        <span class="comment">//查询</span></span><br><span class="line">        Teacher teacher = st.selTeacherById(<span class="number">1</span>);</span><br><span class="line">        System.out.println(teacher.toString());</span><br><span class="line">        </span><br><span class="line">        session.commit();</span><br><span class="line">        MyBatisUtil.closeSession();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">@Results() 相当于&lt;resultMap&gt;</span><br><span class="line">@Result() 相当于&lt;id&#x2F;&gt;或&lt;result&#x2F;&gt;</span><br><span class="line">@Result(id&#x3D;true) 相当与&lt;id&#x2F;&gt;</span><br><span class="line">@Many() 相当于&lt;collection&#x2F;&gt;</span><br><span class="line">@One() 相当于&lt;association&#x2F;&gt;</span><br></pre></td></tr></table></figure>
+
+<h2 id="缓存"><a href="#缓存" class="headerlink" title="缓存"></a>缓存</h2><h3 id="一级缓存"><a href="#一级缓存" class="headerlink" title="一级缓存"></a>一级缓存</h3><p>基于PerpetualCache 的 HashMap本地缓存，其存储作用域为 SqlSession ，当 Session flush 或 close 之后，该Session中的所有 ache 就将清空。缓存的是statement，刷新缓存是清空这个 SqlSession 的所有缓存， 不单单是某个键。任何的 UPDATE, INSERT, DELETE 语句都会清空缓存。</p>
+<p>MyBatis 默认开启了一级缓存，一级缓存是在SqlSession 层面进行缓存的。同一个session多次调用同一个Mapper和同一个方法的同一个参数，只会进行一次数据库查询，然后把数据缓存，以后直接先从缓存中取出数据，不会直接去查数据库。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        SqlSession session = MyBatisUtil.getSession();</span><br><span class="line">        </span><br><span class="line">        User user = session.selectOne(<span class="string">"com.hu.mapper.UserMapper.selectById"</span>,<span class="number">2</span>);</span><br><span class="line">        System.out.println(user);</span><br><span class="line">        User user1 = session.selectOne(<span class="string">"com.hu.mapper.UserMapper.selectById"</span>,<span class="number">2</span>);</span><br><span class="line">        System.out.println(user1);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>同一个session，结果只查一次数据库。结果如下：<br><img src="https://img.huyunshun.com/img/20200407084528.png" alt="20200407084528"></p>
+<h3 id="二级缓存"><a href="#二级缓存" class="headerlink" title="二级缓存"></a>二级缓存</h3><p>二级缓存又叫SQLSessionFactory缓存，二级缓存存在于 SqlSessionFactory 生命周期中。二级缓存与一级缓存其机制相同，默认也是采用 PerpetualCache，HashMap存储，不同在于其存储作用域为 Mapper(Namespace)，并且可自定义存储源Ehcache。<br>对于缓存数据更新机制，当某一个作用域(一级缓存Session/二级缓存Namespaces)的进行了 C/U/D 操作后，默认该作用域下所有 select 中的缓存将被clear。当 SqlSession 对象 close()时或 commit()时会把 SqlSession 缓存的数据刷(flush)到 SqlSessionFactory 缓存区中。</p>
+<p>有效范围：同一个 factory 内所有SqlSession 都可以获取。二级缓存在数据频繁被使用，很少被修改时使用性能最高。</p>
+<p>使用二级缓存步骤：在 mapper.xml 中添加&lt;cache readOnly=”true”&gt;&lt;/cache&gt;    如果不写 readOnly=”true”需要把实体类序列化，示例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line"></span><br><span class="line">        SqlSession session = MyBatisUtil.getSession();</span><br><span class="line">        </span><br><span class="line">        User user = session.selectOne(<span class="string">"com.hu.mapper.UserMapper.selectById"</span>,<span class="number">2</span>);</span><br><span class="line">        System.out.println(user);</span><br><span class="line">        session.commit();</span><br><span class="line">        <span class="comment">//另外一个session</span></span><br><span class="line">        SqlSession session1 = MyBatisUtil.getSession();</span><br><span class="line">        User user1 = session1.selectOne(<span class="string">"com.hu.mapper.UserMapper.selectById"</span>,<span class="number">2</span>);</span><br><span class="line">        System.out.println(user1);</span><br><span class="line">        session.commit();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><img src="https://img.huyunshun.com/img/20200407084850.png" alt="20200407084850"></p>
+<p>说明：可以在开启二级缓存时候，手动配置一些属性</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">cache</span> <span class="attr">eviction</span>=<span class="string">"LRU"</span> <span class="attr">flushInterval</span>=<span class="string">"100000"</span> <span class="attr">size</span>=<span class="string">"1024"</span> <span class="attr">readOnly</span>=<span class="string">"true"</span>/&gt;</span></span><br></pre></td></tr></table></figure>
+<p>各个属性意义如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">eviction：缓存回收策略</span><br><span class="line">- LRU：最少使用原则，移除最长时间不使用的对象</span><br><span class="line">- FIFO：先进先出原则，按照对象进入缓存顺序进行回收</span><br><span class="line">- SOFT：软引用，移除基于垃圾回收器状态和软引用规则的对象</span><br><span class="line">- WEAK：弱引用，更积极的移除移除基于垃圾回收器状态和弱引用规则的对象</span><br><span class="line">flushInterval：刷新时间间隔，单位为毫秒，这里配置的100毫秒。如果不配置，那么只有在进行数据库修改操作才会被动刷新缓存区</span><br><span class="line">size：引用额数目，代表缓存最多可以存储的对象个数</span><br><span class="line">readOnly：是否只读，如果为true，则所有相同的sql语句返回的是同一个对象（有助于提高性能，但并发操作同一条数据时，可能不安全），如果设置为false，则相同的sql，后面访问的是cache的clone副本。</span><br></pre></td></tr></table></figure>
+<p>可以在Mapper的具体方法下设置对二级缓存的访问：useCache配置， 如果一条语句每次都需要最新的数据，就意味着每次都需要从数据库中查询数据，可以把这个属性设置为false，如：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">"selectAll"</span> <span class="attr">resultMap</span>=<span class="string">"BaseResultMap"</span> <span class="attr">useCache</span>=<span class="string">"false"</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h4 id="刷新缓存（清空缓存）"><a href="#刷新缓存（清空缓存）" class="headerlink" title="刷新缓存（清空缓存）"></a>刷新缓存（清空缓存）</h4><p>二级缓存默认会在insert、update、delete操作后刷新缓存，可以手动配置不更新缓存，如下：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">update</span> <span class="attr">id</span>=<span class="string">"updateById"</span> <span class="attr">parameterType</span>=<span class="string">"User"</span> <span class="attr">flushCache</span>=<span class="string">"false"</span> /&gt;</span></span><br></pre></td></tr></table></figure>
+<p>如果不做任何处理，都为默认配置，则结果如下：　　<br>        * 1. 映射语句文件中的所有select语句将会被缓存。<br>　　* 2. 映射语句文件中的所有insert，update和delete语句会刷新缓存。<br>　　* 3. 缓存会使用Least Recently Used（LRU，最近最少使用的）算法来收回。<br>　　* 4. 缓存会根据指定的时间间隔来刷新。<br>　　* 5. 缓存会存储1024个对象</p>
+<h3 id="自定义缓存"><a href="#自定义缓存" class="headerlink" title="自定义缓存"></a>自定义缓存</h3><p>自定义缓存对象，该对象必须实现 org.apache.ibatis.cache.Cache 接口，如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CacheTest</span> <span class="keyword">implements</span> <span class="title">Cache</span> </span>&#123;</span><br><span class="line">       <span class="keyword">private</span> ReadWriteLock lock = <span class="keyword">new</span> ReentrantReadWriteLock();</span><br><span class="line">       <span class="keyword">private</span> ConcurrentHashMap&lt;Object, Object&gt; cache = <span class="keyword">new</span> ConcurrentHashMap&lt;Object, Object&gt;();</span><br><span class="line">       <span class="keyword">private</span> String id;</span><br><span class="line"></span><br><span class="line">       <span class="function"><span class="keyword">public</span> <span class="title">CacheTest</span><span class="params">()</span> </span>&#123;</span><br><span class="line">               System.out.println(<span class="string">"初始化1"</span>);</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       <span class="comment">// 必须有该构造函数</span></span><br><span class="line">       <span class="function"><span class="keyword">public</span> <span class="title">CacheTest</span><span class="params">(String id)</span> </span>&#123;</span><br><span class="line">               System.out.println(<span class="string">"初始化2"</span>);</span><br><span class="line">               <span class="keyword">this</span>.id = id;</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       <span class="comment">// 获取缓存编号</span></span><br><span class="line">       <span class="function"><span class="keyword">public</span> String <span class="title">getId</span><span class="params">()</span> </span>&#123;</span><br><span class="line">               System.out.println(<span class="string">"得到ID："</span> + id);</span><br><span class="line">               <span class="keyword">return</span> id;</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       <span class="comment">// 获取缓存对象的大小</span></span><br><span class="line">       <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getSize</span><span class="params">()</span> </span>&#123;</span><br><span class="line">               System.out.println(<span class="string">"获取缓存大小！"</span>);</span><br><span class="line">               <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       <span class="comment">// 保存key值缓存对象</span></span><br><span class="line">       <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">putObject</span><span class="params">(Object key, Object value)</span> </span>&#123;</span><br><span class="line">               System.out.println(<span class="string">"往缓存中添加元素：key="</span> + key + <span class="string">",value="</span> + value);</span><br><span class="line">               cache.put(key, value);</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       <span class="comment">// 通过KEY</span></span><br><span class="line">       <span class="function"><span class="keyword">public</span> Object <span class="title">getObject</span><span class="params">(Object key)</span> </span>&#123;</span><br><span class="line">               System.out.println(<span class="string">"通过Key获取值的Key："</span> + key);</span><br><span class="line">               System.out.println(<span class="string">"通过Key获取的值为："</span>+cache.get(key));</span><br><span class="line">               <span class="keyword">return</span> cache.get(key);</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       <span class="comment">// 通过key删除缓存对象</span></span><br><span class="line">       <span class="function"><span class="keyword">public</span> Object <span class="title">removeObject</span><span class="params">(Object key)</span> </span>&#123;</span><br><span class="line">               System.out.println(<span class="string">"移除缓存对象："</span> + key);</span><br><span class="line">               <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       <span class="comment">// 清空缓存</span></span><br><span class="line">       <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">clear</span><span class="params">()</span> </span>&#123;</span><br><span class="line">               System.out.println(<span class="string">"清除缓存！"</span>);</span><br><span class="line">               cache.clear();</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       <span class="comment">// 获取缓存的读写锁</span></span><br><span class="line">       <span class="function"><span class="keyword">public</span> ReadWriteLock <span class="title">getReadWriteLock</span><span class="params">()</span> </span>&#123;</span><br><span class="line">               System.out.println(<span class="string">"获取锁对象！！！"</span>);</span><br><span class="line">               <span class="keyword">return</span> lock;</span><br><span class="line">       &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>配置：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">cache</span> <span class="attr">readOnly</span>=<span class="string">"true"</span> <span class="attr">type</span>=<span class="string">"com.hu.test.CacheTest"</span>&gt;</span><span class="tag">&lt;/<span class="name">cache</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>测试：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        SqlSession session = MyBatisUtil.getSession();</span><br><span class="line">                </span><br><span class="line">        User user = session.selectOne(<span class="string">"com.hu.mapper.UserMapper.selectById"</span>,<span class="number">2</span>);</span><br><span class="line">        System.out.println(user);</span><br><span class="line">        System.out.println(<span class="string">"------------------------------------------------------------------------"</span>);</span><br><span class="line">        session.commit();</span><br><span class="line">        <span class="comment">//另外一个session</span></span><br><span class="line">        SqlSession session1 = MyBatisUtil.getSession();</span><br><span class="line">        User user1 = session1.selectOne(<span class="string">"com.hu.mapper.UserMapper.selectById"</span>,<span class="number">2</span>);</span><br><span class="line">        System.out.println(user1);</span><br><span class="line">        session1.commit();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><img src="https://img.huyunshun.com/img/20200407092946.png" alt="20200407092946"></p>
+<p>每次查询数据库前，MyBatis都会先在缓存中查找是否有该缓存对象。只有当调用了commit() 方法，MyBatis才会往缓存中写入数据，数据记录的键为 数字编号+Mapper名+方法名+SQL语句+参数 格式，值为返回的对象值。</p>
+
+      
+    </div>
+     <!-- 相关文章推荐 -->
+    
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/mybatis/" rel="tag"># mybatis</a>
+          
+            <a href="/tags/mapper/" rel="tag"># mapper</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/04/05/Redis%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA%EF%BC%88%E8%8A%82%E7%82%B9%E6%B7%BB%E5%8A%A0%E5%88%A0%E9%99%A4%EF%BC%89/" rel="next" title="Redis集群搭建（节点添加删除）">
+                <i class="fa fa-chevron-left"></i> Redis集群搭建（节点添加删除）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/04/08/Redis%E4%BB%8B%E7%BB%8D%E5%92%8C%E4%B8%8B%E8%BD%BD%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE/" rel="prev" title="Redis介绍和下载安装配置">
+                Redis介绍和下载安装配置 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+<span class="jiathis_txt">分享到：</span>
+<a class="jiathis_button_fav">收藏夹</a>
+<a class="jiathis_button_copy">复制网址</a>
+<a class="jiathis_button_email">邮件</a>
+<a class="jiathis_button_weixin">微信</a>
+<a class="jiathis_button_qzone">QQ空间</a>
+<a class="jiathis_button_tqq">腾讯微博</a>
+<a class="jiathis_button_douban">豆瓣</a>
+<a class="jiathis_button_share">一键分享</a>
+
+<a href="http://www.jiathis.com/share?uid=2140465" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+<a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+var jiathis_config={
+  data_track_clickback:true,
+  summary:"",
+  shortUrl:false,
+  hideMore:false
+}
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://img.huyunshun.com/img/20200522182348.png"
+                alt="初晨" />
+            
+              <p class="site-author-name" itemprop="name">初晨</p>
+              <p class="site-description motion-element" itemprop="description">永远不要说你知道本质，更别说真相了。</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">249</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">46</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+<!--近期文章版块-->
+            
+                <div class="links-of-blogroll motion-element links-of-blogroll-block">
+                  <div class="links-of-blogroll-title">
+                    <!-- modify icon to fire by szw -->
+                    <i class="fa fa-history fa-" aria-hidden="true"></i>
+                    近期文章
+                  </div>
+                  <ul class="links-of-blogroll-list">
+                    
+                    
+                      <li>
+                        <a href="/2020/05/22/WebSocket%E3%80%81Socket%E3%80%81TCP%E3%80%81HTTP%E5%8C%BA%E5%88%AB/" title="WebSocket、Socket、TCP、HTTP区别" target="_blank">WebSocket、Socket、TCP、HTTP区别</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/19/Springboot%E9%A1%B9%E7%9B%AE%E7%9A%84%E6%8E%A5%E5%8F%A3%E9%98%B2%E5%88%B7/" title="Springboot项目的接口防刷" target="_blank">Springboot项目的接口防刷</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/03/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Volatile%E5%85%B3%E9%94%AE%E5%AD%97%E5%8F%8A%E5%85%B6%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/" title="深入理解Volatile关键字及其实现原理" target="_blank">深入理解Volatile关键字及其实现原理</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/04/20/%E4%BD%BF%E7%94%A8vscode%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0%E7%8E%AF%E5%A2%83/" title="使用vscode搭建个人笔记环境" target="_blank">使用vscode搭建个人笔记环境</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/01/20/HBase%E4%BB%8B%E7%BB%8D%E5%AE%89%E8%A3%85%E4%B8%8E%E6%93%8D%E4%BD%9C/" title="HBase介绍安装与操作" target="_blank">HBase介绍安装与操作</a>
+                      </li>
+                    
+                  </ul>
+                </div>
+            
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#mapper配置"><span class="nav-number">1.</span> <span class="nav-text">mapper配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#标签介绍"><span class="nav-number">1.1.</span> <span class="nav-text">标签介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#namespace的作用"><span class="nav-number">1.2.</span> <span class="nav-text">namespace的作用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#parametetType属性"><span class="nav-number">1.3.</span> <span class="nav-text">parametetType属性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#和-区别"><span class="nav-number">1.4.</span> <span class="nav-text">#{}和${}区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#resultType属性"><span class="nav-number">1.5.</span> <span class="nav-text">resultType属性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#注解方式配置"><span class="nav-number">1.6.</span> <span class="nav-text">注解方式配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#typeAliases-别名"><span class="nav-number">1.7.</span> <span class="nav-text">typeAliases  别名</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MyBatis事务"><span class="nav-number">2.</span> <span class="nav-text">MyBatis事务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#动态SQL"><span class="nav-number">3.</span> <span class="nav-text">动态SQL</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#lt-if-gt"><span class="nav-number">3.1.</span> <span class="nav-text">&lt;if&gt;</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#lt-where-gt"><span class="nav-number">3.2.</span> <span class="nav-text">&lt;where&gt;</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#lt-choose-gt-lt-when-gt-lt-otherwise-gt"><span class="nav-number">3.3.</span> <span class="nav-text">&lt;choose&gt;&lt;when&gt; &lt;otherwise&gt;</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#lt-set-gt"><span class="nav-number">3.4.</span> <span class="nav-text">&lt;set&gt;</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#lt-Trim-gt"><span class="nav-number">3.5.</span> <span class="nav-text">&lt;Trim&gt;</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#lt-bind-gt"><span class="nav-number">3.6.</span> <span class="nav-text">&lt;bind&gt;</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#lt-foreach-gt"><span class="nav-number">3.7.</span> <span class="nav-text">&lt;foreach&gt;</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#lt-sql-gt-lt-include-gt"><span class="nav-number">3.8.</span> <span class="nav-text">&lt;sql&gt; &lt;include&gt;</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Mybatis-注解"><span class="nav-number">4.</span> <span class="nav-text">Mybatis 注解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#缓存"><span class="nav-number">5.</span> <span class="nav-text">缓存</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#一级缓存"><span class="nav-number">5.1.</span> <span class="nav-text">一级缓存</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#二级缓存"><span class="nav-number">5.2.</span> <span class="nav-text">二级缓存</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#刷新缓存（清空缓存）"><span class="nav-number">5.2.1.</span> <span class="nav-text">刷新缓存（清空缓存）</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#自定义缓存"><span class="nav-number">5.3.</span> <span class="nav-text">自定义缓存</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Copyright</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

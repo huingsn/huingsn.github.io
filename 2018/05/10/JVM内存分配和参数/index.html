@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="jvm,内存," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="打印参数在虚拟机运行过程中，可以根据一些跟踪系统状态的参数，来排查故障或者参数设置，可以打印系统运行时的一些相关参数，分析实际问题。对参数的配置，主要也就是围绕堆、栈、方法区进行配置。 打印jvm日志的方式 eclipse  控制台得到参数 123456789HeapPSYoungGen      total 35840K, used 2458K [0x00000000d8500000, 0x00">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JVM内存分配和参数">
+<meta property="og:url" content="https://huyunshun.com/2018/05/10/JVM%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D%E5%92%8C%E5%8F%82%E6%95%B0/index.html">
+<meta property="og:site_name" content="简">
+<meta property="og:description" content="打印参数在虚拟机运行过程中，可以根据一些跟踪系统状态的参数，来排查故障或者参数设置，可以打印系统运行时的一些相关参数，分析实际问题。对参数的配置，主要也就是围绕堆、栈、方法区进行配置。 打印jvm日志的方式 eclipse  控制台得到参数 123456789HeapPSYoungGen      total 35840K, used 2458K [0x00000000d8500000, 0x00">
+<meta property="og:image" content="https://img.huyunshun.com/img/20200410181219.png">
+<meta property="article:published_time" content="2018-05-10T09:51:44.000Z">
+<meta property="article:modified_time" content="2020-05-20T10:04:24.686Z">
+<meta property="article:author" content="初晨">
+<meta property="article:tag" content="jvm">
+<meta property="article:tag" content="内存">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img.huyunshun.com/img/20200410181219.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://huyunshun.com/2018/05/10/JVM内存分配和参数/"/>
+
+
+
+
+
+  <title>JVM内存分配和参数 | 简</title>
+  
+
+
+
+
+
+
+
+
+  <script type="text/javascript" src="/js/src/love.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
+
+  <!-- 看板娘 -->
+    
+        <script async src="/live2d-widget/autoload.js"></script>
+    
+ <!-- 飘动的彩带） -->
+  <script src="/js/src/piao.js" type="text/javascript"></script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">简</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">人生短暂，学海无边，而大道至简。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://huyunshun.com/2018/05/10/JVM%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D%E5%92%8C%E5%8F%82%E6%95%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="初晨">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://img.huyunshun.com/img/20200522182348.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="简">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">JVM内存分配和参数</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-10T17:51:44+08:00">
+                2018-05-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="打印参数"><a href="#打印参数" class="headerlink" title="打印参数"></a>打印参数</h2><p>在虚拟机运行过程中，可以根据一些跟踪系统状态的参数，来排查故障或者参数设置，可以打印系统运行时的一些相关参数，分析实际问题。对参数的配置，主要也就是围绕堆、栈、方法区进行配置。</p>
+<p><strong>打印jvm日志的方式</strong></p>
+<p>eclipse</p>
+<p><img src="https://img.huyunshun.com/img/20200410181219.png" alt="20200410181219"></p>
+<p>控制台得到参数</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Heap</span><br><span class="line">PSYoungGen      total 35840K, used 2458K [0x00000000d8500000, 0x00000000dad00000, 0x0000000100000000)</span><br><span class="line"> eden space 30720K, 8% used [0x00000000d8500000,0x00000000d8766888,0x00000000da300000)</span><br><span class="line"> from space 5120K, 0% used [0x00000000da800000,0x00000000da800000,0x00000000dad00000)</span><br><span class="line"> to   space 5120K, 0% used [0x00000000da300000,0x00000000da300000,0x00000000da800000)</span><br><span class="line">ParOldGen       total 81920K, used 0K [0x0000000088e00000, 0x000000008de00000, 0x00000000d8500000)</span><br><span class="line"> object space 81920K, 0% used [0x0000000088e00000,0x0000000088e00000,0x000000008de00000)</span><br><span class="line">Metaspace       used 2748K, capacity 4486K, committed 4864K, reserved 1056768K</span><br><span class="line"> class space    used 293K, capacity 386K, committed 512K, reserved 1048576K</span><br></pre></td></tr></table></figure>
+
+<p>IntelliJ IDEA：</p>
+<p>于是，运行程序后，GC日志就可以打印出来了，和eclipse测试一样。</p>
+<p>解读日志信息：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Heap</span><br><span class="line">新生代分配情况</span><br><span class="line">PSYoungGen      total 35840K, used 3072K [0x00000000d8500000, 0x00000000dad00000, 0x0000000100000000)</span><br><span class="line"> eden space 30720K, 10% used [0x00000000d8500000,0x00000000d88002b8,0x00000000da300000)</span><br><span class="line"> from space 5120K, 0% used [0x00000000da800000,0x00000000da800000,0x00000000dad00000)</span><br><span class="line"> to   space 5120K, 0% used [0x00000000da300000,0x00000000da300000,0x00000000da800000)</span><br><span class="line">老年代分配情况</span><br><span class="line">ParOldGen       total 81920K, used 0K [0x0000000088e00000, 0x000000008de00000, 0x00000000d8500000)</span><br><span class="line"> object space 81920K, 0% used [0x0000000088e00000,0x0000000088e00000,0x000000008de00000)</span><br><span class="line">元空间分配情况，jdk8彻底去除了永久代</span><br><span class="line">Metaspace       used 3125K, capacity 4496K, committed 4864K, reserved 1056768K</span><br><span class="line"> class space    used 342K, capacity 388K, committed 512K, reserved 1048576K</span><br></pre></td></tr></table></figure>
+<h2 id="堆的分配参数"><a href="#堆的分配参数" class="headerlink" title="堆的分配参数"></a>堆的分配参数</h2><pre><code>1、-Xmx -Xms：指定最大堆和最小堆
+    -Xmx设置程序能获得最大堆大小，-Xms设置程序启动时初始堆大小
+2、-XX:+PrintGC 遇到GC就会打印日志。
+3、-XX:+UseSerialGC 配置串行回收器
+4、-XX:+PrintGCDetails查看GC详情，包括各个回收区的情况。
+5、-XX:+PrintCommandLineFlags：可以将隐式或显示传给JVM的参数输出，就是把配置的参数所改变的信息也打印输出。</code></pre><p>-XX这种这是是对jvm系统级别的配置，非-XX配置基本是对应用级别的设置。+启用-禁用</p>
+<p><strong>实际中，可以直接将初始的堆大小与最大堆大小设置相等，这样的好处是可以减少程序运行时的垃圾回收次数，从而提到性能。</strong></p>
+<p>默认程序堆大小，可以通过Java程序获取</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">public static void main(String[] args) &#123;</span><br><span class="line">        System.out.println(&quot;Xmx&#x3D;&quot; + Runtime.getRuntime().maxMemory() &#x2F; 1024.0 &#x2F; 1024 + &quot;M&quot;); &#x2F;&#x2F; 系统的最大空间</span><br><span class="line">        System.out.println(&quot;free mem&#x3D;&quot; + Runtime.getRuntime().freeMemory() &#x2F; 1024.0 &#x2F; 1024 + &quot;M&quot;); &#x2F;&#x2F; 系统的空闲空间</span><br><span class="line">        System.out.println(&quot;total mem&#x3D;&quot; + Runtime.getRuntime().totalMemory() &#x2F; 1024.0 &#x2F; 1024 + &quot;M&quot;); &#x2F;&#x2F; 当前可用的总空间</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<pre><code>Xmx=1694.5M
+free mem=113.19983673095703M
+total mem=115.0M</code></pre><p>Demo测试设置（多个命令一起执行）： -XX:+PrintGC -Xms40M -Xmx40M -Xmn20M -XX:+PrintGCDetails -XX:+UseSerialGC -XX:+PrintCommandLineFlags</p>
+<pre><code>-XX:+PrintGC 打印GC
+-Xms40M 设置堆初始大小40M
+-Xmx40M 设置堆最大大小40M
+-Xmn20M 设置堆中 new Generation 新生代的大小为20M
+-XX:+PrintGCDetails 输出GC的详细日志
+-XX:+UseSerialGC 设置GC回收器模式是串型垃圾回收器
+-XX:+PrintCommandLineFlags  配置的参数所改变的信息也打印输出</code></pre><p>Java代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;**</span><br><span class="line"> *  -XX:+PrintGC -Xms40M -Xmx40M -Xmn20M -XX:+PrintGCDetails -XX:+UseSerialGC -XX:+PrintCommandLineFlags</span><br><span class="line"> * @param args</span><br><span class="line"> *&#x2F;</span><br><span class="line">public static void main(String[] args) &#123;</span><br><span class="line">        byte[] b1 &#x3D; new byte[4 * 1024 * 1024];</span><br><span class="line">        byte[] b2 &#x3D; new byte[4 * 1024 * 1024];</span><br><span class="line">        byte[] b3 &#x3D; new byte[4 * 1024 * 1024];</span><br><span class="line">        byte[] b4 &#x3D; new byte[8 * 1024 * 1024];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>分析：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">初始分配：</span><br><span class="line">Java堆，共有 40M</span><br><span class="line">       新生代，有20M</span><br><span class="line">               Eden区，16M</span><br><span class="line">               Servivor From ，2M</span><br><span class="line">               Servior To ，2M</span><br><span class="line">       老年代，有20M</span><br><span class="line">当b1&#x2F;b2&#x2F;b3执行完时</span><br><span class="line">       Eden 被分配12M</span><br><span class="line">当a4执行时</span><br><span class="line">       因为需要分配8M，但现在Eden中只有4M空闲，无法满足b4申请；</span><br><span class="line">       from和to中也只有2M，也不能满足，所以要触发MinorGC；</span><br><span class="line">       MinorGC执行，处理b1&#x2F;b2&#x2F;b3的空间，他们都是4M，所以servivor也不够转移，直接回被移到老年代；</span><br><span class="line">       MinorGC执行后，分配如下：</span><br><span class="line">       新生代，total 20M</span><br><span class="line">               Eden区 free 16M</span><br><span class="line">               Servivor From free 2M</span><br><span class="line">               Servior To free 2M</span><br><span class="line">       老年代，total 20M free 8M</span><br><span class="line">       再次分配b4</span><br><span class="line">               新生代，total 20M</span><br><span class="line">               Eden区 free 8M</span><br><span class="line">               Servivor From free 2M</span><br><span class="line">               Servior To free 2M</span><br><span class="line">               老年代，total 20M free 8M</span><br></pre></td></tr></table></figure>
+<p>运行结果分析： 配置项大小结果</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">-XX:InitialHeapSize&#x3D;41943040 -XX:MaxHeapSize&#x3D;41943040 -XX:MaxNewSize&#x3D;20971520 -XX:NewSize&#x3D;20971520 -XX:+PrintCommandLineFlags -XX:+PrintGC -XX:+PrintGCDetails -XX:+UseCompressedClassPointers -XX:+UseCompressedOops -XX:-UseLargePagesIndividualAllocation -XX:+UseSerialGC</span><br><span class="line">[GC (Allocation Failure) [DefNew: 13599K-&gt;553K(18432K), 0.0109283 secs] 13599K-&gt;12841K(38912K), 0.0118473 secs] [Times: user&#x3D;0.01 sys&#x3D;0.00, real&#x3D;0.01 secs]</span><br><span class="line">Heap</span><br><span class="line">       新生代</span><br><span class="line">def new generation   total 18432K, used 8909K [0x00000000fd800000, 0x00000000fec00000, 0x00000000fec00000)</span><br><span class="line"> eden space 16384K,  51% used [0x00000000fd800000, 0x00000000fe0290e0, 0x00000000fe800000)</span><br><span class="line"> from space 2048K,  27% used [0x00000000fea00000, 0x00000000fea8a558, 0x00000000fec00000)</span><br><span class="line"> to   space 2048K,   0% used [0x00000000fe800000, 0x00000000fe800000, 0x00000000fea00000)</span><br><span class="line">       老年代</span><br><span class="line">tenured generation   total 20480K, used 12288K [0x00000000fec00000, 0x0000000100000000, 0x0000000100000000)</span><br><span class="line">  the space 20480K,  60% used [0x00000000fec00000, 0x00000000ff800030, 0x00000000ff800200, 0x0000000100000000)</span><br><span class="line">       元空间</span><br><span class="line">Metaspace       used 2749K, capacity 4486K, committed 4864K, reserved 1056768K</span><br><span class="line"> class space    used 293K, capacity 386K, committed 512K, reserved 1048576K</span><br></pre></td></tr></table></figure>
+<p>运行结果基本符合推导结果。</p>
+<p>6、-Xmn</p>
+<pre><code>设置新生代大小</code></pre><p>7、-XX:NewRatio　</p>
+<pre><code>新生代（eden+2*s）和老年代（不包含永久区）的比值，默认2
+例如：4，表示新生代:老年代=1:4，即新生代占整个堆的1/5</code></pre><p>8、-XX:SurvivorRatio   设置两个Survivor区和eden的比值，默认8</p>
+<p>   　例如：8，表示两个Survivor:eden=2:8，即一个Survivor占年轻代的1/10</p>
+<p>9、-XX:+HeapDumpOnOutOfMemoryError</p>
+<pre><code>OOM（Out Of Memory内存溢出）时导出堆到文件，根据这个文件，我们可以看到系统dump时发生了什么。
+内存分析工具：Memory Anakyaer，eclipse插件
+-XX:+HeapDumpPath        导出OOM的路径
+例如：XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=d:/a.dump
+我们可以用VisualVM打开这个dump文件。
+注：关于VisualVM的使用，可以参考下面这篇博客：
+使用 VisualVM 进行性能分析及调优：http://www.ibm.com/developerworks/cn/java/j-lo-visualvm/
+或者使用Java bin目录里自带的Java VisualVM工具也行</code></pre><p>10、-XX:OnOutOfMemoryError</p>
+<pre><code>在OOM时，执行一个脚本。可以在OOM时，发送邮件，甚至是重启程序。
+例：-XX:OnOutOfMemoryError=D:/..../jdk/bin/printstack.bat %p    p代表的是当前进程的pid
+上方参数的意思是说，执行printstack.bat脚本，而这个脚本做的事情是：D:/..../jdk/bin/jstack -F %1 &gt; D:/a.txt，即当程序OOM时，在D:/a.txt中将会生成线程的dump。</code></pre><p>11、-XX:PermSize  -XX:MaxPermSize</p>
+<pre><code>设置永久区的初始空间和最大空间。也就是说，jvm启动时，永久区一开始就占用了PermSize大小的空间，如果空间还不够，可以继续扩展，但是不能超过MaxPermSize，否则会OOM。
+jdk8开始，已经移除永久代。</code></pre><p>12、</p>
+<pre><code>-XX:MaxTenuringThreshold 指定新生代经过多少次回收后进入老年代，默认15
+-XX:PretenureSizeThreshold 设置对象大小超过指定大小后，直接进入老年代。注意线程TLAB区优先分配空间问题。
+TLAB（Thread Local Allocation Buffer）线程本地分配缓存，是为了加速对象 分配而生的。线程私有。
+JVM使用这个区来避免多线程冲突问题，提高对象分配的效率，TLAB空间不会太大，当大对象无法再TLAB上分配时，才会直接分配到堆上。
+-XX:+UseTLAB 使用TLAB
+-XX:+TLABSize 设置大小
+-XX:TLABRefillWasteFraction 设置维护进入TLAB空间的单个对象大小，他是一个比值，默认64，如果对象DAU整个空间的1/64则在堆上创建对象。
+-XX:+PrintTLAB 查看TLAB信息
+-XX:ResizeTLAB 自调整TLABRefillWasteFraction的阈值。</code></pre><p>总结：实际中，根基实际情况调整新生代和幸存代的大小；在OOM时，记得把dump文件导出，可以促进排查问题。</p>
+<h2 id="栈的分配参数"><a href="#栈的分配参数" class="headerlink" title="栈的分配参数"></a>栈的分配参数</h2><p>1、-Xss 指定线程的最大栈空间，决定了函数可以调用的最大深度。</p>
+<p>　　<br>    每个线程都有独立的栈空间；<br>    局部变量、参数 分配在栈上；<br>    栈空间是每个线程私有的区域。栈里面的主要内容是栈帧，而栈帧存放的是局部变量表，局部变量表的内容是：局部变量、参数。</p>
+<p>示例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"> public class Demo2 &#123;</span><br><span class="line">      private static int count &#x3D; 0;</span><br><span class="line">      public static void recursion() &#123;</span><br><span class="line">              long l1 &#x3D; 1;</span><br><span class="line">              count++;</span><br><span class="line">              recursion();</span><br><span class="line">      &#125;</span><br><span class="line">      public static void main(String[] args) &#123;</span><br><span class="line">              try &#123;</span><br><span class="line">                      recursion();</span><br><span class="line">              &#125; catch (Throwable e) &#123;</span><br><span class="line">                      System.out.println(count);</span><br><span class="line">                      e.printStackTrace();</span><br><span class="line">              &#125;</span><br><span class="line">      &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这段代码是没有出口的递归，肯定会出现OOM.</p>
+<p>如果设置栈大小为：-Xss1m，方法调用26037了次</p>
+<pre><code>26037
+java.lang.StackOverflowError
+    at com.hu.demo.Demo2.recursion(Demo2.java:9)
+
+如果设置栈大小为：-Xss2m，方法调用了48156次
+48156
+java.lang.StackOverflowError
+    at com.hu.demo.Demo2.recursion(Demo2.java:8)</code></pre><p>所以：-Xss设置决定函数调用的深度。</p>
+<p><strong>方法区参数</strong></p>
+<p>和堆一样，方法区是一块所有线程共享的内存，用于保存类的信息，可以保存多少信息，可以通过配置：</p>
+<p>-XX:MaxPermSize ,默认64M，实际中，如果系统产生大量的类，就需要设置这个合适的参数，一面出现OOM。<br>-XX:sPermSize</p>
+<p><strong>直接内存配置</strong></p>
+<p>特别是在NIO编程中，直接内存跳过了java堆，使其java直接访问内存空间。</p>
+<p>-XX:MaxDirechMemorySize，如果不设置，默认为最大堆空间-Xmx，直接内存到上限时就会触发垃圾回收。</p>
+<h2 id="垃圾回收的JVM配置"><a href="#垃圾回收的JVM配置" class="headerlink" title="垃圾回收的JVM配置"></a>垃圾回收的JVM配置</h2><p>运行的垃圾回收器类型</p>
+<p>配置        </p>
+<pre><code>-XX:+UseSerialGC        串行垃圾回收器
+-XX:+UseParallelGC        并行垃圾回收器
+-XX:+UseConcMarkSweepGC        并发标记扫描垃圾回收器
+-XX:ParallelCMSThreads=        并发标记扫描垃圾回收器 =为使用的线程数量
+-XX:+UseG1GC        G1垃圾回收器</code></pre><p>GC的优化配置</p>
+<p>配置      </p>
+<pre><code>-Xms        初始化堆内存大小
+-Xmx        堆内存最大值
+-Xmn        新生代大小
+-XX:PermSize        初始化永久代大小
+-XX:MaxPermSize        永久代最大容量</code></pre><p>并行收集器设置</p>
+<pre><code>-XX:ParallelGCThreads=n:设置并行收集器收集时使用的CPU数。并行收集线程数。
+-XX:MaxGCPauseMillis=n:设置并行收集最大暂停时间
+-XX:GCTimeRatio=n:设置垃圾回收时间占程序运行时间的百分比。公式为1/(1+n)</code></pre><p>并发收集器设置</p>
+<pre><code>-XX:+CMSIncrementalMode:设置为增量模式。适用于单CPU情况。
+-XX:ParallelGCThreads=n:设置并发收集器年轻代收集方式为并行收集时，使用的CPU数。并行收集线程数。</code></pre><h2 id="JDK8相关参数"><a href="#JDK8相关参数" class="headerlink" title="JDK8相关参数"></a>JDK8相关参数</h2><p>1、由于jdk8开始，彻底去除永久区，所以永久区的参数就不用了。</p>
+<p>-XX:PermSize<br>-XX:MaxPermSize</p>
+<p>2、metaspace，元数据空间，专门用来存元数据的，jdk8里特有的数据结构用来替代perm</p>
+<pre><code>（1）CompressedClassSpaceSize参数作用是设置Klass Metaspace的大小，默认1G
+
+Klass Metaspace就是用来存klass的，klass是的class文件在jvm里的运行时数据结构，没有开启压缩指针，就不会有CompressedClassSpaceSize这块内存，但是jdk1.8里应该是默认开启的，并且，如果这块内存会如果没有满会一直增加。
+
+但是-Xmx超过了32G，压缩指针是默认不开启的，而这个参数也就失去了设置的意义。
+
+（2）MaxMetaspaceSize
+
+   默认基本是无穷大，这个参数很可能会因为没有限制而导致metaspace被无止境使用(一般是内存泄漏)而被OS Kill。这个参数会限制metaspace(包括了Klass Metaspace以及NoKlass Metaspace)被committed的内存大小，会保证committed的内存不会超过这个值，一旦超过就会触发GC，这里要注意和MaxPermSize的区别，MaxMetaspaceSize并不会在jvm启动的时候分配一块这么大的内存出来，而MaxPermSize是会分配一块这么大的内存的。</code></pre><p>3.MaxDirectMemorySize</p>
+<pre><code>此参数主要影响的是非堆内存的direct byte buffer，jvm默认会设置64M，可根据功能适当加大此项参数，因为非堆内存，故而不会被GC回收掉，容易出现java.lang.OutOfMemoryError: Direct buffer memory错误
+如出现以上错误，可通过以下参数打印log，之后用工具进行分析</code></pre><p>-XX:-HeapDumpOnOutOfMemoryError<br>-XX:HeapDumpPath=logs/oom_dump.log</p>
+<p>4、G1收集器参数</p>
+<pre><code>-XX:+UseG1GC
+使用G1收集器
+-XX:MaxGCPauseMillis=200
+用户设定的最大gc 停顿时间，默认是200ms.
+-XX:InitiatingHeapOccupancyPercent=45
+默认是45，也就是heap中45%的容量被使用，则会触发concurrent gc
+
+-XX:NewRatio=n
+新生代与老生代(new/old generation)的大小比例(Ratio). 默认值为 2.
+-XX:SurvivorRatio=n    eden/survivor
+空间大小的比例(Ratio). 默认值为 8.
+-XX:MaxTenuringThreshold=n
+提升年老代的最大临界值(tenuring threshold). 默认值为 15.
+-XX:ParallelGCThreads=n
+设置垃圾收集器在并行阶段使用的线程数,默认值随JVM运行的平台不同而不同.
+-XX:ConcGCThreads=n
+并发垃圾收集器使用的线程数量. 默认值随JVM运行的平台不同而不同.
+-XX:G1ReservePercent=n
+设置堆内存保留为假天花板的总量,以降低提升失败的可能性. 默认值是 10.
+-XX:G1HeapRegionSize=n
+使用G1时Java堆会被分为大小统一的的区(region)。此参数可以指定每个heap区的大小. 默认值将根据 heap size 算出最优解. 最小值为 1Mb, 最大值为 32Mb.</code></pre><p> 目前jvm支持Client和Server两种运行模式，</p>
+<p>使用参数-client可以指定使用client模式。</p>
+<p>使用参数-server启动server模式。</p>
+<p>查看当前jvm使用的模式java -version</p>
+<p>区别：client比server启动较快，server启动较慢，如果是要对其进行复杂的系统性能信息收集和使用更复杂的算法对程序进行优化，一般都会启动server模式，长期运行的性能远远快于client模式。</p>
+
+      
+    </div>
+     <!-- 相关文章推荐 -->
+    
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/jvm/" rel="tag"># jvm</a>
+          
+            <a href="/tags/%E5%86%85%E5%AD%98/" rel="tag"># 内存</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/05/10/JVM%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E6%9C%BA%E5%88%B6/" rel="next" title="JVM垃圾回收机制">
+                <i class="fa fa-chevron-left"></i> JVM垃圾回收机制
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/05/14/Rest%E5%92%8CRestful%E9%A3%8E%E6%A0%BC/" rel="prev" title="Rest和Restful风格">
+                Rest和Restful风格 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+<span class="jiathis_txt">分享到：</span>
+<a class="jiathis_button_fav">收藏夹</a>
+<a class="jiathis_button_copy">复制网址</a>
+<a class="jiathis_button_email">邮件</a>
+<a class="jiathis_button_weixin">微信</a>
+<a class="jiathis_button_qzone">QQ空间</a>
+<a class="jiathis_button_tqq">腾讯微博</a>
+<a class="jiathis_button_douban">豆瓣</a>
+<a class="jiathis_button_share">一键分享</a>
+
+<a href="http://www.jiathis.com/share?uid=2140465" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+<a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+var jiathis_config={
+  data_track_clickback:true,
+  summary:"",
+  shortUrl:false,
+  hideMore:false
+}
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://img.huyunshun.com/img/20200522182348.png"
+                alt="初晨" />
+            
+              <p class="site-author-name" itemprop="name">初晨</p>
+              <p class="site-description motion-element" itemprop="description">永远不要说你知道本质，更别说真相了。</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">249</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">46</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+<!--近期文章版块-->
+            
+                <div class="links-of-blogroll motion-element links-of-blogroll-block">
+                  <div class="links-of-blogroll-title">
+                    <!-- modify icon to fire by szw -->
+                    <i class="fa fa-history fa-" aria-hidden="true"></i>
+                    近期文章
+                  </div>
+                  <ul class="links-of-blogroll-list">
+                    
+                    
+                      <li>
+                        <a href="/2020/05/22/WebSocket%E3%80%81Socket%E3%80%81TCP%E3%80%81HTTP%E5%8C%BA%E5%88%AB/" title="WebSocket、Socket、TCP、HTTP区别" target="_blank">WebSocket、Socket、TCP、HTTP区别</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/19/Springboot%E9%A1%B9%E7%9B%AE%E7%9A%84%E6%8E%A5%E5%8F%A3%E9%98%B2%E5%88%B7/" title="Springboot项目的接口防刷" target="_blank">Springboot项目的接口防刷</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/03/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Volatile%E5%85%B3%E9%94%AE%E5%AD%97%E5%8F%8A%E5%85%B6%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/" title="深入理解Volatile关键字及其实现原理" target="_blank">深入理解Volatile关键字及其实现原理</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/04/20/%E4%BD%BF%E7%94%A8vscode%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0%E7%8E%AF%E5%A2%83/" title="使用vscode搭建个人笔记环境" target="_blank">使用vscode搭建个人笔记环境</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/01/20/HBase%E4%BB%8B%E7%BB%8D%E5%AE%89%E8%A3%85%E4%B8%8E%E6%93%8D%E4%BD%9C/" title="HBase介绍安装与操作" target="_blank">HBase介绍安装与操作</a>
+                      </li>
+                    
+                  </ul>
+                </div>
+            
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#打印参数"><span class="nav-number">1.</span> <span class="nav-text">打印参数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#堆的分配参数"><span class="nav-number">2.</span> <span class="nav-text">堆的分配参数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#栈的分配参数"><span class="nav-number">3.</span> <span class="nav-text">栈的分配参数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#垃圾回收的JVM配置"><span class="nav-number">4.</span> <span class="nav-text">垃圾回收的JVM配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JDK8相关参数"><span class="nav-number">5.</span> <span class="nav-text">JDK8相关参数</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Copyright</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

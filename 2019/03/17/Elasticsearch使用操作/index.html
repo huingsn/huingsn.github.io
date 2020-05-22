@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Elasticsearch," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="ES架构  123456789101112131415161718192021Gateway层：最底这一层最主要是是做数据持久化的，其实就是数据层，es支持可以在多种文件系统上运行，可以支持各种的存储系统，本地的存储系统、HadoopHDFS等等各种各样的数据存储系统，用于存元数据。Lucene层ElasticScarch的底层就是对Lucene的一个封装，它由始至终都要用到Lucene，Elas">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Elasticsearch使用操作">
+<meta property="og:url" content="https://huyunshun.com/2019/03/17/Elasticsearch%E4%BD%BF%E7%94%A8%E6%93%8D%E4%BD%9C/index.html">
+<meta property="og:site_name" content="简">
+<meta property="og:description" content="ES架构  123456789101112131415161718192021Gateway层：最底这一层最主要是是做数据持久化的，其实就是数据层，es支持可以在多种文件系统上运行，可以支持各种的存储系统，本地的存储系统、HadoopHDFS等等各种各样的数据存储系统，用于存元数据。Lucene层ElasticScarch的底层就是对Lucene的一个封装，它由始至终都要用到Lucene，Elas">
+<meta property="og:image" content="https://img.huyunshun.com/img1/Elasticsearch/sdfsdjjhfdvxdd676tyfgfdimgclip.png">
+<meta property="article:published_time" content="2019-03-16T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-05-20T10:04:24.708Z">
+<meta property="article:author" content="初晨">
+<meta property="article:tag" content="Elasticsearch">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img.huyunshun.com/img1/Elasticsearch/sdfsdjjhfdvxdd676tyfgfdimgclip.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://huyunshun.com/2019/03/17/Elasticsearch使用操作/"/>
+
+
+
+
+
+  <title>Elasticsearch使用操作 | 简</title>
+  
+
+
+
+
+
+
+
+
+  <script type="text/javascript" src="/js/src/love.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
+
+  <!-- 看板娘 -->
+    
+        <script async src="/live2d-widget/autoload.js"></script>
+    
+ <!-- 飘动的彩带） -->
+  <script src="/js/src/piao.js" type="text/javascript"></script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">简</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">人生短暂，学海无边，而大道至简。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://huyunshun.com/2019/03/17/Elasticsearch%E4%BD%BF%E7%94%A8%E6%93%8D%E4%BD%9C/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="初晨">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://img.huyunshun.com/img/20200522182348.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="简">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Elasticsearch使用操作</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-03-17T00:00:00+08:00">
+                2019-03-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Elasticsearch/" itemprop="url" rel="index">
+                    <span itemprop="name">Elasticsearch</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>ES架构</p>
+<p><img src="https://img.huyunshun.com/img1/Elasticsearch/sdfsdjjhfdvxdd676tyfgfdimgclip.png" alt=""></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">Gateway层：</span><br><span class="line">最底这一层最主要是是做数据持久化的，其实就是数据层，es支持可以在多种文件系统上运行，可以支持各种的存储系统，本地的存储系统、HadoopHDFS等等各种各样的数据存储系统，用于存元数据。</span><br><span class="line"></span><br><span class="line">Lucene层</span><br><span class="line">ElasticScarch的底层就是对Lucene的一个封装，它由始至终都要用到Lucene，ElasticScarch在Lucene的基础之上做了一个分布式的框架，把多个Lucene的索引给管理起来，最后做一个非常大规模的搜索引擎。</span><br><span class="line"></span><br><span class="line">倒数第三层 index、search、mapping：</span><br><span class="line">index模块： 怎么创建某个索引，数据如何创建，如何存储 都由它来管理。</span><br><span class="line">search模块： 数据的查询由它来完成。</span><br><span class="line">mapping模块： 相单于如何创建一个表的结构、怎么创建这个mapping都由它管理</span><br><span class="line">River模块： 这个模块现在没有了，我记得是数据同步还是什么鬼（反正不重要）</span><br><span class="line"></span><br><span class="line">倒数第四层 Discovery、Scripting、3rdPlugins：</span><br><span class="line">Discovery模块： 服务发现模块、当有节点要加入进来需要通过此模块，主要处理节点与节点之间的问题，目前实现有两种方式，分别是ZEN、EC2，用的最多的是ZEN。</span><br><span class="line">Scripting模块： 脚本模块、可以自己写一段脚本代码 来进行元数据的二次处理 返回给前台页面。（性能低最好别用）</span><br><span class="line">3rdPlugins：第三方插件，ElasticScarch支持很多的第三方插件。</span><br><span class="line"></span><br><span class="line">Transport层：</span><br><span class="line">Transport层主要用于数据的传输、想访问ElasticScarch，第一步就是要和它进行连接，那么连接的步骤和数据的传输，就在这层。一般我们都用http进行交互。</span><br><span class="line"></span><br><span class="line">RESTful 层：访问</span><br></pre></td></tr></table></figure>
+
+<p>** ES支持的客户端连接方式 **</p>
+<p>1、REST API ，端口 9200</p>
+<p>这种连接方式对应于架构图中的RESTful style API这一层，这种客户端的连接方式是RESTful风格的，使用http的方式进行连接</p>
+<p>2、Transport 连接 端口 9300</p>
+<p>这种连接方式对应于架构图中的Transport这一层，这种客户端连接方式是直接连接ES的节点，使用TCP的方式进行连接</p>
+<p>3、多种编程语言客户端</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Java REST Client [7.4] — other versions</span><br><span class="line">Java API [7.4] — other versions</span><br><span class="line">JavaScript API [7.x] — other versions</span><br><span class="line">Ruby API [7.x] — other versions</span><br><span class="line">Go API</span><br><span class="line">.NET API [7.x] — other versions</span><br><span class="line">PHP API [7.2] — other versions</span><br><span class="line">Perl API</span><br><span class="line">Python API</span><br><span class="line">Community Contributed Clients</span><br></pre></td></tr></table></figure>
+<h1 id="Java-REST-Client"><a href="#Java-REST-Client" class="headerlink" title="Java REST Client"></a>Java REST Client</h1><p>** ES提供了两个JAVA REST client 版本** </p>
+<p>Java Low Level REST Client: 低级别的REST客户端，通过http与集群交互，用户需自己编组请求JSON串，及解析响应JSON串。兼容所有ES版本。</p>
+<p>Java High Level REST Client: 高级别的REST客户端，基于低级别的REST客户端，增加了编组请求JSON串、解析响应JSON串等相关api。使用的版本需要保持和ES服务端的版本一致，否则会有版本问题。</p>
+<p>** Java Low Level REST Client ** </p>
+<p>maven 引入、使用介绍： <a href="https://www.elastic.co/guide/en/elasticsearch/client/java-rest/current/java-rest-low.html" target="_blank" rel="noopener">https://www.elastic.co/guide/en/elasticsearch/client/java-rest/current/java-rest-low.html</a></p>
+<p>API doc ：<a href="https://artifacts.elastic.co/javadoc/org/elasticsearch/client/elasticsearch-rest-client/6.2.4/index.html" target="_blank" rel="noopener">https://artifacts.elastic.co/javadoc/org/elasticsearch/client/elasticsearch-rest-client/6.2.4/index.html</a>.</p>
+<p>** Java High Level REST Client ** </p>
+<p>从6.0.0开始加入的，目的是以java面向对象的方式来进行请求、响应处理。每个API 支持 同步/异步 两种方式，同步方法直接返回一个结果对象。异步的方法以async为后缀，通过listener参数来通知结果。<br>高级java REST 客户端依赖Elasticsearch core project</p>
+<p>兼容性说明：依赖 java1.8 和 Elasticsearch core project，请使用与服务端ES版本一致的客户端版本</p>
+<p>** Java High Level REST Client  maven 集成** </p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.elasticsearch.client<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>elasticsearch-rest-high-level-client<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>6.2.4<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>** Java High Level REST Client  初始化** </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">RestHighLevelClient client = <span class="keyword">new</span> RestHighLevelClient(</span><br><span class="line">        RestClient.builder(</span><br><span class="line">                <span class="keyword">new</span> HttpHost(<span class="string">"localhost"</span>, <span class="number">9200</span>, <span class="string">"http"</span>),</span><br><span class="line">                <span class="keyword">new</span> HttpHost(<span class="string">"localhost"</span>, <span class="number">9201</span>, <span class="string">"http"</span>)));</span><br><span class="line"><span class="comment">//...</span></span><br><span class="line">client.close();</span><br></pre></td></tr></table></figure>
+<p>给定集群的多个节点地址，将客户端负载均衡地向这个节点地址集发请求，API及用法示例，请参考：<a href="https://www.elastic.co/guide/en/elasticsearch/client/java-rest/current/java-rest-high-supported-apis.html" target="_blank" rel="noopener">https://www.elastic.co/guide/en/elasticsearch/client/java-rest/current/java-rest-high-supported-apis.html</a></p>
+<h1 id="Java-High-Level-REST-Client-使用示例"><a href="#Java-High-Level-REST-Client-使用示例" class="headerlink" title="Java High Level REST Client  使用示例"></a>Java High Level REST Client  使用示例</h1><h2 id="引入包"><a href="#引入包" class="headerlink" title="引入包"></a>引入包</h2><p>maven工程里面引入和ES服务端版本一样的Java客户端</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;org.elasticsearch.client&lt;&#x2F;groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;elasticsearch-rest-high-level-client&lt;&#x2F;artifactId&gt;</span><br><span class="line">    &lt;version&gt;6.2.4&lt;&#x2F;version&gt;</span><br><span class="line"> &lt;&#x2F;dependency&gt;</span><br></pre></td></tr></table></figure>
+<h2 id="初始化客户端"><a href="#初始化客户端" class="headerlink" title="初始化客户端"></a>初始化客户端</h2><p>给定集群的多个节点地址，将客户端负载均衡地向这个节点地址集发请求。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">public class InitDemo &#123;</span><br><span class="line"></span><br><span class="line">    public static RestHighLevelClient getClient() &#123;</span><br><span class="line"></span><br><span class="line">        RestHighLevelClient client &#x3D; new RestHighLevelClient(</span><br><span class="line">                RestClient.builder(new HttpHost(&quot;localhost&quot;, 9200, &quot;http&quot;),</span><br><span class="line">                        new HttpHost(&quot;localhost&quot;, 9201, &quot;http&quot;)));</span><br><span class="line"></span><br><span class="line">        return client;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Create-index-创建索引"><a href="#Create-index-创建索引" class="headerlink" title="Create index 创建索引"></a>Create index 创建索引</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CreateIndexDemo</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">try</span> (RestHighLevelClient client = InitDemo.getClient();) &#123;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 1、创建 创建索引request 参数：索引名mess</span></span><br><span class="line">            CreateIndexRequest request = <span class="keyword">new</span> CreateIndexRequest(<span class="string">"mess"</span>);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 2、设置索引的settings</span></span><br><span class="line">            request.settings(Settings.builder().put(<span class="string">"index.number_of_shards"</span>, <span class="number">3</span>) <span class="comment">// 分片数</span></span><br><span class="line">                    .put(<span class="string">"index.number_of_replicas"</span>, <span class="number">2</span>) <span class="comment">// 副本数</span></span><br><span class="line">                    .put(<span class="string">"analysis.analyzer.default.tokenizer"</span>, <span class="string">"ik_smart"</span>) <span class="comment">// 默认分词器</span></span><br><span class="line">            );</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 3、设置索引的mappings</span></span><br><span class="line">            request.mapping(<span class="string">"_doc"</span>,</span><br><span class="line">                    <span class="string">"  &#123;\n"</span> +</span><br><span class="line">                    <span class="string">"    \"_doc\": &#123;\n"</span> +</span><br><span class="line">                    <span class="string">"      \"properties\": &#123;\n"</span> +</span><br><span class="line">                    <span class="string">"        \"message\": &#123;\n"</span> +</span><br><span class="line">                    <span class="string">"          \"type\": \"text\"\n"</span> +</span><br><span class="line">                    <span class="string">"        &#125;\n"</span> +</span><br><span class="line">                    <span class="string">"      &#125;\n"</span> +</span><br><span class="line">                    <span class="string">"    &#125;\n"</span> +</span><br><span class="line">                    <span class="string">"  &#125;"</span>,</span><br><span class="line">                    XContentType.JSON);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 4、 设置索引的别名</span></span><br><span class="line">            request.alias(<span class="keyword">new</span> Alias(<span class="string">"mmm"</span>));</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 5、 发送请求</span></span><br><span class="line">            <span class="comment">// 5.1 同步方式发送请求</span></span><br><span class="line">            CreateIndexResponse createIndexResponse = client.indices()</span><br><span class="line">                    .create(request);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 6、处理响应</span></span><br><span class="line">            <span class="keyword">boolean</span> acknowledged = createIndexResponse.isAcknowledged();</span><br><span class="line">            <span class="keyword">boolean</span> shardsAcknowledged = createIndexResponse</span><br><span class="line">                    .isShardsAcknowledged();</span><br><span class="line">            System.out.println(<span class="string">"acknowledged = "</span> + acknowledged);</span><br><span class="line">            System.out.println(<span class="string">"shardsAcknowledged = "</span> + shardsAcknowledged);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 5.1 异步方式发送请求</span></span><br><span class="line">            <span class="comment">/*ActionListener&lt;CreateIndexResponse&gt; listener = new ActionListener&lt;CreateIndexResponse&gt;() &#123;</span></span><br><span class="line"><span class="comment">                @Override</span></span><br><span class="line"><span class="comment">                public void onResponse(</span></span><br><span class="line"><span class="comment">                        CreateIndexResponse createIndexResponse) &#123;</span></span><br><span class="line"><span class="comment">                    // 6、处理响应</span></span><br><span class="line"><span class="comment">                    boolean acknowledged = createIndexResponse.isAcknowledged();</span></span><br><span class="line"><span class="comment">                    boolean shardsAcknowledged = createIndexResponse</span></span><br><span class="line"><span class="comment">                            .isShardsAcknowledged();</span></span><br><span class="line"><span class="comment">                    System.out.println("acknowledged = " + acknowledged);</span></span><br><span class="line"><span class="comment">                    System.out.println(</span></span><br><span class="line"><span class="comment">                            "shardsAcknowledged = " + shardsAcknowledged);</span></span><br><span class="line"><span class="comment">                &#125;</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">                @Override</span></span><br><span class="line"><span class="comment">                public void onFailure(Exception e) &#123;</span></span><br><span class="line"><span class="comment">                    System.out.println("创建索引异常：" + e.getMessage());</span></span><br><span class="line"><span class="comment">                &#125;</span></span><br><span class="line"><span class="comment">            &#125;;</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">            client.indices().createAsync(request, listener);</span></span><br><span class="line"><span class="comment">            */</span></span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="index-document"><a href="#index-document" class="headerlink" title="index  document"></a>index  document</h2><p> 索引文档，即往索引里面放入文档数据.类似于数据库里面向表里面插入一行数据，一行数据就是一个文档。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">IndexDocumentDemo</span> </span>&#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Logger logger = LogManager.getRootLogger();  </span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">try</span> (RestHighLevelClient client = InitDemo.getClient();) &#123;</span><br><span class="line">            <span class="comment">// 1、创建索引请求</span></span><br><span class="line">            IndexRequest request = <span class="keyword">new</span> IndexRequest(</span><br><span class="line">                    <span class="string">"mess"</span>,   <span class="comment">//索引</span></span><br><span class="line">                    <span class="string">"_doc"</span>,     <span class="comment">// mapping type</span></span><br><span class="line">                    <span class="string">"1"</span>);     <span class="comment">//文档id  </span></span><br><span class="line">            </span><br><span class="line">            <span class="comment">// 2、准备文档数据</span></span><br><span class="line">            <span class="comment">// 方式一：直接给JSON串</span></span><br><span class="line">            String jsonString = <span class="string">"&#123;"</span> +</span><br><span class="line">                    <span class="string">"\"user\":\"kimchy\","</span> +</span><br><span class="line">                    <span class="string">"\"postDate\":\"2013-01-30\","</span> +</span><br><span class="line">                    <span class="string">"\"message\":\"trying out Elasticsearch\""</span> +</span><br><span class="line">                    <span class="string">"&#125;"</span>;</span><br><span class="line">            request.source(jsonString, XContentType.JSON); </span><br><span class="line">            </span><br><span class="line">            <span class="comment">// 方式二：以map对象来表示文档</span></span><br><span class="line">            <span class="comment">/*</span></span><br><span class="line"><span class="comment">            Map&lt;String, Object&gt; jsonMap = new HashMap&lt;&gt;();</span></span><br><span class="line"><span class="comment">            jsonMap.put("user", "kimchy");</span></span><br><span class="line"><span class="comment">            jsonMap.put("postDate", new Date());</span></span><br><span class="line"><span class="comment">            jsonMap.put("message", "trying out Elasticsearch");</span></span><br><span class="line"><span class="comment">            request.source(jsonMap); </span></span><br><span class="line"><span class="comment">            */</span></span><br><span class="line">            </span><br><span class="line">            <span class="comment">// 方式三：用XContentBuilder来构建文档</span></span><br><span class="line">            <span class="comment">/*</span></span><br><span class="line"><span class="comment">            XContentBuilder builder = XContentFactory.jsonBuilder();</span></span><br><span class="line"><span class="comment">            builder.startObject();</span></span><br><span class="line"><span class="comment">            &#123;</span></span><br><span class="line"><span class="comment">                builder.field("user", "kimchy");</span></span><br><span class="line"><span class="comment">                builder.field("postDate", new Date());</span></span><br><span class="line"><span class="comment">                builder.field("message", "trying out Elasticsearch");</span></span><br><span class="line"><span class="comment">            &#125;</span></span><br><span class="line"><span class="comment">            builder.endObject();</span></span><br><span class="line"><span class="comment">            request.source(builder); </span></span><br><span class="line"><span class="comment">            */</span></span><br><span class="line">            </span><br><span class="line">            <span class="comment">// 方式四：直接用key-value对给出</span></span><br><span class="line">            <span class="comment">/*</span></span><br><span class="line"><span class="comment">            request.source("user", "kimchy",</span></span><br><span class="line"><span class="comment">                            "postDate", new Date(),</span></span><br><span class="line"><span class="comment">                            "message", "trying out Elasticsearch");</span></span><br><span class="line"><span class="comment">            */</span></span><br><span class="line">            </span><br><span class="line">            <span class="comment">//3、其他的一些可选设置</span></span><br><span class="line">            <span class="comment">/*</span></span><br><span class="line"><span class="comment">            request.routing("routing");  //设置routing值</span></span><br><span class="line"><span class="comment">            request.timeout(TimeValue.timeValueSeconds(1));  //设置主分片等待时长</span></span><br><span class="line"><span class="comment">            request.setRefreshPolicy("wait_for");  //设置重刷新策略</span></span><br><span class="line"><span class="comment">            request.version(2);  //设置版本号</span></span><br><span class="line"><span class="comment">            request.opType(DocWriteRequest.OpType.CREATE);  //操作类别  </span></span><br><span class="line"><span class="comment">            */</span></span><br><span class="line">            </span><br><span class="line">            <span class="comment">//4、发送请求</span></span><br><span class="line">            IndexResponse indexResponse = <span class="keyword">null</span>;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                <span class="comment">// 同步方式</span></span><br><span class="line">                indexResponse = client.index(request);            </span><br><span class="line">            &#125; <span class="keyword">catch</span>(ElasticsearchException e) &#123;</span><br><span class="line">                <span class="comment">// 捕获，并处理异常</span></span><br><span class="line">                <span class="comment">//判断是否版本冲突、create但文档已存在冲突</span></span><br><span class="line">                <span class="keyword">if</span> (e.status() == RestStatus.CONFLICT) &#123;</span><br><span class="line">                    logger.error(<span class="string">"冲突了，请在此写冲突处理逻辑！\n"</span> + e.getDetailedMessage());</span><br><span class="line">                &#125;</span><br><span class="line">                </span><br><span class="line">                logger.error(<span class="string">"索引异常"</span>, e);</span><br><span class="line">            &#125;</span><br><span class="line">            </span><br><span class="line">            <span class="comment">//5、处理响应</span></span><br><span class="line">            <span class="keyword">if</span>(indexResponse != <span class="keyword">null</span>) &#123;</span><br><span class="line">                String index = indexResponse.getIndex();</span><br><span class="line">                String type = indexResponse.getType();</span><br><span class="line">                String id = indexResponse.getId();</span><br><span class="line">                <span class="keyword">long</span> version = indexResponse.getVersion();</span><br><span class="line">                <span class="keyword">if</span> (indexResponse.getResult() == DocWriteResponse.Result.CREATED) &#123;</span><br><span class="line">                    System.out.println(<span class="string">"新增文档成功，处理逻辑代码写到这里。"</span>);</span><br><span class="line">                &#125; <span class="keyword">else</span> <span class="keyword">if</span> (indexResponse.getResult() == DocWriteResponse.Result.UPDATED) &#123;</span><br><span class="line">                    System.out.println(<span class="string">"修改文档成功，处理逻辑代码写到这里。"</span>);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">// 分片处理信息</span></span><br><span class="line">                ReplicationResponse.ShardInfo shardInfo = indexResponse.getShardInfo();</span><br><span class="line">                <span class="keyword">if</span> (shardInfo.getTotal() != shardInfo.getSuccessful()) &#123;</span><br><span class="line">                    </span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">// 如果有分片副本失败，可以获得失败原因信息</span></span><br><span class="line">                <span class="keyword">if</span> (shardInfo.getFailed() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                    <span class="keyword">for</span> (ReplicationResponse.ShardInfo.Failure failure : shardInfo.getFailures()) &#123;</span><br><span class="line">                        String reason = failure.reason(); </span><br><span class="line">                        System.out.println(<span class="string">"副本失败原因："</span> + reason);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            </span><br><span class="line">            </span><br><span class="line">            <span class="comment">//异步方式发送索引请求</span></span><br><span class="line">            <span class="comment">/*ActionListener&lt;IndexResponse&gt; listener = new ActionListener&lt;IndexResponse&gt;() &#123;</span></span><br><span class="line"><span class="comment">                @Override</span></span><br><span class="line"><span class="comment">                public void onResponse(IndexResponse indexResponse) &#123;</span></span><br><span class="line"><span class="comment">                    </span></span><br><span class="line"><span class="comment">                &#125;</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">                @Override</span></span><br><span class="line"><span class="comment">                public void onFailure(Exception e) &#123;</span></span><br><span class="line"><span class="comment">                    </span></span><br><span class="line"><span class="comment">                &#125;</span></span><br><span class="line"><span class="comment">            &#125;;</span></span><br><span class="line"><span class="comment">            client.indexAsync(request, listener);</span></span><br><span class="line"><span class="comment">            */</span></span><br><span class="line">            </span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="获取文档数据"><a href="#获取文档数据" class="headerlink" title="获取文档数据"></a>获取文档数据</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">GetDocumentDemo</span> </span>&#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Logger logger = LogManager.getRootLogger();  </span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">try</span> (RestHighLevelClient client = InitDemo.getClient();) &#123;</span><br><span class="line">            <span class="comment">// 1、创建获取文档请求</span></span><br><span class="line">            GetRequest request = <span class="keyword">new</span> GetRequest(</span><br><span class="line">                    <span class="string">"mess"</span>,   <span class="comment">//索引</span></span><br><span class="line">                    <span class="string">"_doc"</span>,     <span class="comment">// mapping type</span></span><br><span class="line">                    <span class="string">"1"</span>);     <span class="comment">//文档id  </span></span><br><span class="line">            </span><br><span class="line">            <span class="comment">// 2、可选的设置</span></span><br><span class="line">            <span class="comment">//request.routing("routing");</span></span><br><span class="line">            <span class="comment">//request.version(2);</span></span><br><span class="line">            </span><br><span class="line">            <span class="comment">//request.fetchSourceContext(new FetchSourceContext(false)); //是否获取_source字段</span></span><br><span class="line">            <span class="comment">//选择返回的字段</span></span><br><span class="line">            String[] includes = <span class="keyword">new</span> String[]&#123;<span class="string">"message"</span>, <span class="string">"*Date"</span>&#125;;</span><br><span class="line">            String[] excludes = Strings.EMPTY_ARRAY;</span><br><span class="line">            FetchSourceContext fetchSourceContext = <span class="keyword">new</span> FetchSourceContext(<span class="keyword">true</span>, includes, excludes);</span><br><span class="line">            request.fetchSourceContext(fetchSourceContext); </span><br><span class="line">            </span><br><span class="line">            <span class="comment">//也可写成这样</span></span><br><span class="line">            <span class="comment">/*String[] includes = Strings.EMPTY_ARRAY;</span></span><br><span class="line"><span class="comment">            String[] excludes = new String[]&#123;"message"&#125;;</span></span><br><span class="line"><span class="comment">            FetchSourceContext fetchSourceContext = new FetchSourceContext(true, includes, excludes);</span></span><br><span class="line"><span class="comment">            request.fetchSourceContext(fetchSourceContext);*/</span></span><br><span class="line">            </span><br><span class="line">            </span><br><span class="line">            <span class="comment">// 取stored字段</span></span><br><span class="line">            <span class="comment">/*request.storedFields("message"); </span></span><br><span class="line"><span class="comment">            GetResponse getResponse = client.get(request);</span></span><br><span class="line"><span class="comment">            String message = getResponse.getField("message").getValue();*/</span></span><br><span class="line">            </span><br><span class="line">            </span><br><span class="line">            <span class="comment">//3、发送请求        </span></span><br><span class="line">            GetResponse getResponse = <span class="keyword">null</span>;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                <span class="comment">// 同步请求</span></span><br><span class="line">                getResponse = client.get(request);</span><br><span class="line">            &#125; <span class="keyword">catch</span> (ElasticsearchException e) &#123;</span><br><span class="line">                <span class="keyword">if</span> (e.status() == RestStatus.NOT_FOUND) &#123;</span><br><span class="line">                    logger.error(<span class="string">"没有找到该id的文档"</span> );</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span> (e.status() == RestStatus.CONFLICT) &#123;</span><br><span class="line">                    logger.error(<span class="string">"获取时版本冲突了，请在此写冲突处理逻辑！"</span> );</span><br><span class="line">                &#125;</span><br><span class="line">                logger.error(<span class="string">"获取文档异常"</span>, e);</span><br><span class="line">            &#125;</span><br><span class="line">            </span><br><span class="line">            <span class="comment">//4、处理响应</span></span><br><span class="line">            <span class="keyword">if</span>(getResponse != <span class="keyword">null</span>) &#123;</span><br><span class="line">                String index = getResponse.getIndex();</span><br><span class="line">                String type = getResponse.getType();</span><br><span class="line">                String id = getResponse.getId();</span><br><span class="line">                <span class="keyword">if</span> (getResponse.isExists()) &#123; <span class="comment">// 文档存在</span></span><br><span class="line">                    <span class="keyword">long</span> version = getResponse.getVersion();</span><br><span class="line">                    String sourceAsString = getResponse.getSourceAsString(); <span class="comment">//结果取成 String       </span></span><br><span class="line">                    Map&lt;String, Object&gt; sourceAsMap = getResponse.getSourceAsMap();  <span class="comment">// 结果取成Map</span></span><br><span class="line">                    <span class="keyword">byte</span>[] sourceAsBytes = getResponse.getSourceAsBytes();    <span class="comment">//结果取成字节数组</span></span><br><span class="line">                    </span><br><span class="line">                    logger.info(<span class="string">"index:"</span> + index + <span class="string">"  type:"</span> + type + <span class="string">"  id:"</span> + id);</span><br><span class="line">                    logger.info(sourceAsString);</span><br><span class="line">                    </span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    logger.error(<span class="string">"没有找到该id的文档"</span> );</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            </span><br><span class="line">            </span><br><span class="line">            <span class="comment">//异步方式发送获取文档请求</span></span><br><span class="line">            <span class="comment">/*</span></span><br><span class="line"><span class="comment">            ActionListener&lt;GetResponse&gt; listener = new ActionListener&lt;GetResponse&gt;() &#123;</span></span><br><span class="line"><span class="comment">                @Override</span></span><br><span class="line"><span class="comment">                public void onResponse(GetResponse getResponse) &#123;</span></span><br><span class="line"><span class="comment">                    </span></span><br><span class="line"><span class="comment">                &#125;</span></span><br><span class="line"><span class="comment">            </span></span><br><span class="line"><span class="comment">                @Override</span></span><br><span class="line"><span class="comment">                public void onFailure(Exception e) &#123;</span></span><br><span class="line"><span class="comment">                    </span></span><br><span class="line"><span class="comment">                &#125;</span></span><br><span class="line"><span class="comment">            &#125;;</span></span><br><span class="line"><span class="comment">            client.getAsync(request, listener);</span></span><br><span class="line"><span class="comment">            */</span></span><br><span class="line">            </span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="批量索引文档"><a href="#批量索引文档" class="headerlink" title="批量索引文档"></a>批量索引文档</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BulkDemo</span> </span>&#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Logger logger = LogManager.getRootLogger();  </span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">try</span> (RestHighLevelClient client = InitDemo.getClient();) &#123;</span><br><span class="line">            </span><br><span class="line">            <span class="comment">// 1、创建批量操作请求</span></span><br><span class="line">            BulkRequest request = <span class="keyword">new</span> BulkRequest(); </span><br><span class="line">            request.add(<span class="keyword">new</span> IndexRequest(<span class="string">"mess"</span>, <span class="string">"_doc"</span>, <span class="string">"1"</span>)  </span><br><span class="line">                    .source(XContentType.JSON,<span class="string">"field"</span>, <span class="string">"foo"</span>));</span><br><span class="line">            request.add(<span class="keyword">new</span> IndexRequest(<span class="string">"mess"</span>, <span class="string">"_doc"</span>, <span class="string">"2"</span>)  </span><br><span class="line">                    .source(XContentType.JSON,<span class="string">"field"</span>, <span class="string">"bar"</span>));</span><br><span class="line">            request.add(<span class="keyword">new</span> IndexRequest(<span class="string">"mess"</span>, <span class="string">"_doc"</span>, <span class="string">"3"</span>)  </span><br><span class="line">                    .source(XContentType.JSON,<span class="string">"field"</span>, <span class="string">"baz"</span>));</span><br><span class="line">            </span><br><span class="line">            <span class="comment">/*</span></span><br><span class="line"><span class="comment">            request.add(new DeleteRequest("mess", "_doc", "3")); </span></span><br><span class="line"><span class="comment">            request.add(new UpdateRequest("mess", "_doc", "2") </span></span><br><span class="line"><span class="comment">                    .doc(XContentType.JSON,"other", "test"));</span></span><br><span class="line"><span class="comment">            request.add(new IndexRequest("mess", "_doc", "4")  </span></span><br><span class="line"><span class="comment">                    .source(XContentType.JSON,"field", "baz"));</span></span><br><span class="line"><span class="comment">            */</span></span><br><span class="line">            </span><br><span class="line">            <span class="comment">// 2、可选的设置</span></span><br><span class="line">            <span class="comment">/*</span></span><br><span class="line"><span class="comment">            request.timeout("2m");</span></span><br><span class="line"><span class="comment">            request.setRefreshPolicy("wait_for");  </span></span><br><span class="line"><span class="comment">            request.waitForActiveShards(2);</span></span><br><span class="line"><span class="comment">            */</span></span><br><span class="line">            </span><br><span class="line">            </span><br><span class="line">            <span class="comment">//3、发送请求        </span></span><br><span class="line">        </span><br><span class="line">            <span class="comment">// 同步请求</span></span><br><span class="line">            BulkResponse bulkResponse = client.bulk(request);</span><br><span class="line">            </span><br><span class="line">            </span><br><span class="line">            <span class="comment">//4、处理响应</span></span><br><span class="line">            <span class="keyword">if</span>(bulkResponse != <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="keyword">for</span> (BulkItemResponse bulkItemResponse : bulkResponse) &#123; </span><br><span class="line">                    DocWriteResponse itemResponse = bulkItemResponse.getResponse(); </span><br><span class="line"></span><br><span class="line">                    <span class="keyword">if</span> (bulkItemResponse.getOpType() == DocWriteRequest.OpType.INDEX</span><br><span class="line">                            || bulkItemResponse.getOpType() == DocWriteRequest.OpType.CREATE) &#123; </span><br><span class="line">                        IndexResponse indexResponse = (IndexResponse) itemResponse;</span><br><span class="line">                        <span class="comment">//TODO 新增成功的处理</span></span><br><span class="line"></span><br><span class="line">                    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (bulkItemResponse.getOpType() == DocWriteRequest.OpType.UPDATE) &#123; </span><br><span class="line">                        UpdateResponse updateResponse = (UpdateResponse) itemResponse;</span><br><span class="line">                       <span class="comment">//TODO 修改成功的处理</span></span><br><span class="line"></span><br><span class="line">                    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (bulkItemResponse.getOpType() == DocWriteRequest.OpType.DELETE) &#123; </span><br><span class="line">                        DeleteResponse deleteResponse = (DeleteResponse) itemResponse;</span><br><span class="line">                        <span class="comment">//TODO 删除成功的处理</span></span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            </span><br><span class="line">            </span><br><span class="line">            <span class="comment">//异步方式发送批量操作请求</span></span><br><span class="line">            <span class="comment">/*</span></span><br><span class="line"><span class="comment">            ActionListener&lt;BulkResponse&gt; listener = new ActionListener&lt;BulkResponse&gt;() &#123;</span></span><br><span class="line"><span class="comment">                @Override</span></span><br><span class="line"><span class="comment">                public void onResponse(BulkResponse bulkResponse) &#123;</span></span><br><span class="line"><span class="comment">                    </span></span><br><span class="line"><span class="comment">                &#125;</span></span><br><span class="line"><span class="comment">            </span></span><br><span class="line"><span class="comment">                @Override</span></span><br><span class="line"><span class="comment">                public void onFailure(Exception e) &#123;</span></span><br><span class="line"><span class="comment">                    </span></span><br><span class="line"><span class="comment">                &#125;</span></span><br><span class="line"><span class="comment">            &#125;;</span></span><br><span class="line"><span class="comment">            client.bulkAsync(request, listener);</span></span><br><span class="line"><span class="comment">            */</span></span><br><span class="line">            </span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="搜索数据"><a href="#搜索数据" class="headerlink" title="搜索数据"></a>搜索数据</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SearchDemo</span> </span>&#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Logger logger = LogManager.getRootLogger();  </span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">try</span> (RestHighLevelClient client = InitDemo.getClient();) &#123;</span><br><span class="line">            </span><br><span class="line">            <span class="comment">// 1、创建search请求</span></span><br><span class="line">            <span class="comment">//SearchRequest searchRequest = new SearchRequest();</span></span><br><span class="line">            SearchRequest searchRequest = <span class="keyword">new</span> SearchRequest(<span class="string">"bank"</span>); </span><br><span class="line">            searchRequest.types(<span class="string">"_doc"</span>);</span><br><span class="line">            </span><br><span class="line">            <span class="comment">// 2、用SearchSourceBuilder来构造查询请求体 ,请仔细查看它的方法，构造各种查询的方法都在这。</span></span><br><span class="line">            SearchSourceBuilder sourceBuilder = <span class="keyword">new</span> SearchSourceBuilder(); </span><br><span class="line">            </span><br><span class="line">            <span class="comment">//构造QueryBuilder</span></span><br><span class="line">            <span class="comment">/*QueryBuilder matchQueryBuilder = QueryBuilders.matchQuery("user", "kimchy")</span></span><br><span class="line"><span class="comment">                    .fuzziness(Fuzziness.AUTO)</span></span><br><span class="line"><span class="comment">                    .prefixLength(3)</span></span><br><span class="line"><span class="comment">                    .maxExpansions(10);</span></span><br><span class="line"><span class="comment">            sourceBuilder.query(matchQueryBuilder);*/</span></span><br><span class="line">            </span><br><span class="line">            sourceBuilder.query(QueryBuilders.termQuery(<span class="string">"age"</span>, <span class="number">24</span>)); </span><br><span class="line">            sourceBuilder.from(<span class="number">0</span>); </span><br><span class="line">            sourceBuilder.size(<span class="number">10</span>); </span><br><span class="line">            sourceBuilder.timeout(<span class="keyword">new</span> TimeValue(<span class="number">60</span>, TimeUnit.SECONDS)); </span><br><span class="line">            </span><br><span class="line">            <span class="comment">//是否返回_source字段</span></span><br><span class="line">            <span class="comment">//sourceBuilder.fetchSource(false);</span></span><br><span class="line">            </span><br><span class="line">            <span class="comment">//设置返回哪些字段</span></span><br><span class="line">            <span class="comment">/*String[] includeFields = new String[] &#123;"title", "user", "innerObject.*"&#125;;</span></span><br><span class="line"><span class="comment">            String[] excludeFields = new String[] &#123;"_type"&#125;;</span></span><br><span class="line"><span class="comment">            sourceBuilder.fetchSource(includeFields, excludeFields);*/</span></span><br><span class="line">            </span><br><span class="line">            <span class="comment">//指定排序</span></span><br><span class="line">            <span class="comment">//sourceBuilder.sort(new ScoreSortBuilder().order(SortOrder.DESC)); </span></span><br><span class="line">            <span class="comment">//sourceBuilder.sort(new FieldSortBuilder("_uid").order(SortOrder.ASC));</span></span><br><span class="line">            </span><br><span class="line">            <span class="comment">// 设置返回 profile </span></span><br><span class="line">            <span class="comment">//sourceBuilder.profile(true);</span></span><br><span class="line">            </span><br><span class="line">            <span class="comment">//将请求体加入到请求中</span></span><br><span class="line">            searchRequest.source(sourceBuilder);</span><br><span class="line">            </span><br><span class="line">            <span class="comment">// 可选的设置</span></span><br><span class="line">            <span class="comment">//searchRequest.routing("routing");</span></span><br><span class="line">            </span><br><span class="line">            <span class="comment">// 高亮设置</span></span><br><span class="line">            <span class="comment">/*</span></span><br><span class="line"><span class="comment">            HighlightBuilder highlightBuilder = new HighlightBuilder(); </span></span><br><span class="line"><span class="comment">            HighlightBuilder.Field highlightTitle =</span></span><br><span class="line"><span class="comment">                    new HighlightBuilder.Field("title"); </span></span><br><span class="line"><span class="comment">            highlightTitle.highlighterType("unified");  </span></span><br><span class="line"><span class="comment">            highlightBuilder.field(highlightTitle);  </span></span><br><span class="line"><span class="comment">            HighlightBuilder.Field highlightUser = new HighlightBuilder.Field("user");</span></span><br><span class="line"><span class="comment">            highlightBuilder.field(highlightUser);</span></span><br><span class="line"><span class="comment">            sourceBuilder.highlighter(highlightBuilder);*/</span></span><br><span class="line">            </span><br><span class="line">            </span><br><span class="line">            <span class="comment">//加入聚合</span></span><br><span class="line">            <span class="comment">/*TermsAggregationBuilder aggregation = AggregationBuilders.terms("by_company")</span></span><br><span class="line"><span class="comment">                    .field("company.keyword");</span></span><br><span class="line"><span class="comment">            aggregation.subAggregation(AggregationBuilders.avg("average_age")</span></span><br><span class="line"><span class="comment">                    .field("age"));</span></span><br><span class="line"><span class="comment">            sourceBuilder.aggregation(aggregation);*/</span></span><br><span class="line">            </span><br><span class="line">            <span class="comment">//做查询建议</span></span><br><span class="line">            <span class="comment">/*SuggestionBuilder termSuggestionBuilder =</span></span><br><span class="line"><span class="comment">                    SuggestBuilders.termSuggestion("user").text("kmichy"); </span></span><br><span class="line"><span class="comment">                SuggestBuilder suggestBuilder = new SuggestBuilder();</span></span><br><span class="line"><span class="comment">                suggestBuilder.addSuggestion("suggest_user", termSuggestionBuilder); </span></span><br><span class="line"><span class="comment">            sourceBuilder.suggest(suggestBuilder);*/</span></span><br><span class="line">            </span><br><span class="line">            <span class="comment">//3、发送请求        </span></span><br><span class="line">            SearchResponse searchResponse = client.search(searchRequest);</span><br><span class="line">            </span><br><span class="line">            </span><br><span class="line">            <span class="comment">//4、处理响应</span></span><br><span class="line">            <span class="comment">//搜索结果状态信息</span></span><br><span class="line">            RestStatus status = searchResponse.status();</span><br><span class="line">            TimeValue took = searchResponse.getTook();</span><br><span class="line">            Boolean terminatedEarly = searchResponse.isTerminatedEarly();</span><br><span class="line">            <span class="keyword">boolean</span> timedOut = searchResponse.isTimedOut();</span><br><span class="line">            </span><br><span class="line">            <span class="comment">//分片搜索情况</span></span><br><span class="line">            <span class="keyword">int</span> totalShards = searchResponse.getTotalShards();</span><br><span class="line">            <span class="keyword">int</span> successfulShards = searchResponse.getSuccessfulShards();</span><br><span class="line">            <span class="keyword">int</span> failedShards = searchResponse.getFailedShards();</span><br><span class="line">            <span class="keyword">for</span> (ShardSearchFailure failure : searchResponse.getShardFailures()) &#123;</span><br><span class="line">                <span class="comment">// failures should be handled here</span></span><br><span class="line">            &#125;</span><br><span class="line">            </span><br><span class="line">            <span class="comment">//处理搜索命中文档结果</span></span><br><span class="line">            SearchHits hits = searchResponse.getHits();</span><br><span class="line">            </span><br><span class="line">            <span class="keyword">long</span> totalHits = hits.getTotalHits();</span><br><span class="line">            <span class="keyword">float</span> maxScore = hits.getMaxScore();</span><br><span class="line">            </span><br><span class="line">            SearchHit[] searchHits = hits.getHits();</span><br><span class="line">            <span class="keyword">for</span> (SearchHit hit : searchHits) &#123;</span><br><span class="line">                <span class="comment">// do something with the SearchHit</span></span><br><span class="line">                </span><br><span class="line">                String index = hit.getIndex();</span><br><span class="line">                String type = hit.getType();</span><br><span class="line">                String id = hit.getId();</span><br><span class="line">                <span class="keyword">float</span> score = hit.getScore();</span><br><span class="line">                </span><br><span class="line">                <span class="comment">//取_source字段值</span></span><br><span class="line">                String sourceAsString = hit.getSourceAsString(); <span class="comment">//取成json串</span></span><br><span class="line">                Map&lt;String, Object&gt; sourceAsMap = hit.getSourceAsMap(); <span class="comment">// 取成map对象</span></span><br><span class="line">                <span class="comment">//从map中取字段值</span></span><br><span class="line">                <span class="comment">/*</span></span><br><span class="line"><span class="comment">                String documentTitle = (String) sourceAsMap.get("title"); </span></span><br><span class="line"><span class="comment">                List&lt;Object&gt; users = (List&lt;Object&gt;) sourceAsMap.get("user");</span></span><br><span class="line"><span class="comment">                Map&lt;String, Object&gt; innerObject = (Map&lt;String, Object&gt;) sourceAsMap.get("innerObject");</span></span><br><span class="line"><span class="comment">                */</span></span><br><span class="line">                logger.info(<span class="string">"index:"</span> + index + <span class="string">"  type:"</span> + type + <span class="string">"  id:"</span> + id);</span><br><span class="line">                logger.info(sourceAsString);</span><br><span class="line">                </span><br><span class="line">                <span class="comment">//取高亮结果</span></span><br><span class="line">                <span class="comment">/*Map&lt;String, HighlightField&gt; highlightFields = hit.getHighlightFields();</span></span><br><span class="line"><span class="comment">                HighlightField highlight = highlightFields.get("title"); </span></span><br><span class="line"><span class="comment">                Text[] fragments = highlight.fragments();  </span></span><br><span class="line"><span class="comment">                String fragmentString = fragments[0].string();*/</span></span><br><span class="line">            &#125;</span><br><span class="line">            </span><br><span class="line">            <span class="comment">// 获取聚合结果</span></span><br><span class="line">            <span class="comment">/*</span></span><br><span class="line"><span class="comment">            Aggregations aggregations = searchResponse.getAggregations();</span></span><br><span class="line"><span class="comment">            Terms byCompanyAggregation = aggregations.get("by_company"); </span></span><br><span class="line"><span class="comment">            Bucket elasticBucket = byCompanyAggregation.getBucketByKey("Elastic"); </span></span><br><span class="line"><span class="comment">            Avg averageAge = elasticBucket.getAggregations().get("average_age"); </span></span><br><span class="line"><span class="comment">            double avg = averageAge.getValue();</span></span><br><span class="line"><span class="comment">            */</span></span><br><span class="line">            </span><br><span class="line">            <span class="comment">// 获取建议结果</span></span><br><span class="line">            <span class="comment">/*Suggest suggest = searchResponse.getSuggest(); </span></span><br><span class="line"><span class="comment">            TermSuggestion termSuggestion = suggest.getSuggestion("suggest_user"); </span></span><br><span class="line"><span class="comment">            for (TermSuggestion.Entry entry : termSuggestion.getEntries()) &#123; </span></span><br><span class="line"><span class="comment">                for (TermSuggestion.Entry.Option option : entry) &#123; </span></span><br><span class="line"><span class="comment">                    String suggestText = option.getText().string();</span></span><br><span class="line"><span class="comment">                &#125;</span></span><br><span class="line"><span class="comment">            &#125;</span></span><br><span class="line"><span class="comment">            */</span></span><br><span class="line">            </span><br><span class="line">            <span class="comment">//异步方式发送获查询请求</span></span><br><span class="line">            <span class="comment">/*</span></span><br><span class="line"><span class="comment">            ActionListener&lt;SearchResponse&gt; listener = new ActionListener&lt;SearchResponse&gt;() &#123;</span></span><br><span class="line"><span class="comment">                @Override</span></span><br><span class="line"><span class="comment">                public void onResponse(SearchResponse getResponse) &#123;</span></span><br><span class="line"><span class="comment">                    //结果获取</span></span><br><span class="line"><span class="comment">                &#125;</span></span><br><span class="line"><span class="comment">            </span></span><br><span class="line"><span class="comment">                @Override</span></span><br><span class="line"><span class="comment">                public void onFailure(Exception e) &#123;</span></span><br><span class="line"><span class="comment">                    //失败处理</span></span><br><span class="line"><span class="comment">                &#125;</span></span><br><span class="line"><span class="comment">            &#125;;</span></span><br><span class="line"><span class="comment">            client.searchAsync(searchRequest, listener); </span></span><br><span class="line"><span class="comment">            */</span></span><br><span class="line">            </span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            logger.error(e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="highlight-高亮"><a href="#highlight-高亮" class="headerlink" title="highlight 高亮"></a>highlight 高亮</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">HighlightDemo</span> </span>&#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Logger logger = LogManager.getRootLogger();  </span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">try</span> (RestHighLevelClient client = InitDemo.getClient();) &#123;</span><br><span class="line">            </span><br><span class="line">            <span class="comment">// 1、创建search请求</span></span><br><span class="line">            SearchRequest searchRequest = <span class="keyword">new</span> SearchRequest(<span class="string">"hl_test"</span>); </span><br><span class="line">            </span><br><span class="line">            <span class="comment">// 2、用SearchSourceBuilder来构造查询请求体 ,请仔细查看它的方法，构造各种查询的方法都在这。</span></span><br><span class="line">            SearchSourceBuilder sourceBuilder = <span class="keyword">new</span> SearchSourceBuilder(); </span><br><span class="line">            </span><br><span class="line">            <span class="comment">//构造QueryBuilder</span></span><br><span class="line">            QueryBuilder matchQueryBuilder = QueryBuilders.matchQuery(<span class="string">"title"</span>, <span class="string">"lucene solr"</span>);</span><br><span class="line">            sourceBuilder.query(matchQueryBuilder);</span><br><span class="line">            </span><br><span class="line">            <span class="comment">//分页设置</span></span><br><span class="line">            <span class="comment">/*sourceBuilder.from(0); </span></span><br><span class="line"><span class="comment">            sourceBuilder.size(5); ;*/</span> </span><br><span class="line">            </span><br><span class="line">                    </span><br><span class="line">            <span class="comment">// 高亮设置</span></span><br><span class="line">            HighlightBuilder highlightBuilder = <span class="keyword">new</span> HighlightBuilder(); </span><br><span class="line">            highlightBuilder.requireFieldMatch(<span class="keyword">false</span>).field(<span class="string">"title"</span>).field(<span class="string">"content"</span>)</span><br><span class="line">                .preTags(<span class="string">"&lt;strong&gt;"</span>).postTags(<span class="string">"&lt;/strong&gt;"</span>);</span><br><span class="line">            <span class="comment">//不同字段可有不同设置，如不同标签</span></span><br><span class="line">            <span class="comment">/*HighlightBuilder.Field highlightTitle = new HighlightBuilder.Field("title"); </span></span><br><span class="line"><span class="comment">            highlightTitle.preTags("&lt;strong&gt;").postTags("&lt;/strong&gt;");</span></span><br><span class="line"><span class="comment">            highlightBuilder.field(highlightTitle);  </span></span><br><span class="line"><span class="comment">            HighlightBuilder.Field highlightContent = new HighlightBuilder.Field("content");</span></span><br><span class="line"><span class="comment">            highlightContent.preTags("&lt;b&gt;").postTags("&lt;/b&gt;");</span></span><br><span class="line"><span class="comment">            highlightBuilder.field(highlightContent).requireFieldMatch(false);*/</span></span><br><span class="line">            </span><br><span class="line">            sourceBuilder.highlighter(highlightBuilder);</span><br><span class="line">            </span><br><span class="line">            searchRequest.source(sourceBuilder);</span><br><span class="line">            </span><br><span class="line">            <span class="comment">//3、发送请求        </span></span><br><span class="line">            SearchResponse searchResponse = client.search(searchRequest);</span><br><span class="line">            </span><br><span class="line">            </span><br><span class="line">            <span class="comment">//4、处理响应</span></span><br><span class="line">            <span class="keyword">if</span>(RestStatus.OK.equals(searchResponse.status())) &#123;</span><br><span class="line">                <span class="comment">//处理搜索命中文档结果</span></span><br><span class="line">                SearchHits hits = searchResponse.getHits();</span><br><span class="line">                <span class="keyword">long</span> totalHits = hits.getTotalHits();</span><br><span class="line">                </span><br><span class="line">                SearchHit[] searchHits = hits.getHits();</span><br><span class="line">                <span class="keyword">for</span> (SearchHit hit : searchHits) &#123;        </span><br><span class="line">                    String index = hit.getIndex();</span><br><span class="line">                    String type = hit.getType();</span><br><span class="line">                    String id = hit.getId();</span><br><span class="line">                    <span class="keyword">float</span> score = hit.getScore();</span><br><span class="line">                    </span><br><span class="line">                    <span class="comment">//取_source字段值</span></span><br><span class="line">                    <span class="comment">//String sourceAsString = hit.getSourceAsString(); //取成json串</span></span><br><span class="line">                    Map&lt;String, Object&gt; sourceAsMap = hit.getSourceAsMap(); <span class="comment">// 取成map对象</span></span><br><span class="line">                    <span class="comment">//从map中取字段值</span></span><br><span class="line">                    <span class="comment">/*String title = (String) sourceAsMap.get("title"); </span></span><br><span class="line"><span class="comment">                    String content  = (String) sourceAsMap.get("content"); */</span></span><br><span class="line">                    logger.info(<span class="string">"index:"</span> + index + <span class="string">"  type:"</span> + type + <span class="string">"  id:"</span> + id);</span><br><span class="line">                    logger.info(<span class="string">"sourceMap : "</span> +  sourceAsMap);</span><br><span class="line">                    <span class="comment">//取高亮结果</span></span><br><span class="line">                    Map&lt;String, HighlightField&gt; highlightFields = hit.getHighlightFields();</span><br><span class="line">                    HighlightField highlight = highlightFields.get(<span class="string">"title"</span>); </span><br><span class="line">                    <span class="keyword">if</span>(highlight != <span class="keyword">null</span>) &#123;</span><br><span class="line">                        Text[] fragments = highlight.fragments();  <span class="comment">//多值的字段会有多个值</span></span><br><span class="line">                        <span class="keyword">if</span>(fragments != <span class="keyword">null</span>) &#123;</span><br><span class="line">                            String fragmentString = fragments[<span class="number">0</span>].string();</span><br><span class="line">                            logger.info(<span class="string">"title highlight : "</span> +  fragmentString);</span><br><span class="line">                            <span class="comment">//可用高亮字符串替换上面sourceAsMap中的对应字段返回到上一级调用</span></span><br><span class="line">                            <span class="comment">//sourceAsMap.put("title", fragmentString);</span></span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                    </span><br><span class="line">                    highlight = highlightFields.get(<span class="string">"content"</span>); </span><br><span class="line">                    <span class="keyword">if</span>(highlight != <span class="keyword">null</span>) &#123;</span><br><span class="line">                        Text[] fragments = highlight.fragments();  <span class="comment">//多值的字段会有多个值</span></span><br><span class="line">                        <span class="keyword">if</span>(fragments != <span class="keyword">null</span>) &#123;</span><br><span class="line">                            String fragmentString = fragments[<span class="number">0</span>].string();</span><br><span class="line">                            logger.info(<span class="string">"content highlight : "</span> +  fragmentString);</span><br><span class="line">                            <span class="comment">//可用高亮字符串替换上面sourceAsMap中的对应字段返回到上一级调用</span></span><br><span class="line">                            <span class="comment">//sourceAsMap.put("content", fragmentString);</span></span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            </span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            logger.error(e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="suggest-查询建议"><a href="#suggest-查询建议" class="headerlink" title="suggest 查询建议"></a>suggest 查询建议</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SuggestDemo</span> </span>&#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Logger logger = LogManager.getRootLogger();  </span><br><span class="line">    </span><br><span class="line">    <span class="comment">//词项建议拼写检查，检查用户的拼写是否错误，如果有错给用户推荐正确的词，appel-&gt;apple</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">termSuggest</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">try</span> (RestHighLevelClient client = InitDemo.getClient();) &#123;</span><br><span class="line">            </span><br><span class="line">            <span class="comment">// 1、创建search请求</span></span><br><span class="line">            <span class="comment">//SearchRequest searchRequest = new SearchRequest();</span></span><br><span class="line">            SearchRequest searchRequest = <span class="keyword">new</span> SearchRequest(<span class="string">"mess"</span>); </span><br><span class="line">            </span><br><span class="line">            <span class="comment">// 2、用SearchSourceBuilder来构造查询请求体 ,请仔细查看它的方法，构造各种查询的方法都在这。</span></span><br><span class="line">            SearchSourceBuilder sourceBuilder = <span class="keyword">new</span> SearchSourceBuilder(); </span><br><span class="line">             </span><br><span class="line">            sourceBuilder.size(<span class="number">0</span>); </span><br><span class="line">            </span><br><span class="line">            <span class="comment">//做查询建议        </span></span><br><span class="line">            <span class="comment">//词项建议</span></span><br><span class="line">            SuggestionBuilder termSuggestionBuilder =</span><br><span class="line">                    SuggestBuilders.termSuggestion(<span class="string">"user"</span>).text(<span class="string">"kmichy"</span>); </span><br><span class="line">            SuggestBuilder suggestBuilder = <span class="keyword">new</span> SuggestBuilder();</span><br><span class="line">            suggestBuilder.addSuggestion(<span class="string">"suggest_user"</span>, termSuggestionBuilder);     </span><br><span class="line">            sourceBuilder.suggest(suggestBuilder);</span><br><span class="line">            </span><br><span class="line">            searchRequest.source(sourceBuilder);    </span><br><span class="line">            </span><br><span class="line">            <span class="comment">//3、发送请求        </span></span><br><span class="line">            SearchResponse searchResponse = client.search(searchRequest);</span><br><span class="line">            </span><br><span class="line">            </span><br><span class="line">            <span class="comment">//4、处理响应</span></span><br><span class="line">            <span class="comment">//搜索结果状态信息</span></span><br><span class="line">            <span class="keyword">if</span>(RestStatus.OK.equals(searchResponse.status())) &#123;</span><br><span class="line">                <span class="comment">// 获取建议结果</span></span><br><span class="line">                Suggest suggest = searchResponse.getSuggest(); </span><br><span class="line">                TermSuggestion termSuggestion = suggest.getSuggestion(<span class="string">"suggest_user"</span>); </span><br><span class="line">                <span class="keyword">for</span> (TermSuggestion.Entry entry : termSuggestion.getEntries()) &#123; </span><br><span class="line">                    logger.info(<span class="string">"text: "</span> + entry.getText().string());</span><br><span class="line">                    <span class="keyword">for</span> (TermSuggestion.Entry.Option option : entry) &#123; </span><br><span class="line">                        String suggestText = option.getText().string();</span><br><span class="line">                        logger.info(<span class="string">"   suggest option : "</span> + suggestText);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">/*</span></span><br><span class="line"><span class="comment">              "suggest": &#123;</span></span><br><span class="line"><span class="comment">                "my-suggestion": [</span></span><br><span class="line"><span class="comment">                  &#123;</span></span><br><span class="line"><span class="comment">                    "text": "tring",</span></span><br><span class="line"><span class="comment">                    "offset": 0,</span></span><br><span class="line"><span class="comment">                    "length": 5,</span></span><br><span class="line"><span class="comment">                    "options": [</span></span><br><span class="line"><span class="comment">                      &#123;</span></span><br><span class="line"><span class="comment">                        "text": "trying",</span></span><br><span class="line"><span class="comment">                        "score": 0.8,</span></span><br><span class="line"><span class="comment">                        "freq": 1</span></span><br><span class="line"><span class="comment">                      &#125;</span></span><br><span class="line"><span class="comment">                    ]</span></span><br><span class="line"><span class="comment">                  &#125;,</span></span><br><span class="line"><span class="comment">                  &#123;</span></span><br><span class="line"><span class="comment">                    "text": "out",</span></span><br><span class="line"><span class="comment">                    "offset": 6,</span></span><br><span class="line"><span class="comment">                    "length": 3,</span></span><br><span class="line"><span class="comment">                    "options": []</span></span><br><span class="line"><span class="comment">                  &#125;,</span></span><br><span class="line"><span class="comment">                  &#123;</span></span><br><span class="line"><span class="comment">                    "text": "elasticsearch",</span></span><br><span class="line"><span class="comment">                    "offset": 10,</span></span><br><span class="line"><span class="comment">                    "length": 13,</span></span><br><span class="line"><span class="comment">                    "options": []</span></span><br><span class="line"><span class="comment">                  &#125;</span></span><br><span class="line"><span class="comment">                ]</span></span><br><span class="line"><span class="comment">              &#125;*/</span></span><br><span class="line"></span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            logger.error(e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//自动补全，根据用户的输入联想到可能的词或者短语</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">completionSuggester</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">try</span> (RestHighLevelClient client = InitDemo.getClient();) &#123;</span><br><span class="line">            </span><br><span class="line">            <span class="comment">// 1、创建search请求</span></span><br><span class="line">            <span class="comment">//SearchRequest searchRequest = new SearchRequest();</span></span><br><span class="line">            SearchRequest searchRequest = <span class="keyword">new</span> SearchRequest(<span class="string">"music"</span>); </span><br><span class="line">            </span><br><span class="line">            <span class="comment">// 2、用SearchSourceBuilder来构造查询请求体 ,请仔细查看它的方法，构造各种查询的方法都在这。</span></span><br><span class="line">            SearchSourceBuilder sourceBuilder = <span class="keyword">new</span> SearchSourceBuilder(); </span><br><span class="line">             </span><br><span class="line">            sourceBuilder.size(<span class="number">0</span>); </span><br><span class="line">            </span><br><span class="line">            <span class="comment">//做查询建议        </span></span><br><span class="line">            <span class="comment">//自动补全</span></span><br><span class="line">            <span class="comment">/*POST music/_search?pretty</span></span><br><span class="line"><span class="comment">                    &#123;</span></span><br><span class="line"><span class="comment">                        "suggest": &#123;</span></span><br><span class="line"><span class="comment">                            "song-suggest" : &#123;</span></span><br><span class="line"><span class="comment">                                "prefix" : "lucene s", </span></span><br><span class="line"><span class="comment">                                "completion" : &#123; </span></span><br><span class="line"><span class="comment">                                    "field" : "suggest" ,</span></span><br><span class="line"><span class="comment">                                    "skip_duplicates": true</span></span><br><span class="line"><span class="comment">                                &#125;</span></span><br><span class="line"><span class="comment">                            &#125;</span></span><br><span class="line"><span class="comment">                        &#125;</span></span><br><span class="line"><span class="comment">                    &#125;*/</span></span><br><span class="line"></span><br><span class="line">            SuggestionBuilder termSuggestionBuilder =</span><br><span class="line">                    SuggestBuilders.completionSuggestion(<span class="string">"suggest"</span>).prefix(<span class="string">"lucene s"</span>)</span><br><span class="line">                    .skipDuplicates(<span class="keyword">true</span>); </span><br><span class="line">            SuggestBuilder suggestBuilder = <span class="keyword">new</span> SuggestBuilder();</span><br><span class="line">            suggestBuilder.addSuggestion(<span class="string">"song-suggest"</span>, termSuggestionBuilder);     </span><br><span class="line">            sourceBuilder.suggest(suggestBuilder);</span><br><span class="line">            </span><br><span class="line">            searchRequest.source(sourceBuilder);    </span><br><span class="line">            </span><br><span class="line">            <span class="comment">//3、发送请求        </span></span><br><span class="line">            SearchResponse searchResponse = client.search(searchRequest);</span><br><span class="line">            </span><br><span class="line">            </span><br><span class="line">            <span class="comment">//4、处理响应</span></span><br><span class="line">            <span class="comment">//搜索结果状态信息</span></span><br><span class="line">            <span class="keyword">if</span>(RestStatus.OK.equals(searchResponse.status())) &#123;</span><br><span class="line">                <span class="comment">// 获取建议结果</span></span><br><span class="line">                Suggest suggest = searchResponse.getSuggest(); </span><br><span class="line">                CompletionSuggestion termSuggestion = suggest.getSuggestion(<span class="string">"song-suggest"</span>); </span><br><span class="line">                <span class="keyword">for</span> (CompletionSuggestion.Entry entry : termSuggestion.getEntries()) &#123; </span><br><span class="line">                    logger.info(<span class="string">"text: "</span> + entry.getText().string());</span><br><span class="line">                    <span class="keyword">for</span> (CompletionSuggestion.Entry.Option option : entry) &#123; </span><br><span class="line">                        String suggestText = option.getText().string();</span><br><span class="line">                        logger.info(<span class="string">"   suggest option : "</span> + suggestText);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            logger.error(e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        termSuggest();</span><br><span class="line">        </span><br><span class="line">        logger.info(<span class="string">"--------------------------------------"</span>);</span><br><span class="line">        </span><br><span class="line">        completionSuggester();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="aggregation-聚合分析"><a href="#aggregation-聚合分析" class="headerlink" title="aggregation 聚合分析"></a>aggregation 聚合分析</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AggregationDemo</span> </span>&#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Logger logger = LogManager.getRootLogger();  </span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">try</span> (RestHighLevelClient client = InitDemo.getClient();) &#123;</span><br><span class="line">            </span><br><span class="line">            <span class="comment">// 1、创建search请求</span></span><br><span class="line">            <span class="comment">//SearchRequest searchRequest = new SearchRequest();</span></span><br><span class="line">            SearchRequest searchRequest = <span class="keyword">new</span> SearchRequest(<span class="string">"bank"</span>); </span><br><span class="line">            </span><br><span class="line">            <span class="comment">// 2、用SearchSourceBuilder来构造查询请求体 ,请仔细查看它的方法，构造各种查询的方法都在这。</span></span><br><span class="line">            SearchSourceBuilder sourceBuilder = <span class="keyword">new</span> SearchSourceBuilder(); </span><br><span class="line">             </span><br><span class="line">            sourceBuilder.size(<span class="number">0</span>); </span><br><span class="line"></span><br><span class="line">            <span class="comment">//加入聚合</span></span><br><span class="line">            <span class="comment">//字段值项分组聚合</span></span><br><span class="line">            TermsAggregationBuilder aggregation = AggregationBuilders.terms(<span class="string">"by_age"</span>)</span><br><span class="line">                    .field(<span class="string">"age"</span>).order(BucketOrder.aggregation(<span class="string">"average_balance"</span>, <span class="keyword">true</span>));</span><br><span class="line">            <span class="comment">//计算每组的平均balance指标</span></span><br><span class="line">            aggregation.subAggregation(AggregationBuilders.avg(<span class="string">"average_balance"</span>)</span><br><span class="line">                    .field(<span class="string">"balance"</span>));</span><br><span class="line">            sourceBuilder.aggregation(aggregation);</span><br><span class="line">            </span><br><span class="line">            searchRequest.source(sourceBuilder);</span><br><span class="line">            </span><br><span class="line">            <span class="comment">//3、发送请求        </span></span><br><span class="line">            SearchResponse searchResponse = client.search(searchRequest);</span><br><span class="line">                </span><br><span class="line">            <span class="comment">//4、处理响应</span></span><br><span class="line">            <span class="comment">//搜索结果状态信息</span></span><br><span class="line">            <span class="keyword">if</span>(RestStatus.OK.equals(searchResponse.status())) &#123;</span><br><span class="line">                <span class="comment">// 获取聚合结果</span></span><br><span class="line">                Aggregations aggregations = searchResponse.getAggregations();</span><br><span class="line">                Terms byAgeAggregation = aggregations.get(<span class="string">"by_age"</span>); </span><br><span class="line">                logger.info(<span class="string">"aggregation by_age 结果"</span>);</span><br><span class="line">                logger.info(<span class="string">"docCountError: "</span> + byAgeAggregation.getDocCountError());</span><br><span class="line">                logger.info(<span class="string">"sumOfOtherDocCounts: "</span> + byAgeAggregation.getSumOfOtherDocCounts());</span><br><span class="line">                logger.info(<span class="string">"------------------------------------"</span>);</span><br><span class="line">                <span class="keyword">for</span>(Bucket buck : byAgeAggregation.getBuckets()) &#123;</span><br><span class="line">                    logger.info(<span class="string">"key: "</span> + buck.getKeyAsNumber());</span><br><span class="line">                    logger.info(<span class="string">"docCount: "</span> + buck.getDocCount());</span><br><span class="line">                    logger.info(<span class="string">"docCountError: "</span> + buck.getDocCountError());</span><br><span class="line">                    <span class="comment">//取子聚合</span></span><br><span class="line">                    Avg averageBalance = buck.getAggregations().get(<span class="string">"average_balance"</span>); </span><br><span class="line"></span><br><span class="line">                    logger.info(<span class="string">"average_balance: "</span> + averageBalance.getValue());</span><br><span class="line">                    logger.info(<span class="string">"------------------------------------"</span>);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">//直接用key 来去分组</span></span><br><span class="line">                <span class="comment">/*Bucket elasticBucket = byCompanyAggregation.getBucketByKey("24"); </span></span><br><span class="line"><span class="comment">                Avg averageAge = elasticBucket.getAggregations().get("average_age"); </span></span><br><span class="line"><span class="comment">                double avg = averageAge.getValue();*/</span></span><br><span class="line">                </span><br><span class="line">            &#125;</span><br><span class="line">            </span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            logger.error(e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>各种查询对应的QueryBuilder：</p>
+<p><a href="https://www.elastic.co/guide/en/elasticsearch/client/java-rest/current/java-rest-high-query-builders.html" target="_blank" rel="noopener">https://www.elastic.co/guide/en/elasticsearch/client/java-rest/current/java-rest-high-query-builders.html</a></p>
+<p>各种聚合对应的AggregationBuilder：</p>
+<p><a href="https://www.elastic.co/guide/en/elasticsearch/client/java-rest/current/java-rest-high-aggregation-builders.html" target="_blank" rel="noopener">https://www.elastic.co/guide/en/elasticsearch/client/java-rest/current/java-rest-high-aggregation-builders.html</a></p>
+<p>参考：<a href="https://www.cnblogs.com/leeSmall/p/9218779.html" target="_blank" rel="noopener">https://www.cnblogs.com/leeSmall/p/9218779.html</a></p>
+
+      
+    </div>
+     <!-- 相关文章推荐 -->
+    
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Elasticsearch/" rel="tag"># Elasticsearch</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/03/16/Elasticsearch%E8%81%9A%E5%90%88%E5%88%86%E6%9E%90/" rel="next" title="Elasticsearch聚合分析">
+                <i class="fa fa-chevron-left"></i> Elasticsearch聚合分析
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/03/18/Elasticsearch%E9%9B%86%E7%BE%A4%E7%AE%A1%E7%90%86/" rel="prev" title="Elasticsearch集群管理">
+                Elasticsearch集群管理 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+<span class="jiathis_txt">分享到：</span>
+<a class="jiathis_button_fav">收藏夹</a>
+<a class="jiathis_button_copy">复制网址</a>
+<a class="jiathis_button_email">邮件</a>
+<a class="jiathis_button_weixin">微信</a>
+<a class="jiathis_button_qzone">QQ空间</a>
+<a class="jiathis_button_tqq">腾讯微博</a>
+<a class="jiathis_button_douban">豆瓣</a>
+<a class="jiathis_button_share">一键分享</a>
+
+<a href="http://www.jiathis.com/share?uid=2140465" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+<a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+var jiathis_config={
+  data_track_clickback:true,
+  summary:"",
+  shortUrl:false,
+  hideMore:false
+}
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://img.huyunshun.com/img/20200522182348.png"
+                alt="初晨" />
+            
+              <p class="site-author-name" itemprop="name">初晨</p>
+              <p class="site-description motion-element" itemprop="description">永远不要说你知道本质，更别说真相了。</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">249</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">46</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+<!--近期文章版块-->
+            
+                <div class="links-of-blogroll motion-element links-of-blogroll-block">
+                  <div class="links-of-blogroll-title">
+                    <!-- modify icon to fire by szw -->
+                    <i class="fa fa-history fa-" aria-hidden="true"></i>
+                    近期文章
+                  </div>
+                  <ul class="links-of-blogroll-list">
+                    
+                    
+                      <li>
+                        <a href="/2020/05/22/WebSocket%E3%80%81Socket%E3%80%81TCP%E3%80%81HTTP%E5%8C%BA%E5%88%AB/" title="WebSocket、Socket、TCP、HTTP区别" target="_blank">WebSocket、Socket、TCP、HTTP区别</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/19/Springboot%E9%A1%B9%E7%9B%AE%E7%9A%84%E6%8E%A5%E5%8F%A3%E9%98%B2%E5%88%B7/" title="Springboot项目的接口防刷" target="_blank">Springboot项目的接口防刷</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/03/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Volatile%E5%85%B3%E9%94%AE%E5%AD%97%E5%8F%8A%E5%85%B6%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/" title="深入理解Volatile关键字及其实现原理" target="_blank">深入理解Volatile关键字及其实现原理</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/04/20/%E4%BD%BF%E7%94%A8vscode%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0%E7%8E%AF%E5%A2%83/" title="使用vscode搭建个人笔记环境" target="_blank">使用vscode搭建个人笔记环境</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/01/20/HBase%E4%BB%8B%E7%BB%8D%E5%AE%89%E8%A3%85%E4%B8%8E%E6%93%8D%E4%BD%9C/" title="HBase介绍安装与操作" target="_blank">HBase介绍安装与操作</a>
+                      </li>
+                    
+                  </ul>
+                </div>
+            
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Java-REST-Client"><span class="nav-number">1.</span> <span class="nav-text">Java REST Client</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Java-High-Level-REST-Client-使用示例"><span class="nav-number">2.</span> <span class="nav-text">Java High Level REST Client  使用示例</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#引入包"><span class="nav-number">2.1.</span> <span class="nav-text">引入包</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#初始化客户端"><span class="nav-number">2.2.</span> <span class="nav-text">初始化客户端</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Create-index-创建索引"><span class="nav-number">2.3.</span> <span class="nav-text">Create index 创建索引</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#index-document"><span class="nav-number">2.4.</span> <span class="nav-text">index  document</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#获取文档数据"><span class="nav-number">2.5.</span> <span class="nav-text">获取文档数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#批量索引文档"><span class="nav-number">2.6.</span> <span class="nav-text">批量索引文档</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#搜索数据"><span class="nav-number">2.7.</span> <span class="nav-text">搜索数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#highlight-高亮"><span class="nav-number">2.8.</span> <span class="nav-text">highlight 高亮</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#suggest-查询建议"><span class="nav-number">2.9.</span> <span class="nav-text">suggest 查询建议</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#aggregation-聚合分析"><span class="nav-number">2.10.</span> <span class="nav-text">aggregation 聚合分析</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Copyright</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

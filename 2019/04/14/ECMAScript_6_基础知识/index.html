@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Node," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="一、let和const命令1. let命令基本用法ES6新增了let命令，用来声明变量。用法类似于var，但是也存在新特性： 1234567891011121314151617181920211）let所声明的变量，只在let命令所在的代码块有效。适用于for循环。   &amp;#123;let a &#x3D; 10;var b &#x3D; 1;&amp;#125;   &#x2F;&#x2F;a  a i">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ECMAScript 6 基础知识">
+<meta property="og:url" content="https://huyunshun.com/2019/04/14/ECMAScript_6_%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/index.html">
+<meta property="og:site_name" content="简">
+<meta property="og:description" content="一、let和const命令1. let命令基本用法ES6新增了let命令，用来声明变量。用法类似于var，但是也存在新特性： 1234567891011121314151617181920211）let所声明的变量，只在let命令所在的代码块有效。适用于for循环。   &amp;#123;let a &#x3D; 10;var b &#x3D; 1;&amp;#125;   &#x2F;&#x2F;a  a i">
+<meta property="article:published_time" content="2019-04-13T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-05-20T10:04:24.688Z">
+<meta property="article:author" content="初晨">
+<meta property="article:tag" content="Node">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://huyunshun.com/2019/04/14/ECMAScript_6_基础知识/"/>
+
+
+
+
+
+  <title>ECMAScript 6 基础知识 | 简</title>
+  
+
+
+
+
+
+
+
+
+  <script type="text/javascript" src="/js/src/love.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
+
+  <!-- 看板娘 -->
+    
+        <script async src="/live2d-widget/autoload.js"></script>
+    
+ <!-- 飘动的彩带） -->
+  <script src="/js/src/piao.js" type="text/javascript"></script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">简</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">人生短暂，学海无边，而大道至简。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://huyunshun.com/2019/04/14/ECMAScript_6_%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="初晨">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://img.huyunshun.com/img/20200522182348.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="简">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">ECMAScript 6 基础知识</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-14T00:00:00+08:00">
+                2019-04-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Node/" itemprop="url" rel="index">
+                    <span itemprop="name">Node</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="一、let和const命令"><a href="#一、let和const命令" class="headerlink" title="一、let和const命令"></a>一、let和const命令</h1><h5 id="1-let命令"><a href="#1-let命令" class="headerlink" title="1. let命令"></a>1. let命令</h5><h6 id="基本用法"><a href="#基本用法" class="headerlink" title="基本用法"></a>基本用法</h6><p>ES6新增了let命令，用来声明变量。用法类似于var，但是也存在新特性：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">1）let所声明的变量，只在let命令所在的代码块有效。适用于for循环。</span><br><span class="line"></span><br><span class="line">   &#123;let a &#x3D; 10;var b &#x3D; 1;&#125;</span><br><span class="line">   &#x2F;&#x2F;a  a is not defined</span><br><span class="line">   &#x2F;&#x2F;b  1</span><br><span class="line"></span><br><span class="line">2）不存在变量提升。</span><br><span class="line">   console.log&#123;bar&#125;;</span><br><span class="line">   let bar &#x3D; 2;</span><br><span class="line">   &#x2F;&#x2F;报错ReferenceError:bar is not defined</span><br><span class="line"></span><br><span class="line">3）暂时性死区。</span><br><span class="line">   在代码块内，使用let命令变量之前，该变量都是不可用的。</span><br><span class="line">   var tmp &#x3D; 123;</span><br><span class="line">   if(true)&#123;</span><br><span class="line">        tmp &#x3D; &#39;abc&#39;; &#x2F;&#x2F;ReferenceError</span><br><span class="line">        let tmp;</span><br><span class="line">   &#125;     </span><br><span class="line"></span><br><span class="line">4）不允许重复声明。</span><br><span class="line">    function()&#123;let a &#x3D;10;let a &#x3D; 1;&#125; &#x2F;&#x2F;报错</span><br></pre></td></tr></table></figure>
+<h6 id="块级作用域"><a href="#块级作用域" class="headerlink" title="块级作用域"></a>块级作用域</h6><p>let实际上为JavaScript新增了块级作用域。外层作用域无法读取内层作用域的变量，内层作用域可以定义外层作用域的同名变量。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">let foo &#x3D; 1;</span><br><span class="line">&#123;</span><br><span class="line">   let foo &#x3D; 2; &#x2F;&#x2F;定义同名变量</span><br><span class="line">   let bar &#x3D; &quot;one&quot;;</span><br><span class="line">&#125;      </span><br><span class="line">console.log&#123;foo&#125;; &#x2F;&#x2F;1</span><br><span class="line">console.log(bar); &#x2F;&#x2F;报错</span><br></pre></td></tr></table></figure>
+<p> 块级作用域的出现，实际上使得广泛应用的立即执行函数表达式(IIFE)不再必要了。  </p>
+<h5 id="2-const命令"><a href="#2-const命令" class="headerlink" title="2. const命令"></a>2. const命令</h5><h6 id="基本用法-1"><a href="#基本用法-1" class="headerlink" title="基本用法"></a>基本用法</h6><p>const声明一个只读的变量。一旦声明，常量的值就不能改变。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">1）const声明的变量不得改变值，这意味着，const一旦声明变量，就必须立即初始化，不能留到以后赋值。</span><br><span class="line">const foo; &#x2F;&#x2F;SyntaxErroe:Missing initializer in const declaration</span><br><span class="line">2）块级作用域</span><br><span class="line">只在声明所在的块级作用域内有效。</span><br><span class="line">3）暂时性死区</span><br><span class="line">  在代码块内，使用let命令声明变量之前，该变量是不可用。</span><br><span class="line"></span><br><span class="line">  if(true)&#123;</span><br><span class="line">     console.log(MAX); &#x2F;&#x2F;ReferenceError const MAX &#x3D; 5;</span><br><span class="line">  &#125;</span><br><span class="line">4）不允许重复声明</span><br><span class="line">   var message &#x3D; &#39;Hello!&#39;;</span><br><span class="line">   let age &#x3D; 25;</span><br><span class="line">   &#x2F;&#x2F;以下两行都会报错</span><br><span class="line">   const message &#x3D; &#39;Goodbye!&#39;;</span><br><span class="line">   const age &#x3D; 30;</span><br></pre></td></tr></table></figure>
+<p>用途：为了防止意外修改变量，比如，引入库名，组件名等</p>
+<p>let、const与var的区别：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">a. let、const有块级作用域的概念，只要是定义的变量，就是一个块级作用域；var只有在函数中才有作用域；</span><br><span class="line">b. let、const不允许重复声明；</span><br><span class="line">c. let和var声明的变量，都可以再修改，而const定义的是常量，值是不可以修改的(对象除外，对象的属性可以修改)</span><br></pre></td></tr></table></figure>
+<p>作用域的概念：ES5有两个作用域：全局和局部</p>
+<p>ES6有了块作用域的概念：块作用域，通俗的理解，就是一个大括号，就是一个块作用域；</p>
+<h5 id="ES6-声明变量的六种方法"><a href="#ES6-声明变量的六种方法" class="headerlink" title="ES6 声明变量的六种方法"></a>ES6 声明变量的六种方法</h5><p>ES5 只有两种声明变量的方法：var命令和function命令。ES6 除了添加let和const命令，后面章节还会提到，另外两种声明变量的方法：import命令和class命令。所以，ES6 一共有 6 种声明变量的方法。</p>
+<h5 id="顶层对象的属性"><a href="#顶层对象的属性" class="headerlink" title="顶层对象的属性"></a>顶层对象的属性</h5><p>顶层对象，在浏览器环境指的是window对象，在 Node 指的是global对象。ES5 之中，顶层对象的属性与全局变量是等价的。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">window.a &#x3D; 1;</span><br><span class="line">a &#x2F;&#x2F; 1</span><br><span class="line"></span><br><span class="line">a &#x3D; 2;</span><br><span class="line">window.a &#x2F;&#x2F; 2</span><br></pre></td></tr></table></figure>
+<p>上面代码中，顶层对象的属性赋值与全局变量的赋值，是同一件事。</p>
+<p>顶层对象的属性与全局变量挂钩，是JavaScript 语言最大的设计败笔之一。ES6 为了改变这一点，一方面规定，为了保持兼容性，var命令和function命令声明的全局变量，依旧是顶层对象的属性；另一方面规定，let命令、const命令、class命令声明的全局变量，不属于顶层对象的属性。也就是说，从 ES6 开始，全局变量将逐步与顶层对象的属性脱钩。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">var a &#x3D; 1;</span><br><span class="line">&#x2F;&#x2F; 如果在 Node 的 REPL 环境，可以写成 global.a</span><br><span class="line">&#x2F;&#x2F; 或者采用通用方法，写成 this.a</span><br><span class="line">window.a &#x2F;&#x2F; 1</span><br><span class="line"></span><br><span class="line">let b &#x3D; 1;</span><br><span class="line">window.b &#x2F;&#x2F; undefined</span><br></pre></td></tr></table></figure>
+<p>上面代码中，全局变量a由var命令声明，所以它是顶层对象的属性；全局变量b由let命令声明，所以它不是顶层对象的属性，返回undefined。</p>
+<h5 id="globalThis-对象"><a href="#globalThis-对象" class="headerlink" title="globalThis 对象"></a>globalThis 对象</h5><p>JavaScript 语言存在一个顶层对象，它提供全局环境（即全局作用域），所有代码都是在这个环境中运行。但是，顶层对象在各种实现里面是不统一的。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">浏览器里面，顶层对象是window，但 Node 和 Web Worker 没有window。</span><br><span class="line">浏览器和 Web Worker 里面，self也指向顶层对象，但是 Node 没有self。</span><br><span class="line">Node 里面，顶层对象是global，但其他环境都不支持。</span><br></pre></td></tr></table></figure>
+<p>同一段代码为了能够在各种环境，都能取到顶层对象，现在一般是使用this变量，但是有局限性。</p>
+<ul>
+<li>全局环境中，this会返回顶层对象。但是，Node 模块和 ES6 模块中，this返回的是当前模块。</li>
+<li>函数里面的this，如果函数不是作为对象的方法运行，而是单纯作为函数运行，this会指向顶层对象。但是，严格模式下，这时this会返回undefined。</li>
+<li>不管是严格模式，还是普通模式，new Function(‘return this’)()，总是会返回全局对象。但是，如果浏览器用了 CSP（Content Security Policy，内容安全策略），那么eval、new Function这些方法都可能无法使用。</li>
+</ul>
+<p>综上所述，很难找到一种方法，可以在所有情况下，都取到顶层对象。下面是两种勉强可以使用的方法。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; 方法一</span><br><span class="line">(typeof window !&#x3D;&#x3D; &#39;undefined&#39;</span><br><span class="line">   ? window</span><br><span class="line">   : (typeof process &#x3D;&#x3D;&#x3D; &#39;object&#39; &amp;&amp;</span><br><span class="line">      typeof require &#x3D;&#x3D;&#x3D; &#39;function&#39; &amp;&amp;</span><br><span class="line">      typeof global &#x3D;&#x3D;&#x3D; &#39;object&#39;)</span><br><span class="line">     ? global</span><br><span class="line">     : this);</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 方法二</span><br><span class="line">var getGlobal &#x3D; function () &#123;</span><br><span class="line">  if (typeof self !&#x3D;&#x3D; &#39;undefined&#39;) &#123; return self; &#125;</span><br><span class="line">  if (typeof window !&#x3D;&#x3D; &#39;undefined&#39;) &#123; return window; &#125;</span><br><span class="line">  if (typeof global !&#x3D;&#x3D; &#39;undefined&#39;) &#123; return global; &#125;</span><br><span class="line">  throw new Error(&#39;unable to locate global object&#39;);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>现在有一个提案，在语言标准的层面，引入globalThis作为顶层对象。也就是说，任何环境下，globalThis都是存在的，都可以从它拿到顶层对象，指向全局环境下的this。</p>
+<h1 id="二、解构赋值"><a href="#二、解构赋值" class="headerlink" title="二、解构赋值"></a>二、解构赋值</h1><p>ES6允许按照一定模式，从数组和对象中提取值，对变量进行赋值，这被称为解构（Destructing）。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">以前，为变量赋值，只能直接指定值。</span><br><span class="line"></span><br><span class="line">let a &#x3D; 1;</span><br><span class="line">let b &#x3D; 2;</span><br><span class="line">let c &#x3D; 3;</span><br><span class="line">ES6 允许写成下面这样。</span><br><span class="line"></span><br><span class="line">let [a, b, c] &#x3D; [1, 2, 3];</span><br></pre></td></tr></table></figure>
+
+<p>本质上，这种写法属于“模式匹配”，只要等号两边的模式相同，左边的变量就会被赋予对应的值。如果结构不成功，变量的值就等于undefined。另一种情况是不完全解构，即等号左边的模式只匹配一部分的等号右边的数组。这种情况下，解构依然可以成功。</p>
+<h5 id="数组的解构赋值"><a href="#数组的解构赋值" class="headerlink" title="数组的解构赋值"></a>数组的解构赋值</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">let [a,b,c] &#x3D; [1,2,3];</span><br><span class="line"></span><br><span class="line">1）不完全解构：</span><br><span class="line"></span><br><span class="line">  let [a,[b],d] &#x3D; [1,[2,3],4]; &#x2F;&#x2F;a&#x3D;1;b&#x3D;2;d&#x3D;4</span><br><span class="line"></span><br><span class="line">2）集合解构：</span><br><span class="line"></span><br><span class="line">  let[head,...tail] &#x3D; [1,2,3,4]; &#x2F;&#x2F;head&#x3D;1;tail&#x3D;[2,3,4]</span><br><span class="line"></span><br><span class="line">3）默认值（当匹配值严格等于undefined时，默认值生效）：</span><br><span class="line"></span><br><span class="line">  let [x,y&#x3D;&#39;b&#39;] &#x3D; [&#39;a&#39;]; &#x2F;&#x2F;x &#x3D; &#39;a&#39;,y &#x3D; &#39;b&#39;</span><br><span class="line"></span><br><span class="line">4）默认值也可以为函数：</span><br><span class="line"></span><br><span class="line">  function f()&#123; console.log(&#39;aaa&#39;); &#125;</span><br><span class="line">  let [x&#x3D;f()] &#x3D; [1];</span><br></pre></td></tr></table></figure>
+<h5 id="对象的解构赋值"><a href="#对象的解构赋值" class="headerlink" title="对象的解构赋值"></a>对象的解构赋值</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">1）对象的属性没有次序，变量必须与属性同名，才能取到正确的值</span><br><span class="line"></span><br><span class="line">   let &#123;foo,bar&#125; &#x3D; &#123;foo:&#39;aaa&#39;,bar:&#39;bbb&#39;&#125;; &#x2F;&#x2F;foo&#x3D;&#39;aaa&#39;;bar&#x3D;&#39;bbb&#39;</span><br><span class="line"></span><br><span class="line">2）如果变量名与属性名不一致，必须写成下面这样。</span><br><span class="line"></span><br><span class="line">    var &#123;foo:baz&#125; &#x3D; &#123;foo:&#39;aaa&#39;,bar:&#39;bbb&#39;&#125;; &#x2F;&#x2F; baz&#x3D;&#39;aaa&#39;    </span><br><span class="line"></span><br><span class="line">3）这实际上说明，对象的解构赋值是下面形式的简写。</span><br><span class="line"></span><br><span class="line">    let &#123;foo:foo,bar:bar&#125; &#x3D; &#123;foo:&#39;aaa&#39;,bar:&#39;bbb&#39;&#125;;</span><br><span class="line"></span><br><span class="line">4）嵌套结构</span><br><span class="line"></span><br><span class="line">    let obj &#x3D; &#123;p:[&#39;Hello&#39;,&#123;y:&#39;World&#39;&#125;]&#125;;</span><br><span class="line">    let &#123;p:[x,&#123;y&#125;]&#125; &#x3D; obj;  &#x2F;&#x2F; x&#x3D;&#39;Hello&#39;;y&#x3D;&#39;World&#39;  </span><br><span class="line"></span><br><span class="line">5）默认值（默认值生效的条件是，对象的属性值严格等于undefined）</span><br><span class="line">    var &#123;x:y&#x3D;3&#125; &#x3D; &#123;&#125;; &#x2F;&#x2F; y&#x3D;3</span><br></pre></td></tr></table></figure>
+<p>对象的解构也可以指定默认值。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">var &#123;x &#x3D; 3&#125; &#x3D; &#123;&#125;;</span><br><span class="line">x &#x2F;&#x2F; 3</span><br><span class="line"></span><br><span class="line">var &#123;x, y &#x3D; 5&#125; &#x3D; &#123;x: 1&#125;;</span><br><span class="line">x &#x2F;&#x2F; 1</span><br><span class="line">y &#x2F;&#x2F; 5</span><br><span class="line"></span><br><span class="line">var &#123;x: y &#x3D; 3&#125; &#x3D; &#123;&#125;;</span><br><span class="line">y &#x2F;&#x2F; 3</span><br><span class="line"></span><br><span class="line">var &#123;x: y &#x3D; 3&#125; &#x3D; &#123;x: 5&#125;;</span><br><span class="line">y &#x2F;&#x2F; 5</span><br><span class="line"></span><br><span class="line">var &#123; message: msg &#x3D; &#39;Something went wrong&#39; &#125; &#x3D; &#123;&#125;;</span><br><span class="line">msg &#x2F;&#x2F; &quot;Something went wrong&quot;</span><br></pre></td></tr></table></figure>
+<h5 id="字符串的解构赋值"><a href="#字符串的解构赋值" class="headerlink" title="字符串的解构赋值"></a>字符串的解构赋值</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">1）解构时，字符串被转换成了一个类似数组的对象。</span><br><span class="line"></span><br><span class="line">  const [a,b,c,d,e] &#x3D; &#39;hello&#39;; &#x2F;&#x2F;a&#x3D;h;b&#x3D;e;c&#x3D;l;d&#x3D;l;e&#x3D;o</span><br><span class="line"></span><br><span class="line">2）也可以对数组的属性解构</span><br><span class="line"></span><br><span class="line">  let &#123;length:len&#125; &#x3D; &#39;hello&#39;; &#x2F;&#x2F; len&#x3D;5</span><br></pre></td></tr></table></figure>
+<h5 id="数值和布尔值的解构赋值"><a href="#数值和布尔值的解构赋值" class="headerlink" title="数值和布尔值的解构赋值"></a>数值和布尔值的解构赋值</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">解构时，如果等号右边是数值和布尔值，则会先转为对象。</span><br><span class="line"></span><br><span class="line">let &#123;toString:s&#125; &#x3D; 123; &#x2F;&#x2F; s&#x3D;&#x3D;&#x3D;Number.prototype.toString true</span><br><span class="line">let &#123;toString:s&#125; &#x3D; true; &#x2F;&#x2F; s&#x3D;&#x3D;&#x3D;Boolean.prototype.toString true</span><br></pre></td></tr></table></figure>
+<h5 id="函数参数的解构赋值"><a href="#函数参数的解构赋值" class="headerlink" title="函数参数的解构赋值"></a>函数参数的解构赋值</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">1）基本语法</span><br><span class="line"></span><br><span class="line">  function add([x,y])&#123;return x+y;&#125;</span><br><span class="line">  add([1,2]);</span><br><span class="line"></span><br><span class="line">2）默认值</span><br><span class="line"></span><br><span class="line">  function move(&#123;x&#x3D;0,y&#x3D;0&#125;)&#123;</span><br><span class="line">      return [x,y];</span><br><span class="line">  &#125;  </span><br><span class="line">  move(&#123;x:3,y:8&#125;); &#x2F;&#x2F;[3,8]</span><br><span class="line">  move(&#123;x:3&#125;); &#x2F;&#x2F;[3,0]</span><br><span class="line">  move(&#123;&#125;); &#x2F;&#x2F;[0,0]</span><br><span class="line">  move(); &#x2F;&#x2F;[0,0]</span><br></pre></td></tr></table></figure>
+<h5 id="常见用途"><a href="#常见用途" class="headerlink" title="常见用途"></a>常见用途</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line">1）交换变量的值</span><br><span class="line"></span><br><span class="line">   let x &#x3D; 1; </span><br><span class="line">   let y &#x3D; 2; </span><br><span class="line">   [x,y] &#x3D; [y,x];</span><br><span class="line"></span><br><span class="line">2）从函数返回多个值</span><br><span class="line"></span><br><span class="line">   function example()&#123;</span><br><span class="line">      return [1,2,3];</span><br><span class="line">   &#125;</span><br><span class="line">   let [a,b,c] &#x3D; example();   </span><br><span class="line"></span><br><span class="line">3）函数参数的定义</span><br><span class="line">   </span><br><span class="line">   function f([x,y,z])&#123;...&#125;</span><br><span class="line">   f([1,2,3]);</span><br><span class="line"></span><br><span class="line">4）提取JSON数据</span><br><span class="line"></span><br><span class="line">   let jsonData &#x3D; &#123;id:42,status:&#39;OK&#39;,data:[867,5309]&#125;;</span><br><span class="line">   let &#123;id,status,data:number&#125; &#x3D; jsonData;   </span><br><span class="line"></span><br><span class="line">5）输入模块的指定方法</span><br><span class="line"></span><br><span class="line">   const &#123;SourceMapConsumer,SourceNode&#125; &#x3D; require(&quot;source-map&quot;);</span><br><span class="line"></span><br><span class="line">6）函数参数的默认值         </span><br><span class="line"></span><br><span class="line">   jQuery.ajax &#x3D; function(url,&#123;</span><br><span class="line">     async &#x3D; true,cache &#x3D; true,global &#x3D; true,</span><br><span class="line">     beforeSend &#x3D; function()&#123;&#125;,</span><br><span class="line">     complete &#x3D; function()&#123;&#125;,</span><br><span class="line">     &#x2F;&#x2F;...more config</span><br><span class="line">   &#125;)&#123;&#x2F;&#x2F;...do stuff&#125;;</span><br><span class="line"></span><br><span class="line">   指定参数的默认值，就避免了在函数体内部再写var foo &#x3D; config.foo||&#39;default foo&#39;;这样的语句。</span><br><span class="line"></span><br><span class="line">7）遍历map结构</span><br><span class="line"></span><br><span class="line">   var map &#x3D; new Map();</span><br><span class="line">   map.set(&#39;first&#39;,&#39;hello&#39;);</span><br><span class="line">   map.set(&#39;second&#39;,&#39;world&#39;);</span><br><span class="line">   for(let [key,value] of map)&#123;</span><br><span class="line">      console.log(key + &quot;is&quot; + value);</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+<h1 id="三、字符串、正则、对象、函数、数组等扩展"><a href="#三、字符串、正则、对象、函数、数组等扩展" class="headerlink" title="三、字符串、正则、对象、函数、数组等扩展"></a>三、字符串、正则、对象、函数、数组等扩展</h1><h2 id="字符串的扩展"><a href="#字符串的扩展" class="headerlink" title="字符串的扩展"></a>字符串的扩展</h2><h3 id="字符串的遍历器接口"><a href="#字符串的遍历器接口" class="headerlink" title="字符串的遍历器接口"></a>字符串的遍历器接口</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">for (let codePoint of &#39;foo&#39;) &#123;</span><br><span class="line">  console.log(codePoint)</span><br><span class="line">&#125;</span><br><span class="line">&#x2F;&#x2F; &quot;f&quot;</span><br><span class="line">&#x2F;&#x2F; &quot;o&quot;</span><br><span class="line">&#x2F;&#x2F; &quot;o&quot;</span><br></pre></td></tr></table></figure>
+      
+    </div>
+     <!-- 相关文章推荐 -->
+    
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Node/" rel="tag"># Node</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/13/jenkins%E4%BB%8B%E7%BB%8D%E5%92%8C%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8/" rel="next" title="Jenkins介绍和安装使用">
+                <i class="fa fa-chevron-left"></i> Jenkins介绍和安装使用
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/04/15/ECMAScript_6_Promise/" rel="prev" title="ECMAScript 6 Promise">
+                ECMAScript 6 Promise <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+<span class="jiathis_txt">分享到：</span>
+<a class="jiathis_button_fav">收藏夹</a>
+<a class="jiathis_button_copy">复制网址</a>
+<a class="jiathis_button_email">邮件</a>
+<a class="jiathis_button_weixin">微信</a>
+<a class="jiathis_button_qzone">QQ空间</a>
+<a class="jiathis_button_tqq">腾讯微博</a>
+<a class="jiathis_button_douban">豆瓣</a>
+<a class="jiathis_button_share">一键分享</a>
+
+<a href="http://www.jiathis.com/share?uid=2140465" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+<a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+var jiathis_config={
+  data_track_clickback:true,
+  summary:"",
+  shortUrl:false,
+  hideMore:false
+}
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://img.huyunshun.com/img/20200522182348.png"
+                alt="初晨" />
+            
+              <p class="site-author-name" itemprop="name">初晨</p>
+              <p class="site-description motion-element" itemprop="description">永远不要说你知道本质，更别说真相了。</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">249</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">46</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+<!--近期文章版块-->
+            
+                <div class="links-of-blogroll motion-element links-of-blogroll-block">
+                  <div class="links-of-blogroll-title">
+                    <!-- modify icon to fire by szw -->
+                    <i class="fa fa-history fa-" aria-hidden="true"></i>
+                    近期文章
+                  </div>
+                  <ul class="links-of-blogroll-list">
+                    
+                    
+                      <li>
+                        <a href="/2020/05/22/WebSocket%E3%80%81Socket%E3%80%81TCP%E3%80%81HTTP%E5%8C%BA%E5%88%AB/" title="WebSocket、Socket、TCP、HTTP区别" target="_blank">WebSocket、Socket、TCP、HTTP区别</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/19/Springboot%E9%A1%B9%E7%9B%AE%E7%9A%84%E6%8E%A5%E5%8F%A3%E9%98%B2%E5%88%B7/" title="Springboot项目的接口防刷" target="_blank">Springboot项目的接口防刷</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/03/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Volatile%E5%85%B3%E9%94%AE%E5%AD%97%E5%8F%8A%E5%85%B6%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/" title="深入理解Volatile关键字及其实现原理" target="_blank">深入理解Volatile关键字及其实现原理</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/04/20/%E4%BD%BF%E7%94%A8vscode%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0%E7%8E%AF%E5%A2%83/" title="使用vscode搭建个人笔记环境" target="_blank">使用vscode搭建个人笔记环境</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/01/20/HBase%E4%BB%8B%E7%BB%8D%E5%AE%89%E8%A3%85%E4%B8%8E%E6%93%8D%E4%BD%9C/" title="HBase介绍安装与操作" target="_blank">HBase介绍安装与操作</a>
+                      </li>
+                    
+                  </ul>
+                </div>
+            
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#一、let和const命令"><span class="nav-number">1.</span> <span class="nav-text">一、let和const命令</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-let命令"><span class="nav-number">1.0.0.0.1.</span> <span class="nav-text">1. let命令</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#基本用法"><span class="nav-number">1.0.0.0.1.1.</span> <span class="nav-text">基本用法</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#块级作用域"><span class="nav-number">1.0.0.0.1.2.</span> <span class="nav-text">块级作用域</span></a></li></ol></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-const命令"><span class="nav-number">1.0.0.0.2.</span> <span class="nav-text">2. const命令</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#基本用法-1"><span class="nav-number">1.0.0.0.2.1.</span> <span class="nav-text">基本用法</span></a></li></ol></li><li class="nav-item nav-level-5"><a class="nav-link" href="#ES6-声明变量的六种方法"><span class="nav-number">1.0.0.0.3.</span> <span class="nav-text">ES6 声明变量的六种方法</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#顶层对象的属性"><span class="nav-number">1.0.0.0.4.</span> <span class="nav-text">顶层对象的属性</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#globalThis-对象"><span class="nav-number">1.0.0.0.5.</span> <span class="nav-text">globalThis 对象</span></a></li></ol></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#二、解构赋值"><span class="nav-number">2.</span> <span class="nav-text">二、解构赋值</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#数组的解构赋值"><span class="nav-number">2.0.0.0.1.</span> <span class="nav-text">数组的解构赋值</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#对象的解构赋值"><span class="nav-number">2.0.0.0.2.</span> <span class="nav-text">对象的解构赋值</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#字符串的解构赋值"><span class="nav-number">2.0.0.0.3.</span> <span class="nav-text">字符串的解构赋值</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#数值和布尔值的解构赋值"><span class="nav-number">2.0.0.0.4.</span> <span class="nav-text">数值和布尔值的解构赋值</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#函数参数的解构赋值"><span class="nav-number">2.0.0.0.5.</span> <span class="nav-text">函数参数的解构赋值</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#常见用途"><span class="nav-number">2.0.0.0.6.</span> <span class="nav-text">常见用途</span></a></li></ol></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#三、字符串、正则、对象、函数、数组等扩展"><span class="nav-number">3.</span> <span class="nav-text">三、字符串、正则、对象、函数、数组等扩展</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#字符串的扩展"><span class="nav-number">3.1.</span> <span class="nav-text">字符串的扩展</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#字符串的遍历器接口"><span class="nav-number">3.1.1.</span> <span class="nav-text">字符串的遍历器接口</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Copyright</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

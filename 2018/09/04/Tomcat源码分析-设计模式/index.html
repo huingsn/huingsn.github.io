@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="tomcat,源码," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="模板方法模式模板方法模式抽象出某个业务操作公共的流程，将流程分为几个步骤，其中有一些步骤是固定不变的，有一些步骤是变化的，固定不变的步骤通过一个基类来实现，而变化的部分通过钩子方法让子类去实现，这样就实现了对系统中流程的统一化规范化管理。 Tomcat中关于生命周期管理应用了模板方法模式，在一个组件的生命周期中都会涉及到init(初始化)，start（启动），stop(停止)，destory（销毁">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Tomcat源码中涉及的设计模式">
+<meta property="og:url" content="https://huyunshun.com/2018/09/04/Tomcat%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/index.html">
+<meta property="og:site_name" content="简">
+<meta property="og:description" content="模板方法模式模板方法模式抽象出某个业务操作公共的流程，将流程分为几个步骤，其中有一些步骤是固定不变的，有一些步骤是变化的，固定不变的步骤通过一个基类来实现，而变化的部分通过钩子方法让子类去实现，这样就实现了对系统中流程的统一化规范化管理。 Tomcat中关于生命周期管理应用了模板方法模式，在一个组件的生命周期中都会涉及到init(初始化)，start（启动），stop(停止)，destory（销毁">
+<meta property="og:image" content="https://img.huyunshun.com/img/20200412101412.png">
+<meta property="og:image" content="https://img.huyunshun.com/img/20200412103613.png">
+<meta property="og:image" content="https://img.huyunshun.com/img/20200412111304.png">
+<meta property="og:image" content="https://img.huyunshun.com/img/20200412110748.png">
+<meta property="og:image" content="https://img.huyunshun.com/img/20200412113158.png">
+<meta property="og:image" content="https://img.huyunshun.com/img/20200412111252.png">
+<meta property="og:image" content="https://img.huyunshun.com/img/20200412144024.png">
+<meta property="article:published_time" content="2018-09-03T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-05-20T10:04:24.707Z">
+<meta property="article:author" content="初晨">
+<meta property="article:tag" content="tomcat">
+<meta property="article:tag" content="源码">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img.huyunshun.com/img/20200412101412.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://huyunshun.com/2018/09/04/Tomcat源码分析-设计模式/"/>
+
+
+
+
+
+  <title>Tomcat源码中涉及的设计模式 | 简</title>
+  
+
+
+
+
+
+
+
+
+  <script type="text/javascript" src="/js/src/love.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
+
+  <!-- 看板娘 -->
+    
+        <script async src="/live2d-widget/autoload.js"></script>
+    
+ <!-- 飘动的彩带） -->
+  <script src="/js/src/piao.js" type="text/javascript"></script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">简</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">人生短暂，学海无边，而大道至简。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://huyunshun.com/2018/09/04/Tomcat%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="初晨">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://img.huyunshun.com/img/20200522182348.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="简">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Tomcat源码中涉及的设计模式</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-09-04T00:00:00+08:00">
+                2018-09-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Tomcat/" itemprop="url" rel="index">
+                    <span itemprop="name">Tomcat</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="模板方法模式"><a href="#模板方法模式" class="headerlink" title="模板方法模式"></a>模板方法模式</h2><p>模板方法模式抽象出某个业务操作公共的流程，将流程分为几个步骤，其中有一些步骤是固定不变的，有一些步骤是变化的，固定不变的步骤通过一个基类来实现，而变化的部分通过钩子方法让子类去实现，这样就实现了对系统中流程的统一化规范化管理。</p>
+<p>Tomcat中关于生命周期管理应用了模板方法模式，在一个组件的生命周期中都会涉及到init(初始化)，start（启动），stop(停止)，destory（销毁），而对于每一个生命周期阶段其实都有固定一些事情要做，比如判断前置状态，设置后置状态，以及通知状态变更事件的监听者等，而这些工作其实是可以固化的，所以Tomcat中就将每个生命周期阶段公共的部分固化，然后通过initInternal,startInternal,stopInternal,destoryInternal这几个钩子方法开放给子类去实现具体的逻辑。</p>
+<p><img src="https://img.huyunshun.com/img/20200412101412.png" alt="20200412101412"></p>
+<p>tomcat的所有容器都实现了Lifecycle的生命周期管理接口</p>
+<p>基类LifecycleBase实现了Lifecycle接口并实现init、start、stop、destroy等方法。</p>
+<p>  init()方法内部模板化初始化流程，抽象具体的实现initInternal()方法。<br>  start()方法内部模板化启动流程，抽象具体的实现startInternal()方法。<br>  stop()方法内部模板化停止流程，抽象具体的实现stopInternal()方法。<br>  destroy()方法内部模板化释放流程，抽象具体的实现destroyInternal()方法。</p>
+<p>Tomcat状态转移图</p>
+<p><img src="https://img.huyunshun.com/img/20200412103613.png" alt="20200412103613"></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Lifecycle</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String BEFORE_INIT_EVENT = <span class="string">"before_init"</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String AFTER_INIT_EVENT = <span class="string">"after_init"</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String START_EVENT = <span class="string">"start"</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String BEFORE_START_EVENT = <span class="string">"before_start"</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String AFTER_START_EVENT = <span class="string">"after_start"</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String STOP_EVENT = <span class="string">"stop"</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String BEFORE_STOP_EVENT = <span class="string">"before_stop"</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String AFTER_STOP_EVENT = <span class="string">"after_stop"</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String AFTER_DESTROY_EVENT = <span class="string">"after_destroy"</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String BEFORE_DESTROY_EVENT = <span class="string">"before_destroy"</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String PERIODIC_EVENT = <span class="string">"periodic"</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String CONFIGURE_START_EVENT = <span class="string">"configure_start"</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String CONFIGURE_STOP_EVENT = <span class="string">"configure_stop"</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addLifecycleListener</span><span class="params">(LifecycleListener listener)</span></span>;</span><br><span class="line">    <span class="keyword">public</span> LifecycleListener[] findLifecycleListeners();</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">removeLifecycleListener</span><span class="params">(LifecycleListener listener)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">()</span> <span class="keyword">throws</span> LifecycleException</span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">start</span><span class="params">()</span> <span class="keyword">throws</span> LifecycleException</span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">stop</span><span class="params">()</span> <span class="keyword">throws</span> LifecycleException</span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">destroy</span><span class="params">()</span> <span class="keyword">throws</span> LifecycleException</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>LifecycleBase基实现类：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">LifecycleBase</span> <span class="keyword">implements</span> <span class="title">Lifecycle</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Log log = LogFactory.getLog(LifecycleBase<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> StringManager sm = StringManager.getManager(LifecycleBase<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 事件通知的注册生命周期侦听器列表。</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> List&lt;LifecycleListener&gt; lifecycleListeners = <span class="keyword">new</span> CopyOnWriteArrayList&lt;&gt;();</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 源组件的当前状态。</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">volatile</span> LifecycleState state = LifecycleState.NEW;</span><br><span class="line">    <span class="comment">//捕获Tomcat启动时的错误，当这个属性为真时，就会抛出LifecycleException错误</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">boolean</span> throwOnFailure = <span class="keyword">true</span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">getThrowOnFailure</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> throwOnFailure;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setThrowOnFailure</span><span class="params">(<span class="keyword">boolean</span> throwOnFailure)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.throwOnFailure = throwOnFailure;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addLifecycleListener</span><span class="params">(LifecycleListener listener)</span> </span>&#123;</span><br><span class="line">        lifecycleListeners.add(listener);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> LifecycleListener[] findLifecycleListeners() &#123;</span><br><span class="line">        <span class="keyword">return</span> lifecycleListeners.toArray(<span class="keyword">new</span> LifecycleListener[<span class="number">0</span>]);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">removeLifecycleListener</span><span class="params">(LifecycleListener listener)</span> </span>&#123;</span><br><span class="line">        lifecycleListeners.remove(listener);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 允许子类触发&#123;<span class="doctag">@link</span> Lifecycle&#125;事件。</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">fireLifecycleEvent</span><span class="params">(String type, Object data)</span> </span>&#123;</span><br><span class="line">        LifecycleEvent event = <span class="keyword">new</span> LifecycleEvent(<span class="keyword">this</span>, type, data);</span><br><span class="line">        <span class="keyword">for</span> (LifecycleListener listener : lifecycleListeners) &#123;</span><br><span class="line">            listener.lifecycleEvent(event);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">//初始化</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">()</span> <span class="keyword">throws</span> LifecycleException </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (!state.equals(LifecycleState.NEW)) &#123;</span><br><span class="line">            invalidTransition(Lifecycle.BEFORE_INIT_EVENT);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            setStateInternal(LifecycleState.INITIALIZING, <span class="keyword">null</span>, <span class="keyword">false</span>);</span><br><span class="line">            <span class="comment">//真正的初始化方法</span></span><br><span class="line">            initInternal();</span><br><span class="line">            setStateInternal(LifecycleState.INITIALIZED, <span class="keyword">null</span>, <span class="keyword">false</span>);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Throwable t) &#123;</span><br><span class="line">            handleSubClassException(t, <span class="string">"lifecycleBase.initFail"</span>, toString());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 子类实现此方法以执行所需的任何实例初始化。</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">initInternal</span><span class="params">()</span> <span class="keyword">throws</span> LifecycleException</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">start</span><span class="params">()</span> <span class="keyword">throws</span> LifecycleException </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (LifecycleState.STARTING_PREP.equals(state) || LifecycleState.STARTING.equals(state) ||</span><br><span class="line">                LifecycleState.STARTED.equals(state)) &#123;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (log.isDebugEnabled()) &#123;</span><br><span class="line">                Exception e = <span class="keyword">new</span> LifecycleException();</span><br><span class="line">                log.debug(sm.getString(<span class="string">"lifecycleBase.alreadyStarted"</span>, toString()), e);</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (log.isInfoEnabled()) &#123;</span><br><span class="line">                log.info(sm.getString(<span class="string">"lifecycleBase.alreadyStarted"</span>, toString()));</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (state.equals(LifecycleState.NEW)) &#123;</span><br><span class="line">            init();</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (state.equals(LifecycleState.FAILED)) &#123;</span><br><span class="line">            stop();</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (!state.equals(LifecycleState.INITIALIZED) &amp;&amp;</span><br><span class="line">                !state.equals(LifecycleState.STOPPED)) &#123;</span><br><span class="line">            invalidTransition(Lifecycle.BEFORE_START_EVENT);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            setStateInternal(LifecycleState.STARTING_PREP, <span class="keyword">null</span>, <span class="keyword">false</span>);</span><br><span class="line">            <span class="comment">//最终启动</span></span><br><span class="line">            startInternal();</span><br><span class="line">            <span class="keyword">if</span> (state.equals(LifecycleState.FAILED)) &#123;</span><br><span class="line">                <span class="comment">// This is a 'controlled' failure. The component put itself into the</span></span><br><span class="line">                <span class="comment">// FAILED state so call stop() to complete the clean-up.</span></span><br><span class="line">                stop();</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (!state.equals(LifecycleState.STARTING)) &#123;</span><br><span class="line">                <span class="comment">// Shouldn't be necessary but acts as a check that sub-classes are</span></span><br><span class="line">                <span class="comment">// doing what they are supposed to.</span></span><br><span class="line">                invalidTransition(Lifecycle.AFTER_START_EVENT);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                setStateInternal(LifecycleState.STARTED, <span class="keyword">null</span>, <span class="keyword">false</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Throwable t) &#123;</span><br><span class="line">            <span class="comment">// This is an 'uncontrolled' failure so put the component into the</span></span><br><span class="line">            <span class="comment">// FAILED state and throw an exception.</span></span><br><span class="line">            handleSubClassException(t, <span class="string">"lifecycleBase.startFail"</span>, toString());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 子类必须确保在执行此方法期间状态更改为*&#123;<span class="doctag">@link</span> LifecycleState&#125;STARTING&#125;。</span></span><br><span class="line"><span class="comment">     * 更改状态将触发&#123;<span class="doctag">@link</span> Lifecycle#START_EVENT&#125;事件。</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * 如果一个组件启动失败，它可能抛出一个&#123;<span class="doctag">@link</span> LifecycleException&#125;，这将导致它的父组件启动失败*，</span></span><br><span class="line"><span class="comment">     * 或者它将自己置于错误状态，在这种情况下，将对失败的组件调用&#123;<span class="doctag">@link</span>#stop（）&#125;*，但父组件*将继续正常启动。</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">startInternal</span><span class="params">()</span> <span class="keyword">throws</span> LifecycleException</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">stop</span><span class="params">()</span> <span class="keyword">throws</span> LifecycleException </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (LifecycleState.STOPPING_PREP.equals(state) || LifecycleState.STOPPING.equals(state) ||</span><br><span class="line">                LifecycleState.STOPPED.equals(state)) &#123;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (log.isDebugEnabled()) &#123;</span><br><span class="line">                Exception e = <span class="keyword">new</span> LifecycleException();</span><br><span class="line">                log.debug(sm.getString(<span class="string">"lifecycleBase.alreadyStopped"</span>, toString()), e);</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (log.isInfoEnabled()) &#123;</span><br><span class="line">                log.info(sm.getString(<span class="string">"lifecycleBase.alreadyStopped"</span>, toString()));</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (state.equals(LifecycleState.NEW)) &#123;</span><br><span class="line">            state = LifecycleState.STOPPED;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (!state.equals(LifecycleState.STARTED) &amp;&amp; !state.equals(LifecycleState.FAILED)) &#123;</span><br><span class="line">            invalidTransition(Lifecycle.BEFORE_STOP_EVENT);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (state.equals(LifecycleState.FAILED)) &#123;</span><br><span class="line">                <span class="comment">// Don't transition to STOPPING_PREP as that would briefly mark the</span></span><br><span class="line">                <span class="comment">// component as available but do ensure the BEFORE_STOP_EVENT is</span></span><br><span class="line">                <span class="comment">// fired</span></span><br><span class="line">                fireLifecycleEvent(BEFORE_STOP_EVENT, <span class="keyword">null</span>);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                setStateInternal(LifecycleState.STOPPING_PREP, <span class="keyword">null</span>, <span class="keyword">false</span>);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            stopInternal();</span><br><span class="line"></span><br><span class="line">            <span class="comment">// Shouldn't be necessary but acts as a check that sub-classes are</span></span><br><span class="line">            <span class="comment">// doing what they are supposed to.</span></span><br><span class="line">            <span class="keyword">if</span> (!state.equals(LifecycleState.STOPPING) &amp;&amp; !state.equals(LifecycleState.FAILED)) &#123;</span><br><span class="line">                invalidTransition(Lifecycle.AFTER_STOP_EVENT);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            setStateInternal(LifecycleState.STOPPED, <span class="keyword">null</span>, <span class="keyword">false</span>);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Throwable t) &#123;</span><br><span class="line">            handleSubClassException(t, <span class="string">"lifecycleBase.stopFail"</span>, toString());</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (<span class="keyword">this</span> <span class="keyword">instanceof</span> Lifecycle.SingleUse) &#123;</span><br><span class="line">                <span class="comment">// Complete stop process first</span></span><br><span class="line">                setStateInternal(LifecycleState.STOPPED, <span class="keyword">null</span>, <span class="keyword">false</span>);</span><br><span class="line">                destroy();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * *子类必须确保在执行此方法期间将状态更改为*&#123;<span class="doctag">@link</span> LifecycleState#STOPPING&#125;。*更改状态将触发&#123;<span class="doctag">@link</span> Lifecycle#STOP_EVENT&#125;事件。</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">stopInternal</span><span class="params">()</span> <span class="keyword">throws</span> LifecycleException</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">destroy</span><span class="params">()</span> <span class="keyword">throws</span> LifecycleException </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (LifecycleState.FAILED.equals(state)) &#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                <span class="comment">// Triggers clean-up</span></span><br><span class="line">                stop();</span><br><span class="line">            &#125; <span class="keyword">catch</span> (LifecycleException e) &#123;</span><br><span class="line">                <span class="comment">// Just log. Still want to destroy.</span></span><br><span class="line">                log.error(sm.getString(<span class="string">"lifecycleBase.destroyStopFail"</span>, toString()), e);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (LifecycleState.DESTROYING.equals(state) || LifecycleState.DESTROYED.equals(state)) &#123;</span><br><span class="line">            <span class="keyword">if</span> (log.isDebugEnabled()) &#123;</span><br><span class="line">                Exception e = <span class="keyword">new</span> LifecycleException();</span><br><span class="line">                log.debug(sm.getString(<span class="string">"lifecycleBase.alreadyDestroyed"</span>, toString()), e);</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (log.isInfoEnabled() &amp;&amp; !(<span class="keyword">this</span> <span class="keyword">instanceof</span> Lifecycle.SingleUse)) &#123;</span><br><span class="line">                <span class="comment">// Rather than have every component that might need to call</span></span><br><span class="line">                <span class="comment">// destroy() check for SingleUse, don't log an info message if</span></span><br><span class="line">                <span class="comment">// multiple calls are made to destroy()</span></span><br><span class="line">                log.info(sm.getString(<span class="string">"lifecycleBase.alreadyDestroyed"</span>, toString()));</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (!state.equals(LifecycleState.STOPPED) &amp;&amp; !state.equals(LifecycleState.FAILED) &amp;&amp;</span><br><span class="line">                !state.equals(LifecycleState.NEW) &amp;&amp; !state.equals(LifecycleState.INITIALIZED)) &#123;</span><br><span class="line">            invalidTransition(Lifecycle.BEFORE_DESTROY_EVENT);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            setStateInternal(LifecycleState.DESTROYING, <span class="keyword">null</span>, <span class="keyword">false</span>);</span><br><span class="line">            destroyInternal();</span><br><span class="line">            setStateInternal(LifecycleState.DESTROYED, <span class="keyword">null</span>, <span class="keyword">false</span>);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Throwable t) &#123;</span><br><span class="line">            handleSubClassException(t, <span class="string">"lifecycleBase.destroyFail"</span>, toString());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 子类实现此方法以执行所需的任何实例销毁。</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">destroyInternal</span><span class="params">()</span> <span class="keyword">throws</span> LifecycleException</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> LifecycleState <span class="title">getState</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> state;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getStateName</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> getState().toString();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">setState</span><span class="params">(LifecycleState state)</span> <span class="keyword">throws</span> LifecycleException </span>&#123;</span><br><span class="line">        setStateInternal(state, <span class="keyword">null</span>, <span class="keyword">true</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">setState</span><span class="params">(LifecycleState state, Object data)</span></span></span><br><span class="line"><span class="function">            <span class="keyword">throws</span> LifecycleException </span>&#123;</span><br><span class="line">        setStateInternal(state, data, <span class="keyword">true</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">setStateInternal</span><span class="params">(LifecycleState state, Object data, <span class="keyword">boolean</span> check)</span></span></span><br><span class="line"><span class="function">            <span class="keyword">throws</span> LifecycleException </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (log.isDebugEnabled()) &#123;</span><br><span class="line">            log.debug(sm.getString(<span class="string">"lifecycleBase.setState"</span>, <span class="keyword">this</span>, state));</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (check) &#123;</span><br><span class="line">            <span class="comment">// 必须是由一个抽象方法触发的（假设这个类中的代码是正确的）空永远都不是有效的状态</span></span><br><span class="line">            <span class="keyword">if</span> (state == <span class="keyword">null</span>) &#123;</span><br><span class="line">                invalidTransition(<span class="string">"null"</span>);</span><br><span class="line">                <span class="comment">// 无法访问的代码-这里是为了阻止eclipse抱怨方法后面可能有NPE</span></span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 任何方法都可以转换为failed startInternal（）允许启动准备到启动</span></span><br><span class="line">            <span class="comment">// stopInternal（）允许停止准备到停止，并且无法停止</span></span><br><span class="line">            <span class="keyword">if</span> (!(state == LifecycleState.FAILED ||</span><br><span class="line">                    (<span class="keyword">this</span>.state == LifecycleState.STARTING_PREP &amp;&amp;</span><br><span class="line">                            state == LifecycleState.STARTING) ||</span><br><span class="line">                    (<span class="keyword">this</span>.state == LifecycleState.STOPPING_PREP &amp;&amp;</span><br><span class="line">                            state == LifecycleState.STOPPING) ||</span><br><span class="line">                    (<span class="keyword">this</span>.state == LifecycleState.FAILED &amp;&amp;</span><br><span class="line">                            state == LifecycleState.STOPPING))) &#123;</span><br><span class="line">                <span class="comment">// No other transition permitted</span></span><br><span class="line">                invalidTransition(state.name());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">this</span>.state = state;</span><br><span class="line">        String lifecycleEvent = state.getLifecycleEvent();</span><br><span class="line">        <span class="keyword">if</span> (lifecycleEvent != <span class="keyword">null</span>) &#123;</span><br><span class="line">            fireLifecycleEvent(lifecycleEvent, data);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">invalidTransition</span><span class="params">(String type)</span> <span class="keyword">throws</span> LifecycleException </span>&#123;</span><br><span class="line">        String msg = sm.getString(<span class="string">"lifecycleBase.invalidTransition"</span>, type, toString(), state);</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> LifecycleException(msg);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">handleSubClassException</span><span class="params">(Throwable t, String key, Object... args)</span> <span class="keyword">throws</span> LifecycleException </span>&#123;</span><br><span class="line">        setStateInternal(LifecycleState.FAILED, <span class="keyword">null</span>, <span class="keyword">false</span>);</span><br><span class="line">        ExceptionUtils.handleThrowable(t);</span><br><span class="line">        String msg = sm.getString(key, args);</span><br><span class="line">        <span class="keyword">if</span> (getThrowOnFailure()) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!(t <span class="keyword">instanceof</span> LifecycleException)) &#123;</span><br><span class="line">                t = <span class="keyword">new</span> LifecycleException(msg, t);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">throw</span> (LifecycleException) t;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            log.error(msg, t);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="工厂模式"><a href="#工厂模式" class="headerlink" title="工厂模式"></a>工厂模式</h2><p>在Tomcat启动的过程中，调用Connector的startInternal()启动中，启动endpoint后bind的方法，初始化endpoint就是使用了工厂模式创建socket</p>
+<h2 id="观察者模式"><a href="#观察者模式" class="headerlink" title="观察者模式"></a>观察者模式</h2><p>观察者模式的定义，有多个对象在关注着一个对象，如果这个对象的状态发生了改变，其它依赖（关注）它的对象就会收到通知，然后在接收到通知以后各个对象做出相应的动作。</p>
+<p>观察者</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/** 观察者的事件对象继承了EventObject类</span></span><br><span class="line"><span class="comment"> * 用于通知侦听器实现生命周期接口的组件上的事件。</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">LifecycleEvent</span> <span class="keyword">extends</span> <span class="title">EventObject</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> serialVersionUID = <span class="number">1L</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">LifecycleEvent</span><span class="params">(Lifecycle lifecycle, String type, Object data)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(lifecycle);</span><br><span class="line">        <span class="keyword">this</span>.type = type;</span><br><span class="line">        <span class="keyword">this</span>.data = data;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 与此事件关联的事件数据</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Object data;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> String type;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">getData</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> data;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">public</span> Lifecycle <span class="title">getLifecycle</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> (Lifecycle) getSource();</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getType</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>.type;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 观察者实现统一的接口LifecycleListener，实现具体的方法lifecycleEvent。</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">LifecycleListener</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">lifecycleEvent</span><span class="params">(LifecycleEvent event)</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//具体的lifecycleEvent方法</span></span><br><span class="line"><span class="comment">//具体实现以ContextConfig为例，实现了具体的lifecycleEvent方法。</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ContextConfig</span> <span class="keyword">implements</span> <span class="title">LifecycleListener</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 处理关联上下文的事件。</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">lifecycleEvent</span><span class="params">(LifecycleEvent event)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Identify the context we are associated with</span></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            context = (Context) event.getLifecycle();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (ClassCastException e) &#123;</span><br><span class="line">            log.error(sm.getString(<span class="string">"contextConfig.cce"</span>, event.getLifecycle()), e);</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Process the event that has occurred</span></span><br><span class="line">        <span class="keyword">if</span> (event.getType().equals(Lifecycle.CONFIGURE_START_EVENT)) &#123;</span><br><span class="line">            configureStart();</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (event.getType().equals(Lifecycle.BEFORE_START_EVENT)) &#123;</span><br><span class="line">            beforeStart();</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (event.getType().equals(Lifecycle.AFTER_START_EVENT)) &#123;</span><br><span class="line">            <span class="comment">// Restore docBase for management tools</span></span><br><span class="line">            <span class="keyword">if</span> (originalDocBase != <span class="keyword">null</span>) &#123;</span><br><span class="line">                context.setDocBase(originalDocBase);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (event.getType().equals(Lifecycle.CONFIGURE_STOP_EVENT)) &#123;</span><br><span class="line">            configureStop();</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (event.getType().equals(Lifecycle.AFTER_INIT_EVENT)) &#123;</span><br><span class="line">            init();</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (event.getType().equals(Lifecycle.AFTER_DESTROY_EVENT)) &#123;</span><br><span class="line">            destroy();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>被观察者</p>
+<p>  被观察者实现接口Lifecycle，实现addLifecycleListener和removeLifecycleListener方法。<br>  容器的基类LifecycleBase实现了被观察者功能，提供List&lt;LifecycleListener&gt; lifecycleListeners保存被观察者。<br>  容器的具体实现当中都是继承LifecycleBase类，所以包含了被观察者的功能。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Lifecycle</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addLifecycleListener</span><span class="params">(LifecycleListener listener)</span></span>;</span><br><span class="line">    <span class="keyword">public</span> LifecycleListener[] findLifecycleListeners();</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">removeLifecycleListener</span><span class="params">(LifecycleListener listener)</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">LifecycleBase</span> <span class="keyword">implements</span> <span class="title">Lifecycle</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> List&lt;LifecycleListener&gt; lifecycleListeners = <span class="keyword">new</span> CopyOnWriteArrayList&lt;&gt;();</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">volatile</span> LifecycleState state = LifecycleState.NEW;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addLifecycleListener</span><span class="params">(LifecycleListener listener)</span> </span>&#123;</span><br><span class="line">        lifecycleListeners.add(listener);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> LifecycleListener[] findLifecycleListeners() &#123;</span><br><span class="line">        <span class="keyword">return</span> lifecycleListeners.toArray(<span class="keyword">new</span> LifecycleListener[<span class="number">0</span>]);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">removeLifecycleListener</span><span class="params">(LifecycleListener listener)</span> </span>&#123;</span><br><span class="line">        lifecycleListeners.remove(listener);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">fireLifecycleEvent</span><span class="params">(String type, Object data)</span> </span>&#123;</span><br><span class="line">        LifecycleEvent event = <span class="keyword">new</span> LifecycleEvent(<span class="keyword">this</span>, type, data);</span><br><span class="line">        <span class="keyword">for</span> (LifecycleListener listener : lifecycleListeners) &#123;</span><br><span class="line">            listener.lifecycleEvent(event);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="责任链模式"><a href="#责任链模式" class="headerlink" title="责任链模式"></a>责任链模式</h2><p>责任链，顾名思义，就是用来处理相关事务责任的一条执行链，执行链上有多个节点，每个节点都有机会（条件匹配）处理请求事务，如果某个节点处理完了就可以根据实际业务需求传递给下一个节点继续处理或者返回处理完毕。</p>
+<p>在tomcat中容器之间，当一个请求过来的时候首先是engine容器接受请求，然后engine容器会把请求传到host容器，host容器又会传到context容器，context容器传到wrapper容器，最后wrapper容器使用适配请求的servlet处理请求。</p>
+<p><img src="https://img.huyunshun.com/img/20200412111304.png" alt="20200412111304"></p>
+<p><img src="https://img.huyunshun.com/img/20200412110748.png" alt="20200412110748"></p>
+<p><img src="https://img.huyunshun.com/img/20200412113158.png" alt="20200412113158"></p>
+<p>组成：</p>
+<ul>
+<li>Valve Valve作为职责链上的每个节点，主要用于处理流到该节点的request对象。</li>
+</ul>
+<p><img src="https://img.huyunshun.com/img/20200412111252.png" alt="20200412111252"></p>
+<ul>
+<li>Pipeline Pipeline作为职责链对象，主要维护Valve职责链节点对象。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Valve</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Valve <span class="title">getNext</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setNext</span><span class="params">(Valve valve)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">backgroundProcess</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">invoke</span><span class="params">(Request request, Response response)</span></span></span><br><span class="line"><span class="function">        <span class="keyword">throws</span> IOException, ServletException</span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isAsyncSupported</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Pipeline</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Valve <span class="title">getBasic</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setBasic</span><span class="params">(Valve valve)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addValve</span><span class="params">(Valve valve)</span></span>;</span><br><span class="line">    <span class="keyword">public</span> Valve[] getValves();</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">removeValve</span><span class="params">(Valve valve)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Valve <span class="title">getFirst</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isAsyncSupported</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Container <span class="title">getContainer</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setContainer</span><span class="params">(Container container)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">findNonAsyncValves</span><span class="params">(Set&lt;String&gt; result)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>一个Pipeline上面可以有很多Valve，这些Valve存放的方式并非统一存放在Pipeline中，而是像一个链表一个接着一个。当你获取到一个Valve实例的时候，调用getNext()方法即可获取在这个Pipeline上的下个Valve实例。</p>
+<p>Pipeline中很多的方法都是操作Valve的，包括获取，设置，移除Valve,getFirst()返回的是Pipeline上的第一个Valve,而getBasic(),setBasic()则是获取/设置基础阀,我们都知道在Pipeline中，每个pipeline至少都有一个阀门，叫做基础阀，而getBasic(),setBasic()则是操作基础阀的。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br><span class="line">310</span><br><span class="line">311</span><br><span class="line">312</span><br><span class="line">313</span><br><span class="line">314</span><br><span class="line">315</span><br><span class="line">316</span><br><span class="line">317</span><br><span class="line">318</span><br><span class="line">319</span><br><span class="line">320</span><br><span class="line">321</span><br><span class="line">322</span><br><span class="line">323</span><br><span class="line">324</span><br><span class="line">325</span><br><span class="line">326</span><br><span class="line">327</span><br><span class="line">328</span><br><span class="line">329</span><br><span class="line">330</span><br><span class="line">331</span><br><span class="line">332</span><br><span class="line">333</span><br><span class="line">334</span><br><span class="line">335</span><br><span class="line">336</span><br><span class="line">337</span><br><span class="line">338</span><br><span class="line">339</span><br><span class="line">340</span><br><span class="line">341</span><br><span class="line">342</span><br><span class="line">343</span><br><span class="line">344</span><br><span class="line">345</span><br><span class="line">346</span><br><span class="line">347</span><br><span class="line">348</span><br><span class="line">349</span><br><span class="line">350</span><br><span class="line">351</span><br><span class="line">352</span><br><span class="line">353</span><br><span class="line">354</span><br><span class="line">355</span><br><span class="line">356</span><br><span class="line">357</span><br><span class="line">358</span><br><span class="line">359</span><br><span class="line">360</span><br><span class="line">361</span><br><span class="line">362</span><br><span class="line">363</span><br><span class="line">364</span><br><span class="line">365</span><br><span class="line">366</span><br><span class="line">367</span><br><span class="line">368</span><br><span class="line">369</span><br><span class="line">370</span><br><span class="line">371</span><br><span class="line">372</span><br><span class="line">373</span><br><span class="line">374</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * StandardPipeline标准实现类中我们看到了对Pipeline接口的实现</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">StandardPipeline</span> <span class="keyword">extends</span> <span class="title">LifecycleBase</span></span></span><br><span class="line"><span class="class">        <span class="keyword">implements</span> <span class="title">Pipeline</span>, <span class="title">Contained</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Log log = LogFactory.getLog(StandardPipeline<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> StringManager sm = StringManager.getManager(Constants.Package);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ----------------------------------------------------------- Constructors</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Construct a new StandardPipeline instance with no associated Container.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">StandardPipeline</span><span class="params">()</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">this</span>(<span class="keyword">null</span>);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Construct a new StandardPipeline instance that is associated with the</span></span><br><span class="line"><span class="comment">     * specified Container.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> container The container we should be associated with</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">StandardPipeline</span><span class="params">(Container container)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">super</span>();</span><br><span class="line">        setContainer(container);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">// ----------------------------------------------------- Instance Variables</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * The basic Valve (if any) associated with this Pipeline.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">protected</span> Valve basic = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * The Container with which this Pipeline is associated.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">protected</span> Container container = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * The first valve associated with this Pipeline.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">protected</span> Valve first = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">// --------------------------------------------------------- Public Methods</span></span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isAsyncSupported</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        Valve valve = (first!=<span class="keyword">null</span>)?first:basic;</span><br><span class="line">        <span class="keyword">boolean</span> supported = <span class="keyword">true</span>;</span><br><span class="line">        <span class="keyword">while</span> (supported &amp;&amp; valve!=<span class="keyword">null</span>) &#123;</span><br><span class="line">            supported = supported &amp; valve.isAsyncSupported();</span><br><span class="line">            valve = valve.getNext();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> supported;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">findNonAsyncValves</span><span class="params">(Set&lt;String&gt; result)</span> </span>&#123;</span><br><span class="line">        Valve valve = (first!=<span class="keyword">null</span>) ? first : basic;</span><br><span class="line">        <span class="keyword">while</span> (valve != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!valve.isAsyncSupported()) &#123;</span><br><span class="line">                result.add(valve.getClass().getName());</span><br><span class="line">            &#125;</span><br><span class="line">            valve = valve.getNext();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">// ------------------------------------------------------ Contained Methods</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Container <span class="title">getContainer</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>.container;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 设置与此管道关联的容器。</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setContainer</span><span class="params">(Container container)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.container = container;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">initInternal</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">// NOOP</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 组件的start()方法，将first(第一个阀门)赋值给current变量，如果current为空，就将basic(也就是基础阀)赋值给current,</span></span><br><span class="line"><span class="comment">     * 接下来如果一个标准的遍历单向链表，调用每个对象的start()方法，最后将组件(pipeline)状态设置为STARTING(启动中)。</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">startInternal</span><span class="params">()</span> <span class="keyword">throws</span> LifecycleException </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Start the Valves in our pipeline (including the basic), if any</span></span><br><span class="line">        Valve current = first;</span><br><span class="line">        <span class="keyword">if</span> (current == <span class="keyword">null</span>) &#123;</span><br><span class="line">            current = basic;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">while</span> (current != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (current <span class="keyword">instanceof</span> Lifecycle)</span><br><span class="line">                ((Lifecycle) current).start();</span><br><span class="line">            current = current.getNext();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        setState(LifecycleState.STARTING);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">stopInternal</span><span class="params">()</span> <span class="keyword">throws</span> LifecycleException </span>&#123;</span><br><span class="line"></span><br><span class="line">        setState(LifecycleState.STOPPING);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Stop the Valves in our pipeline (including the basic), if any</span></span><br><span class="line">        Valve current = first;</span><br><span class="line">        <span class="keyword">if</span> (current == <span class="keyword">null</span>) &#123;</span><br><span class="line">            current = basic;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">while</span> (current != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (current <span class="keyword">instanceof</span> Lifecycle)</span><br><span class="line">                ((Lifecycle) current).stop();</span><br><span class="line">            current = current.getNext();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">destroyInternal</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        Valve[] valves = getValves();</span><br><span class="line">        <span class="keyword">for</span> (Valve valve : valves) &#123;</span><br><span class="line">            removeValve(valve);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Return a String representation of this component.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        StringBuilder sb = <span class="keyword">new</span> StringBuilder(<span class="string">"Pipeline["</span>);</span><br><span class="line">        sb.append(container);</span><br><span class="line">        sb.append(<span class="string">']'</span>);</span><br><span class="line">        <span class="keyword">return</span> sb.toString();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">// ------------------------------------------------------- Pipeline Methods</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * &lt;p&gt;Return the Valve instance that has been distinguished as the basic</span></span><br><span class="line"><span class="comment">     * Valve for this Pipeline (if any).</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Valve <span class="title">getBasic</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>.basic;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 设置基础阀的方法，这个方法在每个容器的构造函数中调用，</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * 阀门链表的遍历。</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setBasic</span><span class="params">(Valve valve)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 如果已经有基础阀(basic已经有值并且跟要设置的值一样）那么直接return</span></span><br><span class="line">        Valve oldBasic = <span class="keyword">this</span>.basic;</span><br><span class="line">        <span class="keyword">if</span> (oldBasic == valve)</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 旧的基础阀非空 那么调用其stop方法取消和对应container的关联。(销毁旧的基础阀)</span></span><br><span class="line">        <span class="keyword">if</span> (oldBasic != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (getState().isAvailable() &amp;&amp; (oldBasic <span class="keyword">instanceof</span> Lifecycle)) &#123;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    ((Lifecycle) oldBasic).stop();</span><br><span class="line">                &#125; <span class="keyword">catch</span> (LifecycleException e) &#123;</span><br><span class="line">                    log.error(sm.getString(<span class="string">"standardPipeline.basic.stop"</span>), e);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (oldBasic <span class="keyword">instanceof</span> Contained) &#123;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    ((Contained) oldBasic).setContainer(<span class="keyword">null</span>);</span><br><span class="line">                &#125; <span class="keyword">catch</span> (Throwable t) &#123;</span><br><span class="line">                    ExceptionUtils.handleThrowable(t);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Start the new component if necessary</span></span><br><span class="line">        <span class="keyword">if</span> (valve == <span class="keyword">null</span>)</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        <span class="comment">//和Container进行关联</span></span><br><span class="line">        <span class="keyword">if</span> (valve <span class="keyword">instanceof</span> Contained) &#123;</span><br><span class="line">            ((Contained) valve).setContainer(<span class="keyword">this</span>.container);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//启动新的阀门</span></span><br><span class="line">        <span class="keyword">if</span> (getState().isAvailable() &amp;&amp; valve <span class="keyword">instanceof</span> Lifecycle) &#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                ((Lifecycle) valve).start();</span><br><span class="line">            &#125; <span class="keyword">catch</span> (LifecycleException e) &#123;</span><br><span class="line">                log.error(sm.getString(<span class="string">"standardPipeline.basic.start"</span>), e);</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//遍历阀门链表将新的阀门取代旧的阀门</span></span><br><span class="line">        Valve current = first;</span><br><span class="line">        <span class="keyword">while</span> (current != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (current.getNext() == oldBasic) &#123;</span><br><span class="line">                current.setNext(valve);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            current = current.getNext();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//将基础阀设置为新的阀门</span></span><br><span class="line">        <span class="keyword">this</span>.basic = valve;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 向容器中添加Valve，在server.xml解析的时候也会调用该方法</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addValve</span><span class="params">(Valve valve)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 验证Valve 关联Container</span></span><br><span class="line">        <span class="keyword">if</span> (valve <span class="keyword">instanceof</span> Contained)</span><br><span class="line">            ((Contained) valve).setContainer(<span class="keyword">this</span>.container);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 验证组件状态，如果对的话 启动需要添加的Valve，调用start方法。</span></span><br><span class="line">        <span class="keyword">if</span> (getState().isAvailable()) &#123;</span><br><span class="line">            <span class="keyword">if</span> (valve <span class="keyword">instanceof</span> Lifecycle) &#123;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    ((Lifecycle) valve).start();</span><br><span class="line">                &#125; <span class="keyword">catch</span> (LifecycleException e) &#123;</span><br><span class="line">                    log.error(sm.getString(<span class="string">"standardPipeline.valve.start"</span>), e);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//如果 first变量为空，将valve赋值给first变量，并且设置 valve的下一个阀门为基础阀</span></span><br><span class="line">        <span class="comment">//之所以这样是因为，如果first为空说明这个容器只有一个基础阀，所以此次添加的阀门肯定是第一个非基础阀阀门</span></span><br><span class="line">        <span class="keyword">if</span> (first == <span class="keyword">null</span>) &#123;</span><br><span class="line">            first = valve;</span><br><span class="line">            valve.setNext(basic);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">//否则 遍历阀门链表，将要被添加的阀门设置在 基础阀之前。</span></span><br><span class="line">            Valve current = first;</span><br><span class="line">            <span class="keyword">while</span> (current != <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="keyword">if</span> (current.getNext() == basic) &#123;</span><br><span class="line">                    current.setNext(valve);</span><br><span class="line">                    valve.setNext(basic);</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                current = current.getNext();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//container触发添加阀门事件</span></span><br><span class="line">        container.fireContainerEvent(Container.ADD_VALVE_EVENT, valve);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> Valve[] getValves() &#123;</span><br><span class="line"></span><br><span class="line">        List&lt;Valve&gt; valveList = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        Valve current = first;</span><br><span class="line">        <span class="keyword">if</span> (current == <span class="keyword">null</span>) &#123;</span><br><span class="line">            current = basic;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">while</span> (current != <span class="keyword">null</span>) &#123;</span><br><span class="line">            valveList.add(current);</span><br><span class="line">            current = current.getNext();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> valveList.toArray(<span class="keyword">new</span> Valve[<span class="number">0</span>]);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> ObjectName[] getValveObjectNames() &#123;</span><br><span class="line"></span><br><span class="line">        List&lt;ObjectName&gt; valveList = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        Valve current = first;</span><br><span class="line">        <span class="keyword">if</span> (current == <span class="keyword">null</span>) &#123;</span><br><span class="line">            current = basic;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">while</span> (current != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (current <span class="keyword">instanceof</span> JmxEnabled) &#123;</span><br><span class="line">                valveList.add(((JmxEnabled) current).getObjectName());</span><br><span class="line">            &#125;</span><br><span class="line">            current = current.getNext();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> valveList.toArray(<span class="keyword">new</span> ObjectName[<span class="number">0</span>]);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">removeValve</span><span class="params">(Valve valve)</span> </span>&#123;</span><br><span class="line">        <span class="comment">//如果first 是需要被移除的valve 那么将first的下一个阀门赋值给first，并且current 赋值null,否则current 赋值first</span></span><br><span class="line">        Valve current;</span><br><span class="line">        <span class="keyword">if</span>(first == valve) &#123;</span><br><span class="line">            first = first.getNext();</span><br><span class="line">            current = <span class="keyword">null</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            current = first;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">////遍历阀门链表 查找需要被移除的阀门 如果之前first是被移除的话 current = null是不会进入该循环</span></span><br><span class="line">        <span class="keyword">while</span> (current != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (current.getNext() == valve) &#123;</span><br><span class="line">                current.setNext(valve.getNext());</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            current = current.getNext();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//如果first（此时已经指向下一个阀门）此时  == 基础阀，那么first置空</span></span><br><span class="line">        <span class="comment">//first指的是第一个阀门，即使整个container只有一个基础阀门也不会指向基础阀。</span></span><br><span class="line">        <span class="comment">//first严格定义是 除了基础阀的第一个阀门。</span></span><br><span class="line">        <span class="keyword">if</span> (first == basic) first = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (valve <span class="keyword">instanceof</span> Contained)</span><br><span class="line">            <span class="comment">//验证需要被移除的阀门 取消container关联</span></span><br><span class="line">            ((Contained) valve).setContainer(<span class="keyword">null</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (valve <span class="keyword">instanceof</span> Lifecycle) &#123;</span><br><span class="line">            <span class="comment">//验证需要被移除的阀门 取消container关联</span></span><br><span class="line">            <span class="keyword">if</span> (getState().isAvailable()) &#123;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    ((Lifecycle) valve).stop();</span><br><span class="line">                &#125; <span class="keyword">catch</span> (LifecycleException e) &#123;</span><br><span class="line">                    log.error(sm.getString(<span class="string">"standardPipeline.valve.stop"</span>), e);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                ((Lifecycle) valve).destroy();</span><br><span class="line">            &#125; <span class="keyword">catch</span> (LifecycleException e) &#123;</span><br><span class="line">                log.error(sm.getString(<span class="string">"standardPipeline.valve.destroy"</span>), e);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//触发container的移除valve事件。</span></span><br><span class="line">        container.fireContainerEvent(Container.REMOVE_VALVE_EVENT, valve);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Valve <span class="title">getFirst</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (first != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> first;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> basic;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>每个容器包含职责链对象Pipeline。</p>
+<p>每个职责对象Valve的具体实现当中会包含下一个容器对象，相当于Valve对象内部会访问下一个容器，进而实现职责链传递。</p>
+<p>整个Http请求被处理的流程：</p>
+<ul>
+<li>请求被Connector组件接收，创建Request和Response对象。</li>
+<li>Connector将Request和Response交给Container,先通过Engine的pipeline组件流经内部的每个Valve。</li>
+<li>请求流转到Host的pipeline组件中，并且经过内部Valve的过滤。</li>
+<li>请求流转到Context的pipeline组件中，并且经过内部的Valve的过滤。</li>
+<li>请求流转到Wrapper的pipeline组件中，并且经过内部的Valve的过滤。</li>
+<li>Wrapper内部的WrapperValve创建FilterChain实例，调用指定的Servlet实例处理请求。</li>
+<li>返回</li>
+</ul>
+<h2 id="门面模式"><a href="#门面模式" class="headerlink" title="门面模式"></a>门面模式</h2><p>门面模式是对象的结构模式，外部与一个子系统的通信必须通过一个统一的门面对象进行。门面模式提供一个高层次的接口，使得子系统更易于使用。</p>
+<p>Tomcat中门面模式的例子：</p>
+<p><img src="https://img.huyunshun.com/img/20200412144024.png" alt="20200412144024"></p>
+<p>RequestFacade作为Request的门面，内部包含Request对象。</p>
+<p>这样的例子有：</p>
+<p>  ResponseFacade作为Response的门面，内部包含Response对象。<br>  StandardSessionFacade作为HttpSession的门面，内部包含HttpSession对象。<br>  ApplicationContextFacade作为ApplicationContext的门面，内部包含ApplicaitonContext对象。</p>
+<p>如Request源码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RequestFacade</span> <span class="keyword">implements</span> <span class="title">HttpServletRequest</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">RequestFacade</span><span class="params">(Request request)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.request = request;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">protected</span> Request request = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">getAttribute</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (request == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(</span><br><span class="line">                            sm.getString(<span class="string">"requestFacade.nullRequest"</span>));</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> request.getAttribute(name);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Enumeration&lt;String&gt; <span class="title">getAttributeNames</span><span class="params">()</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (request == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(</span><br><span class="line">                            sm.getString(<span class="string">"requestFacade.nullRequest"</span>));</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (Globals.IS_SECURITY_ENABLED)&#123;</span><br><span class="line">            <span class="keyword">return</span> AccessController.doPrivileged(</span><br><span class="line">                <span class="keyword">new</span> GetAttributePrivilegedAction());</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> request.getAttributeNames();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getContentLength</span><span class="params">()</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (request == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(</span><br><span class="line">                            sm.getString(<span class="string">"requestFacade.nullRequest"</span>));</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> request.getContentLength();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Request</span> <span class="keyword">implements</span> <span class="title">org</span>.<span class="title">apache</span>.<span class="title">catalina</span>.<span class="title">servlet4preview</span>.<span class="title">http</span>.<span class="title">HttpServletRequest</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> HttpServletRequest applicationRequest = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">protected</span> RequestFacade facade = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> HttpServletRequest <span class="title">getRequest</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (facade == <span class="keyword">null</span>) &#123;</span><br><span class="line">            facade = <span class="keyword">new</span> RequestFacade(<span class="keyword">this</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (applicationRequest == <span class="keyword">null</span>) &#123;</span><br><span class="line">            applicationRequest = facade;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> applicationRequest;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      
+    </div>
+     <!-- 相关文章推荐 -->
+    
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/tomcat/" rel="tag"># tomcat</a>
+          
+            <a href="/tags/%E6%BA%90%E7%A0%81/" rel="tag"># 源码</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/09/04/Tomcat%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E5%8A%A0%E8%BD%BD%E5%92%8C%E5%90%AF%E5%8A%A8%E8%BF%87%E7%A8%8B/" rel="next" title="Tomcat源码分析-加载和启动过程">
+                <i class="fa fa-chevron-left"></i> Tomcat源码分析-加载和启动过程
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/09/04/Tomcat%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-web%E8%AF%B7%E6%B1%82%E8%BF%87%E7%A8%8B/" rel="prev" title="Tomcat源码分析-web请求处理过程">
+                Tomcat源码分析-web请求处理过程 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+<span class="jiathis_txt">分享到：</span>
+<a class="jiathis_button_fav">收藏夹</a>
+<a class="jiathis_button_copy">复制网址</a>
+<a class="jiathis_button_email">邮件</a>
+<a class="jiathis_button_weixin">微信</a>
+<a class="jiathis_button_qzone">QQ空间</a>
+<a class="jiathis_button_tqq">腾讯微博</a>
+<a class="jiathis_button_douban">豆瓣</a>
+<a class="jiathis_button_share">一键分享</a>
+
+<a href="http://www.jiathis.com/share?uid=2140465" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+<a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+var jiathis_config={
+  data_track_clickback:true,
+  summary:"",
+  shortUrl:false,
+  hideMore:false
+}
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://img.huyunshun.com/img/20200522182348.png"
+                alt="初晨" />
+            
+              <p class="site-author-name" itemprop="name">初晨</p>
+              <p class="site-description motion-element" itemprop="description">永远不要说你知道本质，更别说真相了。</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">249</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">46</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+<!--近期文章版块-->
+            
+                <div class="links-of-blogroll motion-element links-of-blogroll-block">
+                  <div class="links-of-blogroll-title">
+                    <!-- modify icon to fire by szw -->
+                    <i class="fa fa-history fa-" aria-hidden="true"></i>
+                    近期文章
+                  </div>
+                  <ul class="links-of-blogroll-list">
+                    
+                    
+                      <li>
+                        <a href="/2020/05/22/WebSocket%E3%80%81Socket%E3%80%81TCP%E3%80%81HTTP%E5%8C%BA%E5%88%AB/" title="WebSocket、Socket、TCP、HTTP区别" target="_blank">WebSocket、Socket、TCP、HTTP区别</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/19/Springboot%E9%A1%B9%E7%9B%AE%E7%9A%84%E6%8E%A5%E5%8F%A3%E9%98%B2%E5%88%B7/" title="Springboot项目的接口防刷" target="_blank">Springboot项目的接口防刷</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/03/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Volatile%E5%85%B3%E9%94%AE%E5%AD%97%E5%8F%8A%E5%85%B6%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/" title="深入理解Volatile关键字及其实现原理" target="_blank">深入理解Volatile关键字及其实现原理</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/04/20/%E4%BD%BF%E7%94%A8vscode%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0%E7%8E%AF%E5%A2%83/" title="使用vscode搭建个人笔记环境" target="_blank">使用vscode搭建个人笔记环境</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/01/20/HBase%E4%BB%8B%E7%BB%8D%E5%AE%89%E8%A3%85%E4%B8%8E%E6%93%8D%E4%BD%9C/" title="HBase介绍安装与操作" target="_blank">HBase介绍安装与操作</a>
+                      </li>
+                    
+                  </ul>
+                </div>
+            
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#模板方法模式"><span class="nav-number">1.</span> <span class="nav-text">模板方法模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#工厂模式"><span class="nav-number">2.</span> <span class="nav-text">工厂模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#观察者模式"><span class="nav-number">3.</span> <span class="nav-text">观察者模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#责任链模式"><span class="nav-number">4.</span> <span class="nav-text">责任链模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#门面模式"><span class="nav-number">5.</span> <span class="nav-text">门面模式</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Copyright</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

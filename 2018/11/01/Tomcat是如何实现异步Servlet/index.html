@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="tomcat," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="在Spring boot中实现一个servlet，需要再启动类加上@ServletComponentScan注解来扫描Servlet 12345678910111213141516171819202122232425262728293031@WebServlet(urlPatterns &#x3D; &quot;&#x2F;async&quot;,asyncSupported &#x3D; tru">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Tomcat是如何实现异步Servlet">
+<meta property="og:url" content="https://huyunshun.com/2018/11/01/Tomcat%E6%98%AF%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E5%BC%82%E6%AD%A5Servlet/index.html">
+<meta property="og:site_name" content="简">
+<meta property="og:description" content="在Spring boot中实现一个servlet，需要再启动类加上@ServletComponentScan注解来扫描Servlet 12345678910111213141516171819202122232425262728293031@WebServlet(urlPatterns &#x3D; &quot;&#x2F;async&quot;,asyncSupported &#x3D; tru">
+<meta property="article:published_time" content="2018-10-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-05-20T10:04:24.694Z">
+<meta property="article:author" content="初晨">
+<meta property="article:tag" content="tomcat">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://huyunshun.com/2018/11/01/Tomcat是如何实现异步Servlet/"/>
+
+
+
+
+
+  <title>Tomcat是如何实现异步Servlet | 简</title>
+  
+
+
+
+
+
+
+
+
+  <script type="text/javascript" src="/js/src/love.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
+
+  <!-- 看板娘 -->
+    
+        <script async src="/live2d-widget/autoload.js"></script>
+    
+ <!-- 飘动的彩带） -->
+  <script src="/js/src/piao.js" type="text/javascript"></script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">简</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">人生短暂，学海无边，而大道至简。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://huyunshun.com/2018/11/01/Tomcat%E6%98%AF%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E5%BC%82%E6%AD%A5Servlet/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="初晨">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://img.huyunshun.com/img/20200522182348.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="简">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Tomcat是如何实现异步Servlet</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-11-01T00:00:00+08:00">
+                2018-11-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Tomcat/" itemprop="url" rel="index">
+                    <span itemprop="name">Tomcat</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>在Spring boot中实现一个servlet，需要再启动类加上@ServletComponentScan注解来扫描Servlet</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">@WebServlet(urlPatterns &#x3D; &quot;&#x2F;async&quot;,asyncSupported &#x3D; true)</span><br><span class="line">@Slf4j</span><br><span class="line">public class AsyncServlet extends HttpServlet &#123;</span><br><span class="line"></span><br><span class="line">    ExecutorService executorService &#x3D;Executors.newSingleThreadExecutor();</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException &#123;</span><br><span class="line">        &#x2F;&#x2F;开启异步,获取异步上下文</span><br><span class="line">        final AsyncContext ctx &#x3D; req.startAsync();</span><br><span class="line">        &#x2F;&#x2F; 提交线程池异步执行</span><br><span class="line">        executorService.execute(new Runnable() &#123;</span><br><span class="line"></span><br><span class="line">            @Override</span><br><span class="line">            public void run() &#123;</span><br><span class="line">                try &#123;</span><br><span class="line">                    log.info(&quot;async Service 准备执行了&quot;);</span><br><span class="line">                    &#x2F;&#x2F;模拟耗时任务</span><br><span class="line">                    Thread.sleep(10000L);</span><br><span class="line">                    ctx.getResponse().getWriter().print(&quot;async servlet&quot;);</span><br><span class="line">                    log.info(&quot;async Service 执行了&quot;);</span><br><span class="line">                &#125; catch (IOException e) &#123;</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125; catch (InterruptedException e) &#123;</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125;</span><br><span class="line">                &#x2F;&#x2F;最后执行完成后完成回调。</span><br><span class="line">                ctx.complete();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>异步Servlet的内部原理</p>
+<p>上面主要是：final AsyncContext ctx = req.startAsync()和ctx.complete()，查看源码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">public AsyncContext startAsync(ServletRequest request,</span><br><span class="line">         ServletResponse response) &#123;</span><br><span class="line">     if (!isAsyncSupported()) &#123;</span><br><span class="line">         IllegalStateException ise &#x3D;</span><br><span class="line">                 new IllegalStateException(sm.getString(&quot;request.asyncNotSupported&quot;));</span><br><span class="line">         log.warn(sm.getString(&quot;coyoteRequest.noAsync&quot;,</span><br><span class="line">                 StringUtils.join(getNonAsyncClassNames())), ise);</span><br><span class="line">         throw ise;</span><br><span class="line">     &#125;</span><br><span class="line"></span><br><span class="line">     if (asyncContext &#x3D;&#x3D; null) &#123;</span><br><span class="line">         asyncContext &#x3D; new AsyncContextImpl(this);</span><br><span class="line">     &#125;</span><br><span class="line"></span><br><span class="line">     asyncContext.setStarted(getContext(), request, response,</span><br><span class="line">             request&#x3D;&#x3D;getRequest() &amp;&amp; response&#x3D;&#x3D;getResponse().getResponse());</span><br><span class="line">     asyncContext.setTimeout(getConnector().getAsyncTimeout());</span><br><span class="line"></span><br><span class="line">     return asyncContext;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<p>req.startAsync()只是保存了一个异步上下文，同时设置一些基础信息，比如Timeout，这里设置的默认超时时间是30S，如果你的异步处理逻辑超过30S，此时执行ctx.complete()就会抛出IllegalStateException 异常。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line">  public void complete() &#123;</span><br><span class="line">        if (log.isDebugEnabled()) &#123;</span><br><span class="line">            logDebug(&quot;complete   &quot;);</span><br><span class="line">        &#125;</span><br><span class="line">        check();</span><br><span class="line">        request.getCoyoteRequest().action(ActionCode.ASYNC_COMPLETE, null);</span><br><span class="line">    &#125;</span><br><span class="line">&#x2F;&#x2F;类：AbstractProcessor </span><br><span class="line"> public final void action(ActionCode actionCode, Object param) &#123;</span><br><span class="line">    case ASYNC_COMPLETE: &#123;</span><br><span class="line">            clearDispatches();</span><br><span class="line">            if (asyncStateMachine.asyncComplete()) &#123;</span><br><span class="line">                processSocketEvent(SocketEvent.OPEN_READ, true);</span><br><span class="line">            &#125;</span><br><span class="line">            break;</span><br><span class="line">        &#125; </span><br><span class="line">    &#125;</span><br><span class="line">    &#x2F;&#x2F;类：AbstractProcessor </span><br><span class="line">protected void processSocketEvent(SocketEvent event, boolean dispatch) &#123;</span><br><span class="line">        SocketWrapperBase&lt;?&gt; socketWrapper &#x3D; getSocketWrapper();</span><br><span class="line">        if (socketWrapper !&#x3D; null) &#123;</span><br><span class="line">            socketWrapper.processSocket(event, dispatch);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    &#x2F;&#x2F;类：AbstractEndpoint</span><br><span class="line">public boolean processSocket(SocketWrapperBase&lt;S&gt; socketWrapper,</span><br><span class="line">            SocketEvent event, boolean dispatch) &#123;</span><br><span class="line">        &#x2F;&#x2F;省略部分代码</span><br><span class="line">            SocketProcessorBase&lt;S&gt; sc &#x3D; null;</span><br><span class="line">            if (processorCache !&#x3D; null) &#123;</span><br><span class="line">                sc &#x3D; processorCache.pop();</span><br><span class="line">            &#125;</span><br><span class="line">            if (sc &#x3D;&#x3D; null) &#123;</span><br><span class="line">                sc &#x3D; createSocketProcessor(socketWrapper, event);</span><br><span class="line">            &#125; else &#123;</span><br><span class="line">                sc.reset(socketWrapper, event);</span><br><span class="line">            &#125;</span><br><span class="line">            Executor executor &#x3D; getExecutor();</span><br><span class="line">            if (dispatch &amp;&amp; executor !&#x3D; null) &#123;</span><br><span class="line">                executor.execute(sc);</span><br><span class="line">            &#125; else &#123;</span><br><span class="line">                sc.run();</span><br><span class="line">            &#125;</span><br><span class="line">   </span><br><span class="line">        return true;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>所以，这里最终会调用AbstractEndpoint的processSocket方法，EndPoint是用来接受和处理请求的，接下来就会交给Processor去进行协议处理。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;&#x2F;类：AbstractProcessorLight</span><br><span class="line">public SocketState process(SocketWrapperBase&lt;?&gt; socketWrapper, SocketEvent status)</span><br><span class="line">            throws IOException &#123;</span><br><span class="line">        &#x2F;&#x2F;省略部分diam</span><br><span class="line">        SocketState state &#x3D; SocketState.CLOSED;</span><br><span class="line">        Iterator&lt;DispatchType&gt; dispatches &#x3D; null;</span><br><span class="line">        do &#123;</span><br><span class="line">            if (dispatches !&#x3D; null) &#123;</span><br><span class="line">                DispatchType nextDispatch &#x3D; dispatches.next();</span><br><span class="line">                state &#x3D; dispatch(nextDispatch.getSocketStatus());</span><br><span class="line">            &#125; else if (status &#x3D;&#x3D; SocketEvent.DISCONNECT) &#123;</span><br><span class="line">            </span><br><span class="line">            &#125; else if (isAsync() || isUpgrade() || state &#x3D;&#x3D; SocketState.ASYNC_END) &#123;</span><br><span class="line">                state &#x3D; dispatch(status);</span><br><span class="line">                if (state &#x3D;&#x3D; SocketState.OPEN) &#123;</span><br><span class="line">                    state &#x3D; service(socketWrapper);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; else if (status &#x3D;&#x3D; SocketEvent.OPEN_WRITE) &#123;</span><br><span class="line">                state &#x3D; SocketState.LONG;</span><br><span class="line">            &#125; else if (status &#x3D;&#x3D; SocketEvent.OPEN_READ)&#123;</span><br><span class="line">                state &#x3D; service(socketWrapper);</span><br><span class="line">            &#125; else &#123;</span><br><span class="line">                state &#x3D; SocketState.CLOSED;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">        &#125; while (state &#x3D;&#x3D; SocketState.ASYNC_END ||</span><br><span class="line">                dispatches !&#x3D; null &amp;&amp; state !&#x3D; SocketState.CLOSED);</span><br><span class="line"></span><br><span class="line">        return state;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>AbstractProcessorLight会根据SocketEvent的状态来判断是不是要去调用service(socketWrapper)，该方法最终会去调用到容器，从而完成业务逻辑的调用，我们这个请求是执行完成后调用的，肯定不能进容器了，不然就是死循环了，这里通过isAsync()判断，就会进入dispatch(status)，最终会调用CoyoteAdapter的asyncDispatch方法。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line">public boolean asyncDispatch(org.apache.coyote.Request req, org.apache.coyote.Response res,</span><br><span class="line">            SocketEvent status) throws Exception &#123;</span><br><span class="line">        &#x2F;&#x2F;省略部分代码</span><br><span class="line">        Request request &#x3D; (Request) req.getNote(ADAPTER_NOTES);</span><br><span class="line">        Response response &#x3D; (Response) res.getNote(ADAPTER_NOTES);</span><br><span class="line">        boolean success &#x3D; true;</span><br><span class="line">        AsyncContextImpl asyncConImpl &#x3D; request.getAsyncContextInternal();</span><br><span class="line">        try &#123;</span><br><span class="line">            if (!request.isAsync()) &#123;</span><br><span class="line">                response.setSuspended(false);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            if (status&#x3D;&#x3D;SocketEvent.TIMEOUT) &#123;</span><br><span class="line">                if (!asyncConImpl.timeout()) &#123;</span><br><span class="line">                    asyncConImpl.setErrorState(null, false);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; else if (status&#x3D;&#x3D;SocketEvent.ERROR) &#123;</span><br><span class="line">                </span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            if (!request.isAsyncDispatching() &amp;&amp; request.isAsync()) &#123;</span><br><span class="line">                WriteListener writeListener &#x3D; res.getWriteListener();</span><br><span class="line">                ReadListener readListener &#x3D; req.getReadListener();</span><br><span class="line">                if (writeListener !&#x3D; null &amp;&amp; status &#x3D;&#x3D; SocketEvent.OPEN_WRITE) &#123;</span><br><span class="line">                    ClassLoader oldCL &#x3D; null;</span><br><span class="line">                    try &#123;</span><br><span class="line">                        oldCL &#x3D; request.getContext().bind(false, null);</span><br><span class="line">                        res.onWritePossible();&#x2F;&#x2F;这里执行浏览器响应，写入数据</span><br><span class="line">                        if (request.isFinished() &amp;&amp; req.sendAllDataReadEvent() &amp;&amp;</span><br><span class="line">                                readListener !&#x3D; null) &#123;</span><br><span class="line">                            readListener.onAllDataRead();</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125; catch (Throwable t) &#123;</span><br><span class="line">                       </span><br><span class="line">                    &#125; finally &#123;</span><br><span class="line">                        request.getContext().unbind(false, oldCL);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125; </span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            &#x2F;&#x2F;这里判断异步正在进行，说明这不是一个完成方法的回调，是一个正常异步请求，继续调用容器。</span><br><span class="line">            if (request.isAsyncDispatching()) &#123;</span><br><span class="line">                connector.getService().getContainer().getPipeline().getFirst().invoke(</span><br><span class="line">                        request, response);</span><br><span class="line">                Throwable t &#x3D; (Throwable) request.getAttribute(RequestDispatcher.ERROR_EXCEPTION);</span><br><span class="line">                if (t !&#x3D; null) &#123;</span><br><span class="line">                    asyncConImpl.setErrorState(t, true);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            &#x2F;&#x2F;注意，这里，如果超时或者出错，request.isAsync()会返回false，这里是为了尽快的输出错误给客户端。</span><br><span class="line">            if (!request.isAsync()) &#123;</span><br><span class="line">                &#x2F;&#x2F;这里也是输出逻辑</span><br><span class="line">                request.finishRequest();</span><br><span class="line">                response.finishResponse();</span><br><span class="line">            &#125;</span><br><span class="line">            &#x2F;&#x2F;销毁request和response</span><br><span class="line">            if (!success || !request.isAsync()) &#123;</span><br><span class="line">                updateWrapperErrorCount(request, response);</span><br><span class="line">                request.recycle();</span><br><span class="line">                response.recycle();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        return success;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>ctx.complete()执行最终的方法了，完成了数据的输出，最终输出到浏览器。</p>
+<p>第一次doGet请求执行完成后，Tomcat是怎么知道不用返回到客户端的呢？关键代码在CoyoteAdapter中的service方法，部分代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">postParseSuccess &#x3D; postParseRequest(req, request, res, response);</span><br><span class="line">          &#x2F;&#x2F;省略部分代码</span><br><span class="line">          if (postParseSuccess) &#123;</span><br><span class="line">              request.setAsyncSupported(</span><br><span class="line">                      connector.getService().getContainer().getPipeline().isAsyncSupported());</span><br><span class="line">              connector.getService().getContainer().getPipeline().getFirst().invoke(</span><br><span class="line">                      request, response);</span><br><span class="line">          &#125;</span><br><span class="line">          if (request.isAsync()) &#123;</span><br><span class="line">              async &#x3D; true;</span><br><span class="line">             &#125; else &#123;</span><br><span class="line">             &#x2F;&#x2F;输出数据到客户端</span><br><span class="line">              request.finishRequest();</span><br><span class="line">              response.finishResponse();</span><br><span class="line">          if (!async) &#123;</span><br><span class="line">              updateWrapperErrorCount(request, response);</span><br><span class="line">              &#x2F;&#x2F;销毁request和response</span><br><span class="line">              request.recycle();</span><br><span class="line">              response.recycle();</span><br><span class="line">          &#125;</span><br></pre></td></tr></table></figure>
+<p>调用完Servlet后，会通过request.isAsync()来判断是否是异步请求，如果是异步请求，就设置async = true。如果是非异步请求就执行输出数据到客户端逻辑，同时销毁request和response。这里就完成了请求结束后不响应客户端的操作。</p>
+<p>Spring Boot的@EnableAsync注解不是异步Servlet</p>
+<p>从业务层面来说，确实是异步编程，但是有一个问题，抛开业务的并行处理来说，针对整个请求来说，并不是异步的，也就是说不能立即释放Tomcat的线程，从而不能达到异步Servlet的效果。为什么它不是异步的。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line">@RestController</span><br><span class="line">@Slf4j</span><br><span class="line">public class TestController &#123;</span><br><span class="line">    @Autowired</span><br><span class="line">    private TestService service;</span><br><span class="line"></span><br><span class="line">    @GetMapping(&quot;&#x2F;hello&quot;)</span><br><span class="line">    public String test() &#123;</span><br><span class="line">        try &#123;</span><br><span class="line">            log.info(&quot;testAsynch Start&quot;);</span><br><span class="line">            CompletableFuture&lt;String&gt; test1 &#x3D; service.test1();</span><br><span class="line">            CompletableFuture&lt;String&gt; test2 &#x3D; service.test2();</span><br><span class="line">            CompletableFuture&lt;String&gt; test3 &#x3D; service.test3();</span><br><span class="line">            CompletableFuture.allOf(test1, test2, test3);</span><br><span class="line">            log.info(&quot;test1&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&quot; + test1.get());</span><br><span class="line">            log.info(&quot;test2&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&quot; + test2.get());</span><br><span class="line">            log.info(&quot;test3&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&quot; + test3.get());</span><br><span class="line">        &#125; catch (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125; catch (ExecutionException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        return &quot;hello&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">@Service</span><br><span class="line">public class TestService &#123;</span><br><span class="line">    @Async(&quot;asyncExecutor&quot;)</span><br><span class="line">    public CompletableFuture&lt;String&gt; test1() throws InterruptedException &#123;</span><br><span class="line">        Thread.sleep(3000L);</span><br><span class="line">        return CompletableFuture.completedFuture(&quot;test1&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Async(&quot;asyncExecutor&quot;)</span><br><span class="line">    public CompletableFuture&lt;String&gt; test2() throws InterruptedException &#123;</span><br><span class="line">        Thread.sleep(3000L);</span><br><span class="line">        return CompletableFuture.completedFuture(&quot;test2&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Async(&quot;asyncExecutor&quot;)</span><br><span class="line">    public CompletableFuture&lt;String&gt; test3() throws InterruptedException &#123;</span><br><span class="line">        Thread.sleep(3000L);</span><br><span class="line">        return CompletableFuture.completedFuture(&quot;test3&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">@SpringBootApplication</span><br><span class="line">@EnableAsync</span><br><span class="line">public class TomcatdebugApplication &#123;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        SpringApplication.run(TomcatdebugApplication.class, args);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Bean(name &#x3D; &quot;asyncExecutor&quot;)</span><br><span class="line">    public Executor asyncExecutor() &#123;</span><br><span class="line">        ThreadPoolTaskExecutor executor &#x3D; new ThreadPoolTaskExecutor();</span><br><span class="line">        executor.setCorePoolSize(3);</span><br><span class="line">        executor.setMaxPoolSize(3);</span><br><span class="line">        executor.setQueueCapacity(100);</span><br><span class="line">        executor.setThreadNamePrefix(&quot;AsynchThread-&quot;);</span><br><span class="line">        executor.initialize();</span><br><span class="line">        return executor;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>这里我请求之后，在调用容器执行业务逻辑之前打了一个断点，然后在返回之后的同样打了一个断点，在Controller执行完之后，请求才回到了CoyoteAdapter中，并且判断request.isAsync(),根据图中看到，是为false,那么接下来就会执行request.finishRequest()和response.finishResponse()<br>来执行响应的结束，并销毁请求和响应体。很有趣的事情是，我实验的时候发现，在执行request.isAsync()之前，浏览器的页面上已经出现了响应体，这是SpringBoot框架已经通过StringHttpMessageConverter类中的writeInternal方法已经进行输出了。<br>以上分析的核心逻辑就是，Tomcat的线程执行CoyoteAdapter调用容器后，必须要等到请求返回，然后再判断是否是异步请求，再处理请求，然后执行完毕后，线程才能进行回收。而我一最开始的异步Servlet例子，执行完doGet方法后，就会立即返回，也就是会直接到request.isAsync()的逻辑，然后整个线程的逻辑执行完毕，线程被回收。</p>
+
+      
+    </div>
+     <!-- 相关文章推荐 -->
+    
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/tomcat/" rel="tag"># tomcat</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/09/04/Tomcat%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-web%E8%AF%B7%E6%B1%82%E8%BF%87%E7%A8%8B/" rel="next" title="Tomcat源码分析-web请求处理过程">
+                <i class="fa fa-chevron-left"></i> Tomcat源码分析-web请求处理过程
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/12/23/Idea%20SpringBoot%E5%A4%9A%E6%A8%A1%E5%9D%97%E9%A1%B9%E7%9B%AE%E6%89%93%E5%8C%85/" rel="prev" title="Idea SpringBoot多模块项目打包">
+                Idea SpringBoot多模块项目打包 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+<span class="jiathis_txt">分享到：</span>
+<a class="jiathis_button_fav">收藏夹</a>
+<a class="jiathis_button_copy">复制网址</a>
+<a class="jiathis_button_email">邮件</a>
+<a class="jiathis_button_weixin">微信</a>
+<a class="jiathis_button_qzone">QQ空间</a>
+<a class="jiathis_button_tqq">腾讯微博</a>
+<a class="jiathis_button_douban">豆瓣</a>
+<a class="jiathis_button_share">一键分享</a>
+
+<a href="http://www.jiathis.com/share?uid=2140465" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+<a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+var jiathis_config={
+  data_track_clickback:true,
+  summary:"",
+  shortUrl:false,
+  hideMore:false
+}
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://img.huyunshun.com/img/20200522182348.png"
+                alt="初晨" />
+            
+              <p class="site-author-name" itemprop="name">初晨</p>
+              <p class="site-description motion-element" itemprop="description">永远不要说你知道本质，更别说真相了。</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">249</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">46</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+<!--近期文章版块-->
+            
+                <div class="links-of-blogroll motion-element links-of-blogroll-block">
+                  <div class="links-of-blogroll-title">
+                    <!-- modify icon to fire by szw -->
+                    <i class="fa fa-history fa-" aria-hidden="true"></i>
+                    近期文章
+                  </div>
+                  <ul class="links-of-blogroll-list">
+                    
+                    
+                      <li>
+                        <a href="/2020/05/22/WebSocket%E3%80%81Socket%E3%80%81TCP%E3%80%81HTTP%E5%8C%BA%E5%88%AB/" title="WebSocket、Socket、TCP、HTTP区别" target="_blank">WebSocket、Socket、TCP、HTTP区别</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/19/Springboot%E9%A1%B9%E7%9B%AE%E7%9A%84%E6%8E%A5%E5%8F%A3%E9%98%B2%E5%88%B7/" title="Springboot项目的接口防刷" target="_blank">Springboot项目的接口防刷</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/03/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Volatile%E5%85%B3%E9%94%AE%E5%AD%97%E5%8F%8A%E5%85%B6%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/" title="深入理解Volatile关键字及其实现原理" target="_blank">深入理解Volatile关键字及其实现原理</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/04/20/%E4%BD%BF%E7%94%A8vscode%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0%E7%8E%AF%E5%A2%83/" title="使用vscode搭建个人笔记环境" target="_blank">使用vscode搭建个人笔记环境</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/01/20/HBase%E4%BB%8B%E7%BB%8D%E5%AE%89%E8%A3%85%E4%B8%8E%E6%93%8D%E4%BD%9C/" title="HBase介绍安装与操作" target="_blank">HBase介绍安装与操作</a>
+                      </li>
+                    
+                  </ul>
+                </div>
+            
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Copyright</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

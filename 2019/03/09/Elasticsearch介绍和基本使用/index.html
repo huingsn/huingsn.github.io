@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Elasticsearch," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="ES特性官网的介绍： https:&#x2F;&#x2F;www.elastic.co&#x2F;cn&#x2F;products&#x2F;elasticsearch 速度快、易扩展、弹性、灵活、操作简单、多语言客户端、X-Pack、hadoop&#x2F;spark强强联手、开箱即用。  分布式：横向扩展非常灵活 全文检索：基于lucene的强大的全文检索能力； 近实时搜索和分析：数据进入ES，可达到近实时搜索，还可进行聚合分析 高可用：容错机制，自动">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Elasticsearch介绍和基本使用">
+<meta property="og:url" content="https://huyunshun.com/2019/03/09/Elasticsearch%E4%BB%8B%E7%BB%8D%E5%92%8C%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8/index.html">
+<meta property="og:site_name" content="简">
+<meta property="og:description" content="ES特性官网的介绍： https:&#x2F;&#x2F;www.elastic.co&#x2F;cn&#x2F;products&#x2F;elasticsearch 速度快、易扩展、弹性、灵活、操作简单、多语言客户端、X-Pack、hadoop&#x2F;spark强强联手、开箱即用。  分布式：横向扩展非常灵活 全文检索：基于lucene的强大的全文检索能力； 近实时搜索和分析：数据进入ES，可达到近实时搜索，还可进行聚合分析 高可用：容错机制，自动">
+<meta property="og:image" content="https://img.huyunshun.com/img1/Elasticsearch/123432edsfdsfimgclip_3.png">
+<meta property="og:image" content="https://img.huyunshun.com/img1/Elasticsearch/123432edsfdsfimgclip.png">
+<meta property="og:image" content="https://img.huyunshun.com/img1/Elasticsearch/123432edsfdsfimgclip_1.png">
+<meta property="og:image" content="https://img.huyunshun.com/img1/Elasticsearch/123432edsfdsfimgclip_2.png">
+<meta property="og:image" content="https://img.huyunshun.com/img1/Elasticsearch/123432edsfdsfimgclip_4.png">
+<meta property="og:image" content="https://img.huyunshun.com/img1/Elasticsearch/123432edsfdsfimgclip_5.png">
+<meta property="article:published_time" content="2019-03-08T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-05-20T10:04:24.684Z">
+<meta property="article:author" content="初晨">
+<meta property="article:tag" content="Elasticsearch">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img.huyunshun.com/img1/Elasticsearch/123432edsfdsfimgclip_3.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://huyunshun.com/2019/03/09/Elasticsearch介绍和基本使用/"/>
+
+
+
+
+
+  <title>Elasticsearch介绍和基本使用 | 简</title>
+  
+
+
+
+
+
+
+
+
+  <script type="text/javascript" src="/js/src/love.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
+
+  <!-- 看板娘 -->
+    
+        <script async src="/live2d-widget/autoload.js"></script>
+    
+ <!-- 飘动的彩带） -->
+  <script src="/js/src/piao.js" type="text/javascript"></script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">简</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">人生短暂，学海无边，而大道至简。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://huyunshun.com/2019/03/09/Elasticsearch%E4%BB%8B%E7%BB%8D%E5%92%8C%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="初晨">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://img.huyunshun.com/img/20200522182348.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="简">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Elasticsearch介绍和基本使用</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-03-09T00:00:00+08:00">
+                2019-03-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Elasticsearch/" itemprop="url" rel="index">
+                    <span itemprop="name">Elasticsearch</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="ES特性"><a href="#ES特性" class="headerlink" title="ES特性"></a>ES特性</h1><p>官网的介绍： <a href="https://www.elastic.co/cn/products/elasticsearch" target="_blank" rel="noopener">https://www.elastic.co/cn/products/elasticsearch</a></p>
+<p>速度快、易扩展、弹性、灵活、操作简单、多语言客户端、X-Pack、hadoop/spark强强联手、开箱即用。</p>
+<ul>
+<li>分布式：横向扩展非常灵活</li>
+<li>全文检索：基于lucene的强大的全文检索能力；</li>
+<li>近实时搜索和分析：数据进入ES，可达到近实时搜索，还可进行聚合分析</li>
+<li>高可用：容错机制，自动发现新的或失败的节点，重组和重新平衡数据</li>
+<li>模式自由：ES的动态mapping机制可以自动检测数据的结构和类型，创建索引并使数据可搜索。</li>
+<li>RESTful API：JSON + HTTP<h1 id="ES架构"><a href="#ES架构" class="headerlink" title="ES架构"></a>ES架构</h1><img src="https://img.huyunshun.com/img1/Elasticsearch/123432edsfdsfimgclip_3.png" alt=""></li>
+</ul>
+<p>说明:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Gateway是ES用来存储索引的文件系统，支持多种类型。</span><br><span class="line">Gateway的上层是一个分布式的lucene框架。</span><br><span class="line">Lucene之上是ES的模块，包括：索引模块、搜索模块、映射解析模块等</span><br><span class="line">ES模块之上是 Discovery、Scripting和第三方插件。Discovery是ES的节点发现模块，不同机器上的ES节点要组成集群需要进行消息通信，集群内部需要选举master节点，这些工作都是由Discovery模块完成。支持多种发现机制，如 Zen 、EC2、gce、Azure。Scripting用来支持在查询语句中插入javascript、python等脚本语言，scripting模块负责解析这些脚本，使用脚本语句性能稍低。ES也支持多种第三方插件。</span><br><span class="line">再上层是ES的传输模块和JMX.传输模块支持多种传输协议，如 Thrift、memecached、http，默认使用http。JMX是java的管理框架，用来管理ES应用。</span><br><span class="line">最上层是ES提供给用户的接口，可以通过RESTful接口和ES集群进行交互。</span><br></pre></td></tr></table></figure>
+
+<h1 id="ES应用场景"><a href="#ES应用场景" class="headerlink" title="ES应用场景"></a>ES应用场景</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">维基百科</span><br><span class="line">The Guardian（国外新闻网站）</span><br><span class="line">Stack Overflow（国外的程序异常讨论论坛）</span><br><span class="line">GitHub（开源代码管理）</span><br><span class="line">电商网站</span><br><span class="line">日志数据分析</span><br><span class="line">商品价格监控网站</span><br><span class="line">BI系统</span><br><span class="line">站内搜索</span><br></pre></td></tr></table></figure>
+<p>Elasticsearch的使用场景深入详解</p>
+<h2 id="场景—：使用Elasticsearch作为主要的后端"><a href="#场景—：使用Elasticsearch作为主要的后端" class="headerlink" title="场景—：使用Elasticsearch作为主要的后端"></a>场景—：使用Elasticsearch作为主要的后端</h2><p>传统项目中，搜索引擎是部署在成熟的数据存储的顶部，以提供快速且相关的搜索能力。这是因为早期的搜索引擎不能提供耐用的​​存储或其他经常需要的功能，如统计。</p>
+<p><img src="https://img.huyunshun.com/img1/Elasticsearch/123432edsfdsfimgclip.png" alt=""></p>
+<p>Elasticsearch是提供持久存储、统计等多项功能的现代搜索引擎。</p>
+<p>如果你开始一个新项目，考虑使用Elasticsearch作为唯一的数据存储，此种场景不支持包含频繁更新、事务（transaction）的操作。</p>
+<p>例如新建一个博客系统使用es作为存储。</p>
+<p>1）我们可以向ES提交新的博文；</p>
+<p>2）使用ES检索、搜索、统计数据。</p>
+<p>ES作为存储的优势：</p>
+<p>如果一台服务器出现故障时会发生什么？你可以通过复制 数据到不同的服务器以达到容错的目的。</p>
+<p>注意：整体架构设计时，需要我们权衡是否有必要增加额外的存储。</p>
+<h2 id="场景二：在现有系统中增加elasticsearch"><a href="#场景二：在现有系统中增加elasticsearch" class="headerlink" title="场景二：在现有系统中增加elasticsearch"></a>场景二：在现有系统中增加elasticsearch</h2><p>由于ES不能提供存储的所有功能，一些场景下需要在现有系统数据存储的基础上新增ES支持。</p>
+<p><img src="https://img.huyunshun.com/img1/Elasticsearch/123432edsfdsfimgclip_1.png" alt=""></p>
+<p>举例1：ES不支持事务、复杂的关系（至少1.X版本不支持，2.X有改善，但支持的仍然不好），如果你的系统中需要上述特征的支持，需要考虑在原有架构、原有存储的基础上的新增ES的支持。</p>
+<p>举例2：如果你已经有一个在运行的复杂的系统，你的需求之一是在现有系统中添加检索服务。一种非常冒险的方式是重构系统以支持ES。而相对安全的方式是：将ES作为新的组件添加到现有系统中。</p>
+<p>如果你使用了如下图所示的SQL数据库和ES存储，你需要找到一种方式使得两存储之间实时同步。需要根据数据的组成、数据库选择对应的同步插件。可供选择的插件包括：</p>
+<p>1）mysql、oracle选择 logstash-input-jdbc 插件。</p>
+<p>2）mongo选择 mongo-connector工具。</p>
+<p>假设你的在线零售商店的产品信息存储在SQL数据库中。 为了快速且相关的搜索，你安装Elasticsearch。</p>
+<p>为了索引数据，您需要部署一个同步机制，该同步机制可以是Elasticsearch插件或你建立一个自定义的服务。此同步机制可以将对应于每个产品的所有数据和索引都存储在Elasticsearch，每个产品作为一个document存储（相当于关系据库中的一行/row数据）。</p>
+<p>当在该网页上的搜索条件中输入“用户的类型”，店面网络应用程序通过Elasticsearch查询该信息。 Elasticsearch返回符合标准的产品documents，并根据你喜欢的方式来分类文档。 排序可以根据每个产品的被搜索次数所得到的相关分数，或任何存储在产品document信息，例如：最新最近加入的产品、平均得分，或者是那些插入或更新信息。 所以你可以只使用Elasticsearch处理搜索。这取决于同步机制来保持Elasticsearch获取最新变化。</p>
+<h2 id="场景三：使用elasticsearch和现有的工具"><a href="#场景三：使用elasticsearch和现有的工具" class="headerlink" title="场景三：使用elasticsearch和现有的工具"></a>场景三：使用elasticsearch和现有的工具</h2><p>在一些使用情况下，不必写一行代码就能通过elasticssearch完成一项工作。很多工具都可以与Elasticsearch一起工作，所以你不必到你从头开始编写。</p>
+<p>例如，假设要部署一个大规模的日志框架存储，搜索，并分析了大量的事件。</p>
+<p>如图下图，处理日志和输出到Elasticsearch，您可以使用日志记录工具，如rsyslog（<a href="http://www.rsyslog.com），Logstash（www.elastic.co/products/logstash），或Apache" target="_blank" rel="noopener">www.rsyslog.com），Logstash（www.elastic.co/products/logstash），或Apache</a> Flume（<a href="http://flume.apache.org）。" target="_blank" rel="noopener">http://flume.apache.org）。</a><br>搜索和可视化界面分析这些日志，你可以使用Kibana（<a href="http://www.elastic.co/产品/" target="_blank" rel="noopener">www.elastic.co/产品/</a> kibana）。</p>
+<p><img src="https://img.huyunshun.com/img1/Elasticsearch/123432edsfdsfimgclip_2.png" alt=""></p>
+<p>出处：<a href="http://blog.csdn.net/laoyang360/article/details/52227541" target="_blank" rel="noopener">http://blog.csdn.net/laoyang360/article/details/52227541</a></p>
+<h1 id="ES的特点"><a href="#ES的特点" class="headerlink" title="ES的特点"></a>ES的特点</h1><p>可以作为一个大型分布式集群（数百台服务器）技术，处理PB级数据，服务大公司；也可以运行在单机上，服务小公司</p>
+<p>Elasticsearch不是什么新技术，主要是将全文检索、数据分析以及分布式技术，合并在了一起</p>
+<p>对用户而言，是开箱即用的，非常简单，作为中小型的应用，直接3分钟部署一下ES</p>
+<p>Elasticsearch作为传统数据库的一个补充,比如全文检索，同义词处理，相关度排名，复杂数据分析，海量数据的近实时处理；</p>
+<h1 id="ES的核心概念"><a href="#ES的核心概念" class="headerlink" title="ES的核心概念"></a>ES的核心概念</h1><ul>
+<li>** Near Realtime（NRT）** 近实时。数据提交索引后，立马就可以搜索到。</li>
+<li>** Cluster 集群**，一个集群由一个唯一的名字标识，默认为“elasticsearch”。集群名称非常重要，具有相同集群名的节点才会组成一个集群。集群名称可以在配置文件中指定。</li>
+<li>** Node 节点**：存储集群的数据，参与集群的索引和搜索功能。像集群有名字，节点也有自己的名称，默认在启动时会以一个随机的UUID的前七个字符作为节点的名字，你可以为其指定任意的名字。通过集群名在网络中发现同伴组成集群。一个节点也可是集群。</li>
+<li>** Index 索引**: 一个索引是一个文档的集合（等同于solr中的集合）。每个索引有唯一的名字，通过这个名字来操作它。一个集群中可以有任意多个索引。</li>
+<li>** Type 类型**：指在一个索引中，可以索引不同类型的文档，如用户数据、博客数据。从6.0.0 版本起已废弃，一个索引中只存放一类数据。</li>
+<li>** Document 文档**：被索引的一条数据，索引的基本信息单元，以JSON格式来表示。</li>
+<li>** Shard 分片**：在创建一个索引时可以指定分成多少个分片来存储。每个分片本身也是一个功能完善且独立的“索引”，可以被放置在集群的任意节点上。分片的好处：</li>
+</ul>
+<p>-允许我们水平切分/扩展容量<br>-可在多个分片上进行分布式的、并行的操作，提高系统的性能和吞吐量。</p>
+<p>注意：分片数创建索引时指定，创建后不可改了。备份数可以随时改。</p>
+<p>Replication 备份: 一个分片可以有多个备份（副本）。备份的好处：高可用。一个主分片挂了，副本分片就顶上去；扩展搜索的并发能力、吞吐量。搜索可以在所有的副本上并行运行。-高并发下副本也可搜索。</p>
+<p><img src="https://img.huyunshun.com/img1/Elasticsearch/123432edsfdsfimgclip_4.png" alt=""></p>
+<h1 id="安装配置"><a href="#安装配置" class="headerlink" title="安装配置"></a>安装配置</h1><p>略</p>
+<p>注意：在linux 虚拟机上运行可能的失败问题</p>
+<ul>
+<li>内存不够用，默认es配置使用1G堆内存，如果的你学习用的虚拟机没有这么大的内存，请在config/jvm.options中调整</li>
+<li>可能会报如下的错误<br><img src="https://img.huyunshun.com/img1/Elasticsearch/123432edsfdsfimgclip_5.png" alt=""></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">问题一：max file descriptors [4096] for elasticsearch process likely too low, increase to at least [65536]</span><br><span class="line">解决：修改切换到root用户修改配置limits.conf 添加下面两行</span><br><span class="line">命令:vi &#x2F;etc&#x2F;security&#x2F;limits.conf</span><br><span class="line">* hard nofile 65536</span><br><span class="line">* soft nofile 65536</span><br><span class="line"></span><br><span class="line">问题二：max number of threads [1024] for user [lish] likely too low, increase to at least [2048]</span><br><span class="line">解决：切换到root用户，进入limits.d目录下修改配置文件。</span><br><span class="line">vi &#x2F;etc&#x2F;security&#x2F;limits.d&#x2F;90-nproc.conf</span><br><span class="line">修改如下内容：</span><br><span class="line">* soft nproc 1024</span><br><span class="line">#修改为</span><br><span class="line">* soft nproc 2048</span><br><span class="line"></span><br><span class="line">问题三：max virtual memory areas vm.max_map_count [65530] likely too low, increase to at least [262144]</span><br><span class="line">解决：切换到root用户修改配置sysctl.conf</span><br><span class="line">vi &#x2F;etc&#x2F;sysctl.conf</span><br><span class="line">添加下面配置：</span><br><span class="line">vm.max_map_count&#x3D;655360</span><br><span class="line"></span><br><span class="line">并执行命令：</span><br><span class="line">sysctl -p</span><br><span class="line"></span><br><span class="line">切换到es的用户。</span><br><span class="line">然后，重新启动elasticsearch，即可启动成功。</span><br></pre></td></tr></table></figure>
+
+<p>** 后台运行ES **<br>使用守护进程运行：./elasticsearch -d</p>
+<p>** ES 重要的配置参数 **<br>** 1、** 数据目录和日志目录，生成环境下应与软件分离</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">path:</span><br><span class="line">        logs: &#x2F;var&#x2F;.....</span><br><span class="line">        data: &#x2F;var&#x2F;data&#x2F;...</span><br></pre></td></tr></table></figure>
+<p>** 2、** 所属的集群名，默认为 elasticsearch ，可修改：cluster.name: dddd</p>
+<p>** 3、** 节点名称，默认为 UUID前7个字符，可自定义</p>
+<p>** 4、** network.host  IP绑定</p>
+<p>** 5、** http.port: 9200-9300 对外服务的http 端口， 默认 9200-9300 。可以为它指定一个值或一个区间，当为区间时会取用区间第一个可用的端口。</p>
+<p>** 6、** transport.tcp.port: 9300-9400 节点间交互的端口， 默认 9300-9400 。</p>
+<p>** 7、** Discovery Config  节点发现配置</p>
+<p>ES中默认采用的节点发现方式是  zen（基于组播（多播）、单播）。在应用于生产前有两个重要参数需配置：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">discovery.zen.ping.unicast.hosts: [&quot;host1&quot;,&quot;host2:port&quot;,&quot;host3[portX-portY]&quot;] 单播模式下，设置具有master资格的节点列表，新加入的节点向这个列表中的节点发送请求来加入集群</span><br><span class="line">discovery.zen.minimum_master_nodes: 1 这个参数控制的是，一个节点需要看到具有master资格的节点的最小数量，然后才能在集群中做操作。官方的推荐值是(N&#x2F;2)+1，其中N是具有master资格的节点的数量。</span><br></pre></td></tr></table></figure>
+<p>** 8、** Jvm heap 大小设置</p>
+<p>生产环境中一定要在jvm.options中调大它的jvm内存。</p>
+<p>** 9、** JVM heap dump path 设置</p>
+<p>生产环境中指定当发生OOM异常时，heap的dump path，好分析问题。在jvm.options中配置：</p>
+<p>-XX:HeapDumpPath=/var/lib/elasticsearch</p>
+<p>** 10、** 其他配置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">transport.tcp.compress: false</span><br><span class="line">    是否压缩tcp传输的数据，默认false</span><br><span class="line">http.cors.enabled: true</span><br><span class="line">    是否使用http协议对外提供服务，默认true</span><br><span class="line">http.max_content_length: 100mb</span><br><span class="line">    http传输内容的最大容量，默认100mb</span><br><span class="line">node.master: true   </span><br><span class="line">    指定该节点是否可以作为master节点，默认是true。ES集群默认是以第一个节点为master，如果该节点出故障就会重新选举master。</span><br><span class="line">node.data: true</span><br><span class="line">    该节点是否存索引数据，默认true。</span><br><span class="line">discover.zen.ping.timeout: 3s</span><br><span class="line">    设置集群中自动发现其他节点时ping连接超时时长，默认为3秒。在网络环境较差的情况下，增加这个值，会增加节点等待响应的时间，从一定程度上会减少误判。</span><br><span class="line">discovery.zen.ping.multicast.enabled: false</span><br><span class="line">    是否启用多播来发现节点。</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+     <!-- 相关文章推荐 -->
+    
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Elasticsearch/" rel="tag"># Elasticsearch</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/03/08/ES-Spring_JPA%E6%93%8D%E4%BD%9C/" rel="next" title="ES-Spring JPA操作">
+                <i class="fa fa-chevron-left"></i> ES-Spring JPA操作
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/03/10/Elasticsearch%E7%B4%A2%E5%BC%95%E8%AF%A6%E8%A7%A3/" rel="prev" title="Elasticsearch索引详解">
+                Elasticsearch索引详解 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+<span class="jiathis_txt">分享到：</span>
+<a class="jiathis_button_fav">收藏夹</a>
+<a class="jiathis_button_copy">复制网址</a>
+<a class="jiathis_button_email">邮件</a>
+<a class="jiathis_button_weixin">微信</a>
+<a class="jiathis_button_qzone">QQ空间</a>
+<a class="jiathis_button_tqq">腾讯微博</a>
+<a class="jiathis_button_douban">豆瓣</a>
+<a class="jiathis_button_share">一键分享</a>
+
+<a href="http://www.jiathis.com/share?uid=2140465" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+<a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+var jiathis_config={
+  data_track_clickback:true,
+  summary:"",
+  shortUrl:false,
+  hideMore:false
+}
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://img.huyunshun.com/img/20200522182348.png"
+                alt="初晨" />
+            
+              <p class="site-author-name" itemprop="name">初晨</p>
+              <p class="site-description motion-element" itemprop="description">永远不要说你知道本质，更别说真相了。</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">249</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">46</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+<!--近期文章版块-->
+            
+                <div class="links-of-blogroll motion-element links-of-blogroll-block">
+                  <div class="links-of-blogroll-title">
+                    <!-- modify icon to fire by szw -->
+                    <i class="fa fa-history fa-" aria-hidden="true"></i>
+                    近期文章
+                  </div>
+                  <ul class="links-of-blogroll-list">
+                    
+                    
+                      <li>
+                        <a href="/2020/05/22/WebSocket%E3%80%81Socket%E3%80%81TCP%E3%80%81HTTP%E5%8C%BA%E5%88%AB/" title="WebSocket、Socket、TCP、HTTP区别" target="_blank">WebSocket、Socket、TCP、HTTP区别</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/19/Springboot%E9%A1%B9%E7%9B%AE%E7%9A%84%E6%8E%A5%E5%8F%A3%E9%98%B2%E5%88%B7/" title="Springboot项目的接口防刷" target="_blank">Springboot项目的接口防刷</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/03/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Volatile%E5%85%B3%E9%94%AE%E5%AD%97%E5%8F%8A%E5%85%B6%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/" title="深入理解Volatile关键字及其实现原理" target="_blank">深入理解Volatile关键字及其实现原理</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/04/20/%E4%BD%BF%E7%94%A8vscode%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0%E7%8E%AF%E5%A2%83/" title="使用vscode搭建个人笔记环境" target="_blank">使用vscode搭建个人笔记环境</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/01/20/HBase%E4%BB%8B%E7%BB%8D%E5%AE%89%E8%A3%85%E4%B8%8E%E6%93%8D%E4%BD%9C/" title="HBase介绍安装与操作" target="_blank">HBase介绍安装与操作</a>
+                      </li>
+                    
+                  </ul>
+                </div>
+            
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#ES特性"><span class="nav-number">1.</span> <span class="nav-text">ES特性</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ES架构"><span class="nav-number">2.</span> <span class="nav-text">ES架构</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ES应用场景"><span class="nav-number">3.</span> <span class="nav-text">ES应用场景</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#场景—：使用Elasticsearch作为主要的后端"><span class="nav-number">3.1.</span> <span class="nav-text">场景—：使用Elasticsearch作为主要的后端</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#场景二：在现有系统中增加elasticsearch"><span class="nav-number">3.2.</span> <span class="nav-text">场景二：在现有系统中增加elasticsearch</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#场景三：使用elasticsearch和现有的工具"><span class="nav-number">3.3.</span> <span class="nav-text">场景三：使用elasticsearch和现有的工具</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ES的特点"><span class="nav-number">4.</span> <span class="nav-text">ES的特点</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ES的核心概念"><span class="nav-number">5.</span> <span class="nav-text">ES的核心概念</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#安装配置"><span class="nav-number">6.</span> <span class="nav-text">安装配置</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Copyright</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

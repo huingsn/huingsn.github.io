@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Elasticsearch," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="1、集群规模Elasticsearch的优点在于它是非常容易扩展。但，索引和查询时间可能因许多因素而异。在集群规模层面一方面要考虑数据量，另一方面比较重要的衡量因素是项目&#x2F;产品的指标要求。 要想达到吞吐量和CPU利用率的指标要求，建议进行一定量的测试，以确认集群承担的负载和性能瓶颈问题。 测试工具推荐：Apache Jmeter。 网上会有很多的一线互联网公司等的“他山之石”，但，方案仅供参考，需">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Elasticsearch必知（转）">
+<meta property="og:url" content="https://huyunshun.com/2019/03/03/Elasticsearch%E5%BF%85%E7%9F%A5/index.html">
+<meta property="og:site_name" content="简">
+<meta property="og:description" content="1、集群规模Elasticsearch的优点在于它是非常容易扩展。但，索引和查询时间可能因许多因素而异。在集群规模层面一方面要考虑数据量，另一方面比较重要的衡量因素是项目&#x2F;产品的指标要求。 要想达到吞吐量和CPU利用率的指标要求，建议进行一定量的测试，以确认集群承担的负载和性能瓶颈问题。 测试工具推荐：Apache Jmeter。 网上会有很多的一线互联网公司等的“他山之石”，但，方案仅供参考，需">
+<meta property="article:published_time" content="2019-03-02T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-05-20T10:04:24.669Z">
+<meta property="article:author" content="初晨">
+<meta property="article:tag" content="Elasticsearch">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://huyunshun.com/2019/03/03/Elasticsearch必知/"/>
+
+
+
+
+
+  <title>Elasticsearch必知（转） | 简</title>
+  
+
+
+
+
+
+
+
+
+  <script type="text/javascript" src="/js/src/love.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
+
+  <!-- 看板娘 -->
+    
+        <script async src="/live2d-widget/autoload.js"></script>
+    
+ <!-- 飘动的彩带） -->
+  <script src="/js/src/piao.js" type="text/javascript"></script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">简</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">人生短暂，学海无边，而大道至简。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://huyunshun.com/2019/03/03/Elasticsearch%E5%BF%85%E7%9F%A5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="初晨">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://img.huyunshun.com/img/20200522182348.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="简">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Elasticsearch必知（转）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-03-03T00:00:00+08:00">
+                2019-03-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Elasticsearch/" itemprop="url" rel="index">
+                    <span itemprop="name">Elasticsearch</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>1、集群规模<br>Elasticsearch的优点在于它是非常容易扩展。但，索引和查询时间可能因许多因素而异。在集群规模层面一方面要考虑数据量，另一方面比较重要的衡量因素是项目/产品的指标要求。</p>
+<p>要想达到吞吐量和CPU利用率的指标要求，建议进行一定量的测试，以确认集群承担的负载和性能瓶颈问题。</p>
+<p>测试工具推荐：Apache Jmeter。</p>
+<p>网上会有很多的一线互联网公司等的“他山之石”，但，方案仅供参考，需要自己结合业务场景、硬件资源进行反复测试验证。</p>
+<p>2、节点职责<br>Elasticsearch节点可以是主节点（Master），数据节点（Data），客户端/路由节点（Client）或某种组合。 大多数人大规模集群选择专用主节点（至少3个），然后选择一些数据和客户端节点。</p>
+<p>建议：职责分离，并您针对特定工作负载优化每种类型的节点的分配。</p>
+<p>例如，通过分离客户端和数据节点提升性能。 客户端节点处理传入的HTTP请求，这使得数据节点为查询提供服务。</p>
+<p>这并不是绝对的，有大量网友在社区反馈，分离客户端节点并没有提升性能，因实际场景而异，大规模数据增量的业务场景，职责分离必然是大势所趋。</p>
+<p>3、安全<br>近期，未加任何安全防护措施的Elastic安全事件频发。建议在应用程序API和Elasticsearch层之间以及Elasticsearch层和内部网络之间保护您的Elasticsearch集群。</p>
+<p>6.3+版本之后，xpack插件已经集成到Elastic产品线。（收费）</p>
+<p>加一层Nginx代理，能防止未经授权的访问。</p>
+<p>其他选型推荐：search-guard，readonlyRest等。</p>
+<p>“裸奔的风险非常大”，进阶阅读：你的Elasticsearch在裸奔吗？</p>
+<p>4、数据建模<br>4.1 使用别名<br>业务层面使用别名进行检索、聚合操作。</p>
+<p>别名的好处：<br>1）将应用和索引名称隔离；<br>2）可以方便的实现跨索引检索。</p>
+<p>4.2 数据类型选型<br>若不指定数据类型的动态映射机制，比如：字符串类型会默认存储为text和keyword两种类型，势必会增加存储成本。<br>建议：针对业务场景需求，静态的手动指定好每个字段的数据类型。</p>
+<p>考虑因素包含但不限于：<br>1）是否需要索引；<br>2）是否需要存储；<br>3）是否需要分词；<br>4）是否需要聚合；<br>5）是否需要多表关联（nested类型、join或者是宽表存储）；<br>6）是否需要快速响应（keyword和long类型选型）<br>……<br>此处的设计时间不能省。</p>
+<p>进阶阅读：干货 | 论Elasticsearch数据建模的重要性</p>
+<p>5、检索选型<br>Elasticsearch查询DSL非常庞大。如果业务场景不需要计算评分，推荐使用过滤器filter。因为基于缓存，更高效。<br>查询相关的API包含但不限于：</p>
+<p>match/multi_match</p>
+<p>match_phrase/match_phrase_prefix</p>
+<p>term/terms</p>
+<p>wildcard/regexp</p>
+<p>query_string</p>
+<p>选型前，建议通过Demo验证一下是否符合预期。</p>
+<p>了解如何编写高效查询是一回事，但让它们返回最终用户期望的结果是另一回事。</p>
+<p>业务实战中，建议花一些时间调整分析器、分词和评分，以便ES返回期望的正确的命中。</p>
+<p>6、监控和警报<br>请务必考虑一个完全独立的“监视”集群机制，该机制仅用于捕获有关群集运行状况的统计信息，并在出现问题时提醒您。</p>
+<p>监控作用：能通过可视化的方式，直观的看到内存、JVM、CPU、负载、磁盘等的使用情况，以对可能的突发情况及早做出应对方案。</p>
+<p>警报作用：异常实时预警。</p>
+<p>ES6.X xpack已经集成watcher工具。它会监视某些条件，并在满足这些条件时提醒您。</p>
+<p>举例：当某些状态（例如JVM堆）达到阈值时，您可以采取一些操作（发送电子邮件，调用Web钩子等）。</p>
+<p>如果你的业务场景是：几乎实时地将数据写入Elasticsearch并希望在数据与某些模式匹配时收到警报，则推荐使用ElastAlert。</p>
+<p><a href="https://github.com/Yelp/elastalert" target="_blank" rel="noopener">https://github.com/Yelp/elastalert</a></p>
+<p>7、节点配置和配置管理<br>一旦拥有多个节点，就每个节点在软件版本、配置等方面保持同步变得具有挑战性。</p>
+<p>有许多开源工具可以帮助解决这个问题。推荐：Chef和Ansible帮助管理Elasticsearch集群。</p>
+<p>Ansible可以自动执行升级和配置传播，而无需在任何Elasticsearch节点上安装任何其他软件。</p>
+<p>当前可能看不到对自动化的巨大需求，如果要从小规模开始发展，并且希望能够快速发展的话，一个使用Ansible编写的常见任务库可以使你在几分钟内从裸服务器转到完全配置的Elasticsearch节点，无需人工干预。</p>
+<p>增量索引的管理推荐：rollover + curator + crontab，6.6版本的新特性：Index Lifecycle Management(索引生命周期管理），推荐尝鲜使用。</p>
+<p>8、备份和恢复<br>经常被问到的问题1“ES中误删除的数据（delete或者delete_by_query）能恢复吗？”<br>——答案：如果做了备份，是可以的。如果没有，不可以。</p>
+<p>问题2：“迁移节点，直接data路径原封不动拷贝可以吗？”<br>——答案：不可以，不推荐。推荐使用reindex或其他工具实现。</p>
+<p>对于高可用性的业务系统，数据的备份功能非常重要。 由于数据的存储可能会涉及多个节点，依赖OS级文件系统备份可能会很冒险。</p>
+<p>推荐使用Elasticsearch内置的“快照”功能，可以备份您的索引。</p>
+<p>9、API选型<br>Elastic官方支持API，包含：JAVA、Java Script、.net、PHP、python、Ruby。<br>Elastic民间API（社区贡献）非常庞大：C++、Go等20多种。</p>
+<p>API选型推荐使用：官方API。</p>
+<p>原因：<br>1）版本更新及时、<br>2）新特性支持适配更新及时。</p>
+<p><a href="http://t.cn/EMUzubT" target="_blank" rel="noopener">http://t.cn/EMUzubT</a></p>
+<p><a href="http://t.cn/EMUzubH" target="_blank" rel="noopener">http://t.cn/EMUzubH</a></p>
+<p>DSL开发推荐使用的Kibana的Dev-tool，非常高效、方便。</p>
+<p>10、数据接入<br>将数据索引到Elasticsearch很容易。 根据数据源和其他因素，您可以自己编写，也可以使用Elastic中的Logstash工具。</p>
+<p>Logstash可以查看日志文件或其他输入，然后有效地将数据索引到集群中。</p>
+<p>其他大数据组件或开源项目也有类似的功能，举例：</p>
+<p>kafka-connector，flume，canal等。</p>
+<p>选型中，不一棵树上吊死，综合对比性能和稳定性，找适合自己业务场景的最为重要。</p>
+<p>小结<br>安装和运行开箱即用的Elasticsearch集群非常简单。 使其适用于你的实际业务场景并满足你的性能指标非常不容易。</p>
+<p>希望这个列表能助力你的Elastic方案选型，为选型扫清障碍。</p>
+<p>期待反馈交流心得！</p>
+<p>参考：<a href="http://t.cn/EMUZw6N" target="_blank" rel="noopener">http://t.cn/EMUZw6N</a></p>
+
+      
+    </div>
+     <!-- 相关文章推荐 -->
+    
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Elasticsearch/" rel="tag"># Elasticsearch</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/03/02/Elasticsearch_7/" rel="next" title="Elasticsearch 7介绍(转)">
+                <i class="fa fa-chevron-left"></i> Elasticsearch 7介绍(转)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/03/04/%E9%85%8D%E7%BD%AEhead%E6%8F%92%E4%BB%B6/" rel="prev" title="配置head插件">
+                配置head插件 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+<span class="jiathis_txt">分享到：</span>
+<a class="jiathis_button_fav">收藏夹</a>
+<a class="jiathis_button_copy">复制网址</a>
+<a class="jiathis_button_email">邮件</a>
+<a class="jiathis_button_weixin">微信</a>
+<a class="jiathis_button_qzone">QQ空间</a>
+<a class="jiathis_button_tqq">腾讯微博</a>
+<a class="jiathis_button_douban">豆瓣</a>
+<a class="jiathis_button_share">一键分享</a>
+
+<a href="http://www.jiathis.com/share?uid=2140465" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+<a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+var jiathis_config={
+  data_track_clickback:true,
+  summary:"",
+  shortUrl:false,
+  hideMore:false
+}
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://img.huyunshun.com/img/20200522182348.png"
+                alt="初晨" />
+            
+              <p class="site-author-name" itemprop="name">初晨</p>
+              <p class="site-description motion-element" itemprop="description">永远不要说你知道本质，更别说真相了。</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">249</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">46</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+<!--近期文章版块-->
+            
+                <div class="links-of-blogroll motion-element links-of-blogroll-block">
+                  <div class="links-of-blogroll-title">
+                    <!-- modify icon to fire by szw -->
+                    <i class="fa fa-history fa-" aria-hidden="true"></i>
+                    近期文章
+                  </div>
+                  <ul class="links-of-blogroll-list">
+                    
+                    
+                      <li>
+                        <a href="/2020/05/22/WebSocket%E3%80%81Socket%E3%80%81TCP%E3%80%81HTTP%E5%8C%BA%E5%88%AB/" title="WebSocket、Socket、TCP、HTTP区别" target="_blank">WebSocket、Socket、TCP、HTTP区别</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/19/Springboot%E9%A1%B9%E7%9B%AE%E7%9A%84%E6%8E%A5%E5%8F%A3%E9%98%B2%E5%88%B7/" title="Springboot项目的接口防刷" target="_blank">Springboot项目的接口防刷</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/05/03/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Volatile%E5%85%B3%E9%94%AE%E5%AD%97%E5%8F%8A%E5%85%B6%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/" title="深入理解Volatile关键字及其实现原理" target="_blank">深入理解Volatile关键字及其实现原理</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/04/20/%E4%BD%BF%E7%94%A8vscode%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0%E7%8E%AF%E5%A2%83/" title="使用vscode搭建个人笔记环境" target="_blank">使用vscode搭建个人笔记环境</a>
+                      </li>
+                    
+                      <li>
+                        <a href="/2020/01/20/HBase%E4%BB%8B%E7%BB%8D%E5%AE%89%E8%A3%85%E4%B8%8E%E6%93%8D%E4%BD%9C/" title="HBase介绍安装与操作" target="_blank">HBase介绍安装与操作</a>
+                      </li>
+                    
+                  </ul>
+                </div>
+            
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Copyright</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>
